@@ -1,0 +1,202 @@
+# Build output
+build/
+out/
+bin/
+lib/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+!cmake/CPM.cmake
+
+# Compiled object files
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# CMake generated
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_CPack_Packages/
+*.cbp
+
+# Visual Studio
+*.sdf
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+.vs/
+ipch/
+x64/
+x86/
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+
+# Xcode
+*.xcworkspace
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Android
+*.apk
+*.aab
+*.ap_
+local.properties
+.gradle/
+project/.gradle/
+project/android/bin/
+project/android/gen/
+project/android/obj/
+project/android_java/bin/
+project/android_java/gen/
+project/android_java/obj/
+project/android/libs/*.so
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.nfs*
+
+# CLion / JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse CDT
+.project
+.cproject
+.settings/
+
+# Logs
+*.log
+
+# Ninja
+.ninja_deps
+.ninja_log
+build.ninja
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Visual Studio additional
+*.ncb
+*.aps
+*.pdb
+*.ilk
+*.exp
+*.iobj
+*.ipdb
+*.tlog
+*.lastbuildstate
+*.pch
+*.ipch
+*.VC.db-shm
+*.VC.db-wal
+*.svclog
+*.vcxproj.user
+
+# CMake generated project files
+ALL_BUILD.vcxproj
+ALL_BUILD.vcxproj.filters
+INSTALL.vcxproj
+INSTALL.vcxproj.filters
+PACKAGE.vcxproj
+PACKAGE.vcxproj.filters
+ZERO_CHECK.vcxproj
+ZERO_CHECK.vcxproj.filters
+MinecraftPE.vcxproj
+MinecraftPE.vcxproj.filters
+MinecraftPE.sln
+CPackConfig.cmake
+CPackSourceConfig.cmake
+cpm-package-lock.cmake
+MinecraftPE.dir/
+_deps/
+
+# Test / coverage
+Testing/
+CTestResults/
+*.gcno
+*.gcda
+*.gcov
+coverage/
+lcov.info
+
+# Precompiled headers
+*.gch
+
+# Compiler / linker intermediates
+*.map
+*.res
+*.d
+
+# Patch / diff leftovers
+*.orig
+*.rej
+*.patch
+
+# Backup / temp
+*.bak
+*.swp
+*.swo
+*.tmp
+*~.nib
+
+# Tags
+tags
+TAGS
+.tags
+ctags
+
+# macOS extra
+.Spotlight-V100
+.Trashes
+.fseventsd
+Icon\r
+
+# Windows extra
+*.lnk
+[Dd]esktop.ini
+
+# User / local config
+options.txt
+local.cmake
+games/
+
+# Dependency cache
+vcpkg_installed/
+.cache/
+conan/
