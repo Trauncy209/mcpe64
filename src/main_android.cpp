@@ -14,6 +14,22 @@ static pthread_mutex_t g_activityMutex = PTHREAD_MUTEX_INITIALIZER;
 static jobject g_pActivity  = 0;
 static AppPlatform_android appPlatform;
 
+static std::string getPathString(JNIEnv* env, jobject file)
+{
+    if (!file)
+        return std::string();
+
+    jclass fileClass = env->GetObjectClass(file);
+    jmethodID fileMethod = env->GetMethodID(fileClass, "getAbsolutePath", "()Ljava/lang/String;");
+    jstring pathString = (jstring)env->CallObjectMethod(file, fileMethod);
+    const char* str = env->GetStringUTFChars(pathString, NULL);
+    std::string path(str ? str : "");
+    env->ReleaseStringUTFChars(pathString, str);
+    env->DeleteLocalRef(pathString);
+    env->DeleteLocalRef(fileClass);
+    return path;
+}
+
 static void setupExternalPath(struct android_app* state, MAIN_CLASS* app)
 {
     LOGI("setupExternalPath");
@@ -25,33 +41,58 @@ static void setupExternalPath(struct android_app* state, MAIN_CLASS* app)
     {
         LOGI("Environment exists");
     }
-    jclass clazz = env->FindClass("android/os/Environment");
-    jmethodID method = env->GetStaticMethodID(clazz, "getExternalStorageDirectory", "()Ljava/io/File;");
+
+    jclass activityClass = env->GetObjectClass(g_pActivity);
+    jmethodID getExternalFilesDir = env->GetMethodID(activityClass, "getExternalFilesDir", "(Ljava/lang/String;)Ljava/io/File;");
+    jmethodID getExternalCacheDir = env->GetMethodID(activityClass, "getExternalCacheDir", "()Ljava/io/File;");
+
+    std::string writablePath;
+    std::string cachePath;
+
+    if (getExternalFilesDir) {
+        jobject appFilesDir = env->CallObjectMethod(g_pActivity, getExternalFilesDir, NULL);
+        writablePath = getPathString(env, appFilesDir);
+        if (appFilesDir)
+            env->DeleteLocalRef(appFilesDir);
+    }
+
+    if (getExternalCacheDir) {
+        jobject appCacheDir = env->CallObjectMethod(g_pActivity, getExternalCacheDir);
+        cachePath = getPathString(env, appCacheDir);
+        if (appCacheDir)
+            env->DeleteLocalRef(appCacheDir);
+    }
+
     if (env->ExceptionOccurred()) {
         env->ExceptionDescribe();
-    }
-    jobject file = env->CallStaticObjectMethod(clazz, method);
-
-    jclass fileClass = env->GetObjectClass(file);
-    jmethodID fileMethod = env->GetMethodID(fileClass, "getAbsolutePath", "()Ljava/lang/String;");
-    jobject pathString = env->CallObjectMethod(file, fileMethod);
-
-    const char* str = env->GetStringUTFChars((jstring) pathString, NULL);
-    app->externalStoragePath = str;
-	app->externalCacheStoragePath = str;
-    LOGI("%s", str);
-
-    // ensure the process working directory is set to a writable location
-    // on Android the default cwd may be '/' which isn't writable.  By chdir'ing
-    // to the external storage path we make relative fopen calls (e.g. "options.txt")
-    // succeed and persist across launches, fixing the "options never save" bug.
-    if (chdir(str) != 0) {
-        LOGI("chdir to %s failed: %s", str, strerror(errno));
+        env->ExceptionClear();
     }
 
-    env->ReleaseStringUTFChars((jstring)pathString, str);
+    if (writablePath.empty()) {
+        jclass envClass = env->FindClass("android/os/Environment");
+        jmethodID method = env->GetStaticMethodID(envClass, "getExternalStorageDirectory", "()Ljava/io/File;");
+        jobject file = env->CallStaticObjectMethod(envClass, method);
+        writablePath = getPathString(env, file);
+        if (file)
+            env->DeleteLocalRef(file);
+        env->DeleteLocalRef(envClass);
+    }
 
-    // We're done, detach!
+    if (cachePath.empty())
+        cachePath = writablePath;
+
+    app->externalStoragePath = writablePath;
+    app->externalCacheStoragePath = cachePath;
+    LOGI("storage path=%s", writablePath.c_str());
+    LOGI("cache path=%s", cachePath.c_str());
+
+    if (!writablePath.empty() && chdir(writablePath.c_str()) != 0) {
+        LOGI("chdir to %s failed: %s", writablePath.c_str(), strerror(errno));
+    }
+
+    env->DeleteLocalRef(activityClass);
+
+    // We are done, detach!
     state->activity->vm->DetachCurrentThread();
 }
 
