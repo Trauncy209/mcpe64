@@ -41,6 +41,7 @@ LOCAL_SRC_FILES := ../../../src/main.cpp \
 ../../../src/client/gui/components/ScrollingPane.cpp \
 ../../../src/client/gui/components/Slider.cpp \
 ../../../src/client/gui/components/SmallButton.cpp \
+../../../src/client/gui/components/TextBox.cpp \
 ../../../src/client/gui/Font.cpp \
 ../../../src/client/gui/Gui.cpp \
 ../../../src/client/gui/GuiComponent.cpp \
@@ -261,11 +262,11 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../src
 #LOCAL_CFLAGS := -DGLDEBUG $(LOCAL_CFLAGS)
 
 LOCAL_LDLIBS    := -llog -landroid -lEGL -lGLESv1_CM -lOpenSLES
-LOCAL_STATIC_LIBRARIES := android_native_app_glue RakNet
+LOCAL_STATIC_LIBRARIES := RakNet
 
 #LOCAL_CPP_FEATURES := exceptions
 
-TARGET_ARCH_ABI := armeabi-v7a
+TARGET_ARCH_ABI := arm64-v8a
 
 include $(BUILD_SHARED_LIBRARY)
 

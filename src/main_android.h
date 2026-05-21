@@ -25,7 +25,7 @@
 #include "platform/input/Mouse.h"
 #include "platform/input/Multitouch.h"
 
-#include "EGLConfigPrinter.h"
+#include "EglConfigPrinter.h"
 
 const int BroadcastPort = 9991;
 
@@ -93,7 +93,7 @@ engine_init_display( struct ENGINE* engine )
     }
 
     eglInitialize( display, 0, 0 );
-    //EGLConfigPrinter::printAllConfigs(display);
+    //EglConfigPrinter::printAllConfigs(display);
     LOGI("3) Choose config\n");
 
     /* Here, the application chooses the configuration it desires. In this
