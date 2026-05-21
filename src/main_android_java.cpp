@@ -45,9 +45,13 @@ static void setupExternalPath(JNIEnv* env, MAIN_CLASS* app)
     jclass activityClass = env->GetObjectClass(g_pActivity);
     jmethodID getExternalFilesDir = env->GetMethodID(activityClass, "getExternalFilesDir", "(Ljava/lang/String;)Ljava/io/File;");
     jmethodID getExternalCacheDir = env->GetMethodID(activityClass, "getExternalCacheDir", "()Ljava/io/File;");
+    jmethodID getFilesDir = env->GetMethodID(activityClass, "getFilesDir", "()Ljava/io/File;");
+    jmethodID getCacheDir = env->GetMethodID(activityClass, "getCacheDir", "()Ljava/io/File;");
 
     std::string writablePath;
     std::string cachePath;
+    std::string internalFilesPath;
+    std::string internalCachePath;
 
     if (getExternalFilesDir) {
         jobject appFilesDir = env->CallObjectMethod(g_pActivity, getExternalFilesDir, NULL);
@@ -59,6 +63,20 @@ static void setupExternalPath(JNIEnv* env, MAIN_CLASS* app)
     if (getExternalCacheDir) {
         jobject appCacheDir = env->CallObjectMethod(g_pActivity, getExternalCacheDir);
         cachePath = getPathString(env, appCacheDir);
+        if (appCacheDir)
+            env->DeleteLocalRef(appCacheDir);
+    }
+
+    if (getFilesDir) {
+        jobject appFilesDir = env->CallObjectMethod(g_pActivity, getFilesDir);
+        internalFilesPath = getPathString(env, appFilesDir);
+        if (appFilesDir)
+            env->DeleteLocalRef(appFilesDir);
+    }
+
+    if (getCacheDir) {
+        jobject appCacheDir = env->CallObjectMethod(g_pActivity, getCacheDir);
+        internalCachePath = getPathString(env, appCacheDir);
         if (appCacheDir)
             env->DeleteLocalRef(appCacheDir);
     }
@@ -81,13 +99,24 @@ static void setupExternalPath(JNIEnv* env, MAIN_CLASS* app)
     if (cachePath.empty())
         cachePath = writablePath;
 
+
+    if (writablePath.empty())
+        writablePath = internalFilesPath;
+    if (cachePath.empty())
+        cachePath = internalCachePath;
+
     app->externalStoragePath = writablePath;
     app->externalCacheStoragePath = cachePath;
-    LOGI("storage path=%s", writablePath.c_str());
-    LOGI("cache path=%s", cachePath.c_str());
 
     if (!writablePath.empty() && chdir(writablePath.c_str()) != 0) {
         LOGI("chdir to %s failed: %s", writablePath.c_str(), strerror(errno));
+        if (!internalFilesPath.empty() && writablePath != internalFilesPath) {
+            writablePath = internalFilesPath;
+            app->externalStoragePath = writablePath;
+            if (chdir(writablePath.c_str()) != 0) {
+                LOGI("fallback chdir to %s failed: %s", writablePath.c_str(), strerror(errno));
+            }
+        }
     }
 
     env->DeleteLocalRef(activityClass);

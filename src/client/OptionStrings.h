@@ -8,6 +8,11 @@ public:
     
     static const char* Graphics_Fancy;
     static const char* Graphics_LowQuality;
+    static const char* Graphics_RenderDistance;
+    static const char* Graphics_ViewBobbing;
+    static const char* Graphics_Anaglyph;
+    static const char* Graphics_LimitFramerate;
+    static const char* Graphics_AmbientOcclusion;
     static const char* Graphics_GUIScale;
 	static const char* Graphics_Vsync;
     static const char* Controls_Sensitivity;
@@ -18,6 +23,10 @@ public:
     static const char* Controls_FeedbackVibration;
 
 	static const char* Game_DifficultyLevel;
+	static const char* Game_ThirdPerson;
+	static const char* Game_HideGui;
+	static const char* Audio_Music;
+	static const char* Audio_Sound;
 };
 
 #endif /*NET_MINECRAFT_CLIENT__OptionsStrings_H__*/

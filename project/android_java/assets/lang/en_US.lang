@@ -945,3 +945,17 @@ desc.moss_stone=Can be used for construction and decoration.
 desc.stonebricksmooth=Used as building material.
 desc.netherreactor=Core of the Nether Reactor
 desc.glowingobsidian=Obsidion activated by external source.
+
+options.group.game=Game
+options.group.controls=Controls
+options.group.graphics=Graphics
+options.group.audio=Audio
+options.thirdperson=Third Person View
+options.hidegui=Hide HUD
+options.servervisible=Server Visible
+options.lefthanded=Left-Handed Controls
+options.usetouchscreen=Touchscreen Mode
+options.usetouchpad=Touch Joypad
+options.destroyvibration=Vibration
+options.vsync=VSync
+options.limitFramerate=Limit Framerate

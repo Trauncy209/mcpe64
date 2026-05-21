@@ -70,8 +70,12 @@ void OptionsGroup::createProgressSlider( const Options::Option* option, Minecraf
 void OptionsGroup::createStepSlider( const Options::Option* option, Minecraft* minecraft ) {
 	// integer-valued option; use step slider
 	std::vector<int> steps;
-	// render distance was removed; fall through to other cases
-	if(option == &Options::Option::DIFFICULTY) {
+	if(option == &Options::Option::RENDER_DISTANCE) {
+		steps.push_back(0);
+		steps.push_back(1);
+		steps.push_back(2);
+		steps.push_back(3);
+	} else if(option == &Options::Option::DIFFICULTY) {
 		steps.push_back(0);
 		steps.push_back(1);
 		steps.push_back(2);

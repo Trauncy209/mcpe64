@@ -13,9 +13,10 @@ class OptionsScreen: public Screen
 
 	void init();
 	void generateOptionScreens();
+	void closeScreen();
 
 public:
-	OptionsScreen();
+	explicit OptionsScreen(bool returnToPause = false);
 	~OptionsScreen();
 
 	void setupPositions();
@@ -23,6 +24,8 @@ public:
 	void render(int xm, int ym, float a);
 	void removed();
 	void selectCategory(int index);
+	virtual void keyPressed(int eventKey);
+	virtual bool handleBackEvent(bool isDown);
 
 	virtual void mouseClicked(int x, int y, int buttonNum);
 	virtual void mouseReleased(int x, int y, int buttonNum);
@@ -33,7 +36,7 @@ private:
 	ImageButton* btnClose;
 
 	Button* btnChangeUsername;
-	Button* btnCredits;   // <-- ADD THIS
+	Button* btnCredits;
 
 	std::vector<Touch::TButton*> categoryButtons;
 	std::vector<OptionsPane*> optionPanes;
@@ -41,6 +44,8 @@ private:
 	OptionsPane* currentOptionPane;
 
 	int selectedCategory;
+	bool returnToPause;
+	bool showProfileButtons;
 };
 
 #endif /*NET_MINECRAFT_CLIENT_GUI_SCREENS__OptionsScreen_H__*/

@@ -31,6 +31,7 @@ private:
 
 	Button* bContinue;
 	Button* bQuit;
+	Button* bOptions;
 	Button* bQuitAndSaveLocally;
 	Button* bServerVisibility;
 //	Button* bThirdPerson;

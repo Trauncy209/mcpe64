@@ -214,6 +214,8 @@ public:
 			difficulty = value;
 		} else if(item == &Option::GUI_SCALE) {
 			guiScale = value % 5;
+		} else if(item == &Option::RENDER_DISTANCE) {
+			viewDistance = value & 3;
 		}
 		notifyOptionUpdate(item, value);
 		save();
@@ -253,6 +255,7 @@ public:
 	int getIntValue(const Option* item) {
 		if(item == &Option::DIFFICULTY) return difficulty;
 		if(item == &Option::GUI_SCALE) return guiScale;
+		if(item == &Option::RENDER_DISTANCE) return viewDistance;
 		return 0;
 	}
 
@@ -261,12 +264,15 @@ public:
         if (item == &Option::SOUND) return sound;
         if (item == &Option::SENSITIVITY) return sensitivity;
 		if (item == &Option::PIXELS_PER_MILLIMETER) return pixelsPerMillimeter;
+		if (item == &Option::RENDER_DISTANCE) return viewDistance;
         return 0;
     }
 
     bool getBooleanValue(const Option* item) {
         if (item == &Option::INVERT_MOUSE)
             return invertYMouse;
+        if (item == &Option::GRAPHICS)
+            return fancyGraphics;
         if (item == &Option::VIEW_BOBBING)
             return bobView;
         if (item == &Option::ANAGLYPH)

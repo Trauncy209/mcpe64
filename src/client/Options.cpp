@@ -135,7 +135,7 @@ const Options::Option
 	Options::Option::ANAGLYPH			 (6, "options.anaglyph",		false, true),
 	Options::Option::LIMIT_FRAMERATE	 (7, "options.limitFramerate",false, true),
 	Options::Option::DIFFICULTY			 (8, "options.difficulty",	false, false),
-	Options::Option::GRAPHICS			 (9, "options.graphics",		false, false),
+	Options::Option::GRAPHICS			 (9, "options.graphics",		false, true),
 	Options::Option::AMBIENT_OCCLUSION	 (10, "options.ao",		false, true),
 	Options::Option::GUI_SCALE			 (11, "options.guiScale",	false, false),
 	Options::Option::THIRD_PERSON		 (12, "options.thirdperson",	false, true),
@@ -239,13 +239,33 @@ void Options::update()
 			}
 		}
 		// Graphics extras
+		if (key == OptionStrings::Graphics_RenderDistance) {
+			int v;
+			if (readInt(value, v)) viewDistance = v & 3;
+		}
+		if (key == OptionStrings::Graphics_ViewBobbing)
+			readBool(value, bobView);
+		if (key == OptionStrings::Graphics_Anaglyph)
+			readBool(value, anaglyph3d);
+		if (key == OptionStrings::Graphics_LimitFramerate)
+			readBool(value, limitFramerate);
+		if (key == OptionStrings::Graphics_AmbientOcclusion)
+			readBool(value, ambientOcclusion);
 		if (key == OptionStrings::Graphics_Vsync)
 			readBool(value, vsync);
 		if (key == OptionStrings::Graphics_GUIScale) {
 			int v;
 			if (readInt(value, v)) guiScale = v % 5;
 		}
+		if (key == OptionStrings::Audio_Music)
+			readFloat(value, music);
+		if (key == OptionStrings::Audio_Sound)
+			readFloat(value, sound);
 		// Game
+		if (key == OptionStrings::Game_ThirdPerson)
+			readBool(value, thirdPersonView);
+		if (key == OptionStrings::Game_HideGui)
+			readBool(value, hideGui);
 		if (key == OptionStrings::Game_DifficultyLevel) {
 			readInt(value, difficulty);
 			// Only support peaceful and normal right now
@@ -309,6 +329,8 @@ void Options::save()
 	// Game
 	addOptionToSaveOutput(stringVec, OptionStrings::Multiplayer_ServerVisible, serverVisible);
 	addOptionToSaveOutput(stringVec, OptionStrings::Game_DifficultyLevel, difficulty);
+	addOptionToSaveOutput(stringVec, OptionStrings::Game_ThirdPerson, thirdPersonView);
+	addOptionToSaveOutput(stringVec, OptionStrings::Game_HideGui, hideGui);
 
 	// Input
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_InvertMouse, invertYMouse);
@@ -317,8 +339,16 @@ void Options::save()
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchScreen, useTouchScreen);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchJoypad, isJoyTouchArea);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_FeedbackVibration, destroyVibration);
+	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_Fancy, fancyGraphics);
+	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_RenderDistance, viewDistance);
+	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_ViewBobbing, bobView);
+	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_Anaglyph, anaglyph3d);
+	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_LimitFramerate, limitFramerate);
+	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_AmbientOcclusion, ambientOcclusion);
 	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_Vsync, vsync);
 	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_GUIScale, guiScale);
+	addOptionToSaveOutput(stringVec, OptionStrings::Audio_Music, music);
+	addOptionToSaveOutput(stringVec, OptionStrings::Audio_Sound, sound);
 // 
 // 	static const Option MUSIC;
 // 	static const Option SOUND;

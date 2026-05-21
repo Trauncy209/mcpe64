@@ -974,3 +974,5 @@ desc.quartzblock=Decorative block, used to create other kinds of Quartz blocks.
 desc.stonecutter=For crafting stoneblocks.
 desc.seedsmelon=Allows for more melons.
 desc.tile.melon=Can be cut up and eaten.
+options.group.audio=Audio
+options.thirdperson=Third Person View
