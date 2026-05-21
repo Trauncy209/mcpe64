@@ -669,6 +669,7 @@ class GLView extends GLSurfaceView {
         super(context);
         _activity = activity;
         _renderer = new GLRenderer(activity);
+        setEGLContextClientVersion(1);
         
     }
 

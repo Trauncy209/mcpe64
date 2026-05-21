@@ -380,30 +380,30 @@ void Tesselator::draw()
 		if (++vboId >= vboCounts)
 			vboId = 0;
 
-		int bufferId = vboIds[vboId];
-		
-		int access = GL_DYNAMIC_DRAW;//(accessMode==ACCESS_DYNAMIC) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
-		int bytes = p * sizeof(VERTEX);
-		glBindBuffer2(GL_ARRAY_BUFFER, bufferId);
-		glBufferData2(GL_ARRAY_BUFFER, bytes, _varray, access); // GL_STREAM_DRAW
+			int bufferId = vboIds[vboId];
+			
+			int access = GL_DYNAMIC_DRAW;//(accessMode==ACCESS_DYNAMIC) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
+			int bytes = p * sizeof(VERTEX);
+			(void)bufferId;
+			(void)access;
+			(void)bytes;
+			// Immediate/UI draws are more reliable on Android with client-side arrays.
+			glBindBuffer2(GL_ARRAY_BUFFER, 0);
 
-		if (hasTexture) {
-			glTexCoordPointer2(2, GL_FLOAT, VertexSizeBytes, (GLvoid*) (3 * 4));
-			//glTexCoordPointer2(2, GL_FLOAT, VertexSizeBytes, (GLvoid*) &_varray->u);
-			glEnableClientState2(GL_TEXTURE_COORD_ARRAY);
-		}
-		if (hasColor) {
-			glColorPointer2(4, GL_UNSIGNED_BYTE, VertexSizeBytes, (GLvoid*) (5 * 4));
-			//glColorPointer2(4, GL_UNSIGNED_BYTE, VertexSizeBytes, (GLvoid*) &_varray->color);
-			glEnableClientState2(GL_COLOR_ARRAY);
-		}
-		//if (hasNormal) {
-		//	glNormalPointer(GL_BYTE, VertexSizeBytes, (GLvoid*) (6 * 4));
-		//	glEnableClientState2(GL_NORMAL_ARRAY);
-		//}
-		//glVertexPointer2(3, GL_FLOAT, VertexSizeBytes, (GLvoid*)&_varray);
-		glVertexPointer2(3, GL_FLOAT, VertexSizeBytes, 0);
-		glEnableClientState2(GL_VERTEX_ARRAY);
+			if (hasTexture) {
+				glTexCoordPointer2(2, GL_FLOAT, VertexSizeBytes, (GLvoid*) &_varray[0].u);
+				glEnableClientState2(GL_TEXTURE_COORD_ARRAY);
+			}
+			if (hasColor) {
+				glColorPointer2(4, GL_UNSIGNED_BYTE, VertexSizeBytes, (GLvoid*) &_varray[0].color);
+				glEnableClientState2(GL_COLOR_ARRAY);
+			}
+			//if (hasNormal) {
+			//	glNormalPointer(GL_BYTE, VertexSizeBytes, (GLvoid*) &_varray[0].normal);
+			//	glEnableClientState2(GL_NORMAL_ARRAY);
+			//}
+			glVertexPointer2(3, GL_FLOAT, VertexSizeBytes, (GLvoid*) &_varray[0].x);
+			glEnableClientState2(GL_VERTEX_ARRAY);
 
 		if (mode == GL_QUADS) {
 			glDrawArrays2(GL_TRIANGLES, 0, vertices);
