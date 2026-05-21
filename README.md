@@ -1,47 +1,95 @@
 # mcpe64
 
-> [!WARNING]  
-> This repository has been merged with the original repository and is **no longer actively maintained**.  
-> Future work will continue on the original repo: https://gitea.sffempire.ru/Kolyah35/minecraft-pe-0.6.1  
-> Join the Discord server for updates and support: https://discord.gg/ryZ884DWJf
+A community-driven restoration and improvement project for **Minecraft Pocket Edition 0.6.1 alpha**.
 
-Source code for **Minecraft Pocket Edition 0.6.1 alpha** with various fixes and improvements.
+Our goal is simple: **remake Minecraft PE 0.6.1 the best way possible** while preserving the original feel that made early Pocket Edition special.
 
-This project builds upon the original repository by Kolyah35 and aims to preserve and improve this early version of Minecraft PE.
+We want this repository to be a place where:
+- **players** can help test, report issues, and shape the experience
+- **developers** can improve performance, controls, rendering, multiplayer, UI, and platform support
+- **fans of classic Minecraft PE** can help preserve an important piece of Minecraft history
 
-I've done some bad and pointless changes to the code so if someone could improve my horrible debugging skills I'd be very happy.
+> Players and developers are both welcome here.
+> If you care about classic MCPE, you are part of the mission.
 
-## Roadmap
-- [x] Fix fog
-- [x] Fix sound
-- [x] Add sprinting
-- [x] Chat (semi working) and commands
-- [x] Implementing options 
-- [ ] Controller support
-- [ ] Minecraft server hosting
-- [x] Android build support
-    - [x] Touch control improvements
-    - [ ] Screen fixes
-- [x] Better F3
-- [ ] Performance optimalizations
+## Mission
+This project exists to:
+- preserve the original **0.6.1 alpha** experience
+- make it run well on modern hardware
+- improve controls and usability without losing the old-school feel
+- restore unfinished or broken features where it makes sense
+- build an open community around classic Minecraft PE modding and restoration
+
+## Project Priorities
+Current focus areas include:
+- Android compatibility and packaging
+- save reliability on modern devices
+- options/menu improvements
+- controller and non-touch input support
+- multiplayer/LAN stability
+- rendering fixes and performance
+- screen/UI cleanup for newer phones
+
+## Current Status
+This repo already includes work on:
+- Android build support
+- touch control improvements
+- fog fixes
+- sound fixes
+- better debug/F3 information
+- sprinting
+- chat/commands work in progress
+- options/menu work in progress
+
+Still actively being improved:
+- controller support
+- server hosting and multiplayer polish
+- performance optimization
+- screen/layout fixes
+- modern Android compatibility
+
+## Contributing
+We welcome contributions from both experienced developers and first-time contributors.
+
+If you want to help:
+1. open an issue for bugs, ideas, or feature requests
+2. fork the repo and make focused changes
+3. submit a pull request with a clear description
+4. include screenshots, logs, or testing notes when relevant
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+
+## Community
+A dedicated community space is planned soon.
+
+For now, this repository is the home base for:
+- development progress
+- bug reports
+- feature planning
+- testing coordination
+
+When the Discord is ready, it can be added here as the main live community hub.
 
 ## How to Build
 ### Android
-Download r14b Android NDK and run `build.ps1`:
-```
+Download Android NDK r14b and run `build.ps1`:
+
+```powershell
 # Full build (NDK + Java + APK + install)
 C:\apkbuild\build.ps1
 
 # Skip NDK recompile (Java/assets changed only)
 C:\apkbuild\build.ps1 -NoJava
 
-# Skip Java recompile (C++ changed only)  
+# Skip Java recompile (C++ changed only)
 C:\apkbuild\build.ps1 -NoCpp
 
 # Only repackage + install (no recompile at all)
 C:\apkbuild\build.ps1 -NoBuild
 ```
 
-## Credits
-Original repository:  
-https://gitea.sffempire.ru/Kolyah35/minecraft-pe-0.6.1
+## Upstream / Credits
+This project builds on the original restoration work here:
+- https://gitea.sffempire.ru/Kolyah35/minecraft-pe-0.6.1
+
+Thanks to everyone helping preserve and improve classic Minecraft PE.
