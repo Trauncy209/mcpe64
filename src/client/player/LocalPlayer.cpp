@@ -95,7 +95,7 @@ void LocalPlayer::calculateFlight(float xa, float ya, float za) {
 }
 
 bool LocalPlayer::isSolidTile(int x, int y, int z) {
-	if (!level->hasChunkAtNow(x, y, z))
+	if (level->isClientSide && !level->hasChunkAtNow(x, y, z))
 		return false;
 	int tileId = level->getTile(x, y, z);
 	return tileId > 0 && Tile::tiles[tileId]->material->isSolid();
@@ -296,9 +296,14 @@ void LocalPlayer::move(float xa, float ya, float za) {
 				float dist = Mth::sqrt(xa * xa + za * za);
 				const int xx = Mth::floor(x + xa / dist);
 				const int zz = Mth::floor(z + za / dist);
-				if (level->hasChunkAtNow(xx, (int)(y-1), zz)
-					&& level->hasChunkAtNow(xx, (int)y, zz)
-					&& level->hasChunkAtNow(xx, (int)(y+1), zz)) {
+				const bool areaReady = level->isClientSide
+					? (level->hasChunkAtNow(xx, (int)(y-1), zz)
+						&& level->hasChunkAtNow(xx, (int)y, zz)
+						&& level->hasChunkAtNow(xx, (int)(y+1), zz))
+					: (level->hasChunkAt(xx, (int)(y-1), zz)
+						&& level->hasChunkAt(xx, (int)y, zz)
+						&& level->hasChunkAt(xx, (int)(y+1), zz));
+				if (areaReady) {
 					const int tileId = level->getTile(xx, (int)(y-1), zz);
 					jump = (isSolidTile(xx, (int)(y-1), zz) // Solid block to jump up on
 						&& !isSolidTile(xx, (int)y, zz) && !isSolidTile(xx, (int)(y+1), zz)) // Enough space

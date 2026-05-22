@@ -130,7 +130,8 @@ bool Level::checkAndHandleWater(const AABB& box, const Material* material, Entit
     int z0 = Mth::floor(box.z0);
     int z1 = Mth::floor(box.z1 + 1);
 
-    if (!hasChunksAtNow(x0, y0, z0, x1, y1, z1)) {
+    if (!(isClientSide ? hasChunksAtNow(x0, y0, z0, x1, y1, z1)
+                      : hasChunksAt(x0, y0, z0, x1, y1, z1))) {
         return false;
     }
 
@@ -139,7 +140,7 @@ bool Level::checkAndHandleWater(const AABB& box, const Material* material, Entit
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
-                if (!hasChunkAtNow(x, y, z)) continue;
+                if (isClientSide && !hasChunkAtNow(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material == material) {
                     float yt0 = y + 1 - LiquidTile::getHeight(getData(x, y, z));
@@ -1175,7 +1176,8 @@ std::vector<AABB>& Level::getCubes(const Entity* source, const AABB& box_) { //@
 
     for (int x = x0; x < x1; x++)
         for (int z = z0; z < z1; z++) {
-            if (hasChunkAtNow(x, Level::DEPTH / 2, z)) {
+            if (isClientSide ? hasChunkAtNow(x, Level::DEPTH / 2, z)
+                             : hasChunkAt(x, Level::DEPTH / 2, z)) {
                 for (int y = y0 - 1; y < y1; y++) {
                     Tile* tile = Tile::tiles[getTile(x, y, z)];
                     if (tile != NULL) {
@@ -1641,7 +1643,8 @@ bool Level::containsFireTile(const AABB& box) {
     int z0 = Mth::floor(box.z0);
     int z1 = Mth::floor(box.z1 + 1);
 
-    if (hasChunksAtNow(x0, y0, z0, x1, y1, z1)) {
+    if (isClientSide ? hasChunksAtNow(x0, y0, z0, x1, y1, z1)
+                     : hasChunksAt(x0, y0, z0, x1, y1, z1)) {
         for (int x = x0; x < x1; x++)
             for (int y = y0; y < y1; y++)
                 for (int z = z0; z < z1; z++) {

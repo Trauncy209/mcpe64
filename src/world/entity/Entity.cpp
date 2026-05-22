@@ -302,9 +302,11 @@ void Entity::move(float xa, float ya, float za) {
         int yt = Mth::floor(y - 0.2f - this->heightOffset);
         int zt = Mth::floor(z);
 
-        int t = level->hasChunkAtNow(xt, yt, zt) ? level->getTile(xt, yt, zt) : 0;
+        const bool tileReady = level->isClientSide ? level->hasChunkAtNow(xt, yt, zt) : level->hasChunkAt(xt, yt, zt);
+        int t = tileReady ? level->getTile(xt, yt, zt) : 0;
         if (t == 0) {
-            int under = level->hasChunkAtNow(xt, yt - 1, zt) ? level->getTile(xt, yt-1, zt) : 0;
+            const bool underReady = level->isClientSide ? level->hasChunkAtNow(xt, yt - 1, zt) : level->hasChunkAt(xt, yt - 1, zt);
+            int under = underReady ? level->getTile(xt, yt-1, zt) : 0;
             if (Tile::fence->id == under || Tile::fenceGate->id == under) {
                 t = under;
             }
@@ -324,7 +326,8 @@ void Entity::move(float xa, float ya, float za) {
     int y1 = Mth::floor(bb.y1);
     int z1 = Mth::floor(bb.z1);
 
-    if (level->hasChunksAtNow(x0, y0, z0, x1, y1, z1)) {
+    if ((level->isClientSide ? level->hasChunksAtNow(x0, y0, z0, x1, y1, z1)
+                               : level->hasChunksAt(x0, y0, z0, x1, y1, z1))) {
         for (int x = x0; x <= x1; x++)
             for (int y = y0; y <= y1; y++)
                 for (int z = z0; z <= z1; z++) {
@@ -369,7 +372,7 @@ bool Entity::isUnderLiquid(const Material* material) {
     int xt = Mth::floor(x);
     int yt = Mth::floor((float)Mth::floor(yp));
     int zt = Mth::floor(z);
-    if (!level->hasChunkAtNow(xt, yt, zt))
+    if (!(level->isClientSide ? level->hasChunkAtNow(xt, yt, zt) : level->hasChunkAt(xt, yt, zt)))
         return false;
     int t = level->getTile(xt, yt, zt);
     if (t != 0 && Tile::tiles[t]->material == material) {
