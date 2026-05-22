@@ -249,7 +249,7 @@ void StartMenuScreen::render( int xm, int ym, float a )
 		glColor4f2(1, 1, 1, 1);
 		if (Textures::isTextureIdValid(minecraft->textures->loadAndBindTexture("gui/logo/github.png")))
 			blit(2, height - 10, 0, 0, 8, 8, 256, 256);
-		drawString(font, "Kolyah35/minecraft-pe-0.6.1", 12, height - 10, 0xffcccccc);
+		drawString(font, "Trauncy209/mcpe64", 12, height - 10, 0xffcccccc);
 		//patch->draw(t, 0, 20);
 	}
 	Screen::render(xm, ym, a);
@@ -275,11 +275,11 @@ void StartMenuScreen::_updateLicense()
 
 void StartMenuScreen::mouseClicked(int x, int y, int buttonNum) {
 	const int logoX = 2;
-	const int logoW = 8 + 2 + font->width("Kolyah35/minecraft-pe-0.6.1");
+	const int logoW = 8 + 2 + font->width("Trauncy209/mcpe64");
 	const int logoY = height - 10;
 	const int logoH = 10;
 	if (x >= logoX && x <= logoX + logoW && y >= logoY && y <= logoY + logoH)
-		minecraft->platform()->openURL("https://gitea.sffempire.ru/Kolyah35/minecraft-pe-0.6.1");
+		minecraft->platform()->openURL("https://gitea.sffempire.ru/Trauncy209/mcpe64");
 	else
 		Screen::mouseClicked(x, y, buttonNum);
 }

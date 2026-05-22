@@ -233,14 +233,13 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
     random.setSeed(((xt * xScale) + (zt * zScale)) ^ level->getSeed());
 
 	// //@todo: hide those chunks if they are aren't visible
-//    if (random.nextInt(4) == 0) {
-//        int x = xo + random.nextInt(16) + 8;
-//        int y = random.nextInt(128);
-//        int z = zo + random.nextInt(16) + 8;
-//        LakeFeature feature(Tile::calmWater->id);
-//		feature.place(level, &random, x, y, z);
-//        LOGI("Adding underground lake @ (%d,%d,%d)\n", x, y, z);
-//    }
+    if (random.nextInt(4) == 0) {
+        int x = xo + random.nextInt(16) + 8;
+        int y = random.nextInt(128);
+        int z = zo + random.nextInt(16) + 8;
+        LakeFeature feature(Tile::calmWater->id);
+		feature.place(level, &random, x, y, z);
+    }
 
 	////@todo: hide those chunks if they are aren't visible
  //   if (random.nextInt(8) == 0) {
@@ -504,7 +503,8 @@ LevelChunk* RandomLevelSource::getChunk(int xOffs, int zOffs) {
     prepareHeights(xOffs, zOffs, blocks, 0, temperatures);//biomes, temperatures);
     buildSurfaces(xOffs, zOffs, blocks, biomes);
 
-	//caveFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
+	caveFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
+	canyonFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
     levelChunk->recalcHeightmap();
 
     return levelChunk;
@@ -716,7 +716,6 @@ LevelChunk* PerformanceTestChunkSource::create(int x, int z)
 
 	LevelChunk* levelChunk = new LevelChunk(level, blocks, x, z);
 
-	//caveFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
 	levelChunk->recalcHeightmap();
 
 	return levelChunk;

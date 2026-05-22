@@ -71,10 +71,13 @@ void OptionsGroup::createStepSlider( const Options::Option* option, Minecraft* m
 	// integer-valued option; use step slider
 	std::vector<int> steps;
 	if(option == &Options::Option::RENDER_DISTANCE) {
-		steps.push_back(0);
-		steps.push_back(1);
-		steps.push_back(2);
+		// Internal values are reversed: 0=Far, 1=Normal, 2=Short, 3=Tiny.
+		// Present them left-to-right as Tiny -> Short -> Normal -> Far so
+		// sliding right increases render distance like the rest of the UI.
 		steps.push_back(3);
+		steps.push_back(2);
+		steps.push_back(1);
+		steps.push_back(0);
 	} else if(option == &Options::Option::DIFFICULTY) {
 		steps.push_back(0);
 		steps.push_back(1);

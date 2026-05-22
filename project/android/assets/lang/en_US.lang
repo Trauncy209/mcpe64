@@ -980,3 +980,4 @@ options.usetouchpad=Touch Joypad
 options.destroyvibration=Vibration
 options.vsync=VSync
 options.limitFramerate=Limit Framerate
+options.pixelspermilimeter=Touch Scale

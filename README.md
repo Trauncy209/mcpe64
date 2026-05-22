@@ -88,8 +88,10 @@ C:\apkbuild\build.ps1 -NoCpp
 C:\apkbuild\build.ps1 -NoBuild
 ```
 
-## Upstream / Credits
-This project builds on the original restoration work here:
-- https://gitea.sffempire.ru/Kolyah35/minecraft-pe-0.6.1
+## Project Home
+The active GitHub home for this restoration is:
+- https://github.com/Trauncy209/mcpe64
+
+This build continues earlier community restoration work.
 
 Thanks to everyone helping preserve and improve classic Minecraft PE.

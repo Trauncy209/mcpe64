@@ -35,9 +35,9 @@ void CreditsScreen::init() {
     _lines.push_back("Programmers:");
     _lines.push_back("mschiller890");
     _lines.push_back("InviseDivine");
-    _lines.push_back("Kolyah35");
+    _lines.push_back("Trauncy209");
     _lines.push_back("");
-    _lines.push_back("[Gold]Join our Discord server:[/Gold] [Green]url.....[/Green]");
+    _lines.push_back("[Gold]Active GitHub:[/Gold] [Green]https://github.com/Trauncy209/mcpe64[/Green]");
     _scrollSpeed = 0.5f;
     _scrollY = height; // start below screen
 }
