@@ -1,4 +1,4 @@
-# mcpe64
+# TruancyCraftPE
 
 A community-driven restoration and improvement project for **Minecraft Pocket Edition 0.6.1 alpha**.
 
