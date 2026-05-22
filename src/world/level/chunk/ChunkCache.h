@@ -48,10 +48,14 @@ public:
     }
 
     bool hasChunk(int x, int z) {
+        return hasChunkNow(x, z);
+    }
+
+    bool hasChunkNow(int x, int z) {
         if (!fits(x, z))
             return false;
         if (x == xLast && z == zLast && last != NULL) {
-            return true;
+            return last != emptyChunk && last->isAt(x, z);
         }
         int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (CHUNK_CACHE_WIDTH - 1)) : x;
         int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (CHUNK_CACHE_WIDTH - 1)) : z;

@@ -98,9 +98,13 @@ public:
     bool setTile(int x, int y, int z, int tile);
 
 	bool hasChunkAt(int x, int y, int z);
+	bool hasChunkAtNow(int x, int y, int z);
     bool hasChunksAt(int x, int y, int z, int r);
+	bool hasChunksAtNow(int x, int y, int z, int r);
     bool hasChunksAt(int x0, int y0, int z0, int x1, int y1, int z1);
+	bool hasChunksAtNow(int x0, int y0, int z0, int x1, int y1, int z1);
     bool hasChunk(int x, int z);
+	bool hasChunkNow(int x, int z);
     LevelChunk* getChunkAt(int x, int z);
     LevelChunk* getChunk(int x, int z);
 

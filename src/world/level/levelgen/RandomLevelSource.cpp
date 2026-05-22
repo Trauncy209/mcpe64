@@ -664,6 +664,10 @@ bool RandomLevelSource::hasChunk(int x, int y) {
 	return true;
 }
 
+bool RandomLevelSource::hasChunkNow(int x, int z) {
+	return chunkMap.find(ChunkPos::hashCode(x, z)) != chunkMap.end();
+}
+
 bool RandomLevelSource::tick() {
 	return false;
 }

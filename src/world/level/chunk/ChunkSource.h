@@ -21,6 +21,7 @@ public:
 	virtual ~ChunkSource(){}
 
 	virtual bool hasChunk(int x, int y) = 0;
+	virtual bool hasChunkNow(int x, int z) { return hasChunk(x, z); }
 
     virtual LevelChunk* getChunk(int x, int z) = 0;
 

@@ -42,6 +42,7 @@ public:
 	~RandomLevelSource();
 
 	bool hasChunk(int x, int y);
+	bool hasChunkNow(int x, int z);
     LevelChunk* create(int x, int z);
 	LevelChunk* getChunk(int xOffs, int zOffs);
 

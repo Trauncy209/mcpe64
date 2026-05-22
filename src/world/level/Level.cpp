@@ -130,7 +130,7 @@ bool Level::checkAndHandleWater(const AABB& box, const Material* material, Entit
     int z0 = Mth::floor(box.z0);
     int z1 = Mth::floor(box.z1 + 1);
 
-    if (!hasChunksAt(x0, y0, z0, x1, y1, z1)) {
+    if (!hasChunksAtNow(x0, y0, z0, x1, y1, z1)) {
         return false;
     }
 
@@ -139,6 +139,7 @@ bool Level::checkAndHandleWater(const AABB& box, const Material* material, Entit
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
+                if (!hasChunkAtNow(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material == material) {
                     float yt0 = y + 1 - LiquidTile::getHeight(getData(x, y, z));
@@ -545,9 +546,18 @@ bool Level::hasChunkAt(int x, int y, int z) {
     return hasChunk(x >> 4, z >> 4);
 }
 
+bool Level::hasChunkAtNow(int x, int y, int z) {
+    if (y < 0 || y >= Level::DEPTH) return false;
+    return hasChunkNow(x >> 4, z >> 4);
+}
+
 
 bool Level::hasChunksAt(int x, int y, int z, int r) {
     return hasChunksAt(x - r, y - r, z - r, x + r, y + r, z + r);
+}
+
+bool Level::hasChunksAtNow(int x, int y, int z, int r) {
+    return hasChunksAtNow(x - r, y - r, z - r, x + r, y + r, z + r);
 }
 
 bool Level::hasChunksAt(int x0, int y0, int z0, int x1, int y1, int z1) {
@@ -568,8 +578,27 @@ bool Level::hasChunksAt(int x0, int y0, int z0, int x1, int y1, int z1) {
     return true;
 }
 
+bool Level::hasChunksAtNow(int x0, int y0, int z0, int x1, int y1, int z1) {
+    if (y1 < 0 || y0 >= Level::DEPTH) return false;
+
+    x0 >>= 4;
+    z0 >>= 4;
+    x1 >>= 4;
+    z1 >>= 4;
+
+    for (int x = x0; x <= x1; x++)
+        for (int z = z0; z <= z1; z++)
+            if (!hasChunkNow(x, z)) return false;
+
+    return true;
+}
+
 bool Level::hasChunk(int x, int z) {
     return _chunkSource->hasChunk(x, z);
+}
+
+bool Level::hasChunkNow(int x, int z) {
+    return _chunkSource->hasChunkNow(x, z);
 }
 
 LevelChunk* Level::getChunkAt(int x, int z) {
@@ -1146,7 +1175,7 @@ std::vector<AABB>& Level::getCubes(const Entity* source, const AABB& box_) { //@
 
     for (int x = x0; x < x1; x++)
         for (int z = z0; z < z1; z++) {
-            if (hasChunkAt(x, Level::DEPTH / 2, z)) {
+            if (hasChunkAtNow(x, Level::DEPTH / 2, z)) {
                 for (int y = y0 - 1; y < y1; y++) {
                     Tile* tile = Tile::tiles[getTile(x, y, z)];
                     if (tile != NULL) {
@@ -1595,6 +1624,7 @@ bool Level::containsAnyLiquid(const AABB& box) {
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
+                if (!hasChunkAtNow(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material->isLiquid()) {
                     return true;
@@ -1611,7 +1641,7 @@ bool Level::containsFireTile(const AABB& box) {
     int z0 = Mth::floor(box.z0);
     int z1 = Mth::floor(box.z1 + 1);
 
-    if (hasChunksAt(x0, y0, z0, x1, y1, z1)) {
+    if (hasChunksAtNow(x0, y0, z0, x1, y1, z1)) {
         for (int x = x0; x < x1; x++)
             for (int y = y0; y < y1; y++)
                 for (int z = z0; z < z1; z++) {
@@ -1638,6 +1668,7 @@ bool Level::containsMaterial(const AABB& box, const Material* material) {
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
+                if (!hasChunkAtNow(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material == material) {
                     return true;
@@ -1657,6 +1688,7 @@ bool Level::containsLiquid(const AABB& box, const Material* material) {
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
+                if (!hasChunkAtNow(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material == material) {
                     int data = getData(x, y, z);
