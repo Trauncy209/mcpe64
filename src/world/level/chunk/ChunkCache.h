@@ -79,8 +79,10 @@ public:
         if (!hasChunk(x, z)) {
             if (chunks[slot] != NULL) {
                 chunks[slot]->unload();
-                save(chunks[slot]);
-                saveEntities(chunks[slot]);
+                if (!level->isClientSide) {
+                    save(chunks[slot]);
+                    saveEntities(chunks[slot]);
+                }
             }
 
             LevelChunk* newChunk = load(x, z);
@@ -93,7 +95,7 @@ public:
                 }
             } else {
 				//return emptyChunk;
-				updateLights = true;
+				updateLights = !level->isClientSide;
             }
             chunks[slot] = newChunk;
             newChunk->lightLava();

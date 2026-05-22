@@ -575,7 +575,7 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, ChunkDat
 // 		//}
 // 
  	}
-	//chunk->terrainPopulated = true;
+	chunk->terrainPopulated = true;
 	chunk->unsaved = false;
 
 	for (int i = 0; i < NumRequestChunks; ++i) {
