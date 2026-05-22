@@ -71,6 +71,18 @@ public:
 	void		setGameType(int type);
 	bool		getSpawnMobs() const;
 	void		setSpawnMobs(bool doSpawn);
+	bool		getCaves() const;
+	void		setCaves(bool enabled);
+	bool		getRavines() const;
+	void		setRavines(bool enabled);
+	bool		getWaterLakes() const;
+	void		setWaterLakes(bool enabled);
+	bool		getLavaLakes() const;
+	void		setLavaLakes(bool enabled);
+	bool		getWaterSprings() const;
+	void		setWaterSprings(bool enabled);
+	bool		getLavaSprings() const;
+	void		setLavaSprings(bool enabled);
 
 public:
 	PlayerData playerData;
@@ -92,6 +104,12 @@ private:
 	//@note: This version is never written or loaded to disk. The only purpose
 	//       is to use it in the level generator on server and clients.
 	int generatorVersion;
+	bool caves;
+	bool ravines;
+	bool waterLakes;
+	bool lavaLakes;
+	bool waterSprings;
+	bool lavaSprings;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL_STORAGE__LevelData_H__*/

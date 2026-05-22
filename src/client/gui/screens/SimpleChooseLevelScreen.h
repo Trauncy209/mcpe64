@@ -11,15 +11,11 @@ class SimpleChooseLevelScreen: public ChooseLevelScreen
 {
 public:
 	SimpleChooseLevelScreen(const std::string& levelName);
-
 	virtual ~SimpleChooseLevelScreen();
-
 	void init();
 	void setupPositions();
 	void tick();
-
 	void render(int xm, int ym, float a);
-
 	void buttonClicked(Button* button);
 	bool handleBackEvent(bool isDown);
 	virtual void keyPressed(int eventKey);
@@ -30,14 +26,30 @@ private:
 	Touch::THeader* bHeader;
 	Button* bGamemode;
 	Button* bWorldType;
+	Button* bWorldOptions;
+	Button* bOptionsBack;
+	Button* bOptionCaves;
+	Button* bOptionRavines;
+	Button* bOptionWaterLakes;
+	Button* bOptionLavaLakes;
+	Button* bOptionWaterSprings;
+	Button* bOptionLavaSprings;
 	ImageButton* bBack;
 	Button* bCreate;
 	bool hasChosen;
-
+	bool inWorldOptions;
 	std::string levelName;
 	int gamemode;
 	int generatorVersion;
-
+	bool optCaves;
+	bool optRavines;
+	bool optWaterLakes;
+	bool optLavaLakes;
+	bool optWaterSprings;
+	bool optLavaSprings;
+	void applyGeneratorDefaults();
+	void refreshWorldOptionLabels();
+	void setWorldOptionsVisible(bool visible);
 	TextBox tLevelName;
 	TextBox tSeed;
 };

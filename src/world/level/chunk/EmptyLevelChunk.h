@@ -33,6 +33,12 @@ public:
         return x == this->x && z == this->z;
     }
 
+    int getEmptyTileId() const {
+        if (level && level->getLevelData() && level->getLevelData()->getGeneratorVersion() == LGV_INFINITE)
+            return 0;
+        return Tile::invisible_bedrock->id;
+    }
+
     int getHeightmap(int x, int z) {
         return 0;
     }
@@ -53,16 +59,7 @@ public:
     }
 
     int getTile(int x, int y, int z) {
-		//if (y <= 1)
-		//{
-		//	return Tile::unbreakable->id;
-		//}
-		//else if (y < 64)
-		//{
-		//	return Tile::water->id;
-		//}
-		//return 0;
-        return Tile::invisible_bedrock->id;
+        return getEmptyTileId();
     }
 
     bool setTileAndData(int x, int y, int z, int _tile, int _data) {
@@ -171,7 +168,7 @@ public:
         int s = xs * ys * zs;
         int len = s + s / 2 * 3;
 
-		memset(data + p, Tile::invisible_bedrock->id, len); //Arrays.fill(data, p, p + len, (char) 0);
+		memset(data + p, getEmptyTileId(), len); //Arrays.fill(data, p, p + len, (char) 0);
         return len;
     }
 

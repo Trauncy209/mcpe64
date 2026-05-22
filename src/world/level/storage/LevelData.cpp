@@ -8,6 +8,12 @@ LevelData::LevelData()
 	seed(0),
 	lastPlayed(0),
 	generatorVersion(SharedConstants::GeneratorVersion),
+		caves(LevelSettings::defaultCavesForGenerator(SharedConstants::GeneratorVersion)),
+		ravines(LevelSettings::defaultRavinesForGenerator(SharedConstants::GeneratorVersion)),
+		waterLakes(LevelSettings::defaultWaterLakesForGenerator(SharedConstants::GeneratorVersion)),
+		lavaLakes(LevelSettings::defaultLavaLakesForGenerator(SharedConstants::GeneratorVersion)),
+		waterSprings(LevelSettings::defaultWaterSpringsForGenerator(SharedConstants::GeneratorVersion)),
+		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(SharedConstants::GeneratorVersion)),
 	time(0),
 	dimension(Dimension::NORMAL),
 	playerDataVersion(-1),
@@ -30,7 +36,13 @@ LevelData::LevelData( const LevelSettings& settings, const std::string& levelNam
 	time(0),
 	dimension(Dimension::NORMAL),
 	playerDataVersion(-1),
-	loadedPlayerTag(NULL)
+	loadedPlayerTag(NULL),
+		caves(settings.getCaves()),
+		ravines(settings.getRavines()),
+		waterLakes(settings.getWaterLakes()),
+		lavaLakes(settings.getLavaLakes()),
+		waterSprings(settings.getWaterSprings()),
+		lavaSprings(settings.getLavaSprings())
 {
 	//LOGI("ctor 2: %p\n", this);
 
@@ -43,7 +55,13 @@ LevelData::LevelData( const LevelSettings& settings, const std::string& levelNam
 
 LevelData::LevelData( CompoundTag* tag )
 :	loadedPlayerTag(NULL),
-	generatorVersion(LGV_ORIGINAL)
+	generatorVersion(LGV_ORIGINAL),
+		caves(LevelSettings::defaultCavesForGenerator(LGV_ORIGINAL)),
+		ravines(LevelSettings::defaultRavinesForGenerator(LGV_ORIGINAL)),
+		waterLakes(LevelSettings::defaultWaterLakesForGenerator(LGV_ORIGINAL)),
+		lavaLakes(LevelSettings::defaultLavaLakesForGenerator(LGV_ORIGINAL)),
+		waterSprings(LevelSettings::defaultWaterSpringsForGenerator(LGV_ORIGINAL)),
+		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(LGV_ORIGINAL))
 {
 	//LOGI("ctor 3: %p (%p)\n", this, tag);
 	getTagData(tag);
@@ -64,7 +82,13 @@ LevelData::LevelData( const LevelData& rhs )
 	generatorVersion(rhs.generatorVersion),
 	spawnMobs(rhs.spawnMobs),
 	loadedPlayerTag(NULL),
-	playerData(rhs.playerData)
+	playerData(rhs.playerData),
+		caves(rhs.caves),
+		ravines(rhs.ravines),
+		waterLakes(rhs.waterLakes),
+		lavaLakes(rhs.lavaLakes),
+		waterSprings(rhs.waterSprings),
+		lavaSprings(rhs.lavaSprings)
 {
 	//LOGI("c-ctor: %p (%p)\n", this, &rhs);
 	setPlayerTag(rhs.loadedPlayerTag);
@@ -89,6 +113,12 @@ LevelData& LevelData::operator=( const LevelData& rhs )
 		playerDataVersion	= rhs.playerDataVersion;
 		generatorVersion	= rhs.generatorVersion;
 		storageVersion		= rhs.storageVersion;
+			caves = rhs.caves;
+			ravines = rhs.ravines;
+			waterLakes = rhs.waterLakes;
+			lavaLakes = rhs.lavaLakes;
+			waterSprings = rhs.waterSprings;
+			lavaSprings = rhs.lavaSprings;
 		setPlayerTag(rhs.loadedPlayerTag);
 	}
 
@@ -171,6 +201,12 @@ void LevelData::setTagData( CompoundTag* tag, CompoundTag* playerTag )
 	tag->putString("LevelName", levelName);
 	tag->putInt("StorageVersion", storageVersion);
 	tag->putInt("GeneratorVersion", generatorVersion);
+		tag->putByte("WorldGenCaves", caves ? 1 : 0);
+		tag->putByte("WorldGenRavines", ravines ? 1 : 0);
+		tag->putByte("WorldGenWaterLakes", waterLakes ? 1 : 0);
+		tag->putByte("WorldGenLavaLakes", lavaLakes ? 1 : 0);
+		tag->putByte("WorldGenWaterSprings", waterSprings ? 1 : 0);
+		tag->putByte("WorldGenLavaSprings", lavaSprings ? 1 : 0);
 	tag->putInt("Platform", 2);
 
 	if (playerTag != NULL) {
@@ -192,6 +228,18 @@ void LevelData::getTagData( const CompoundTag* tag )
 	levelName = tag->getString("LevelName");
 	storageVersion = tag->getInt("StorageVersion");
 	generatorVersion = tag->contains("GeneratorVersion", Tag::TAG_Int) ? tag->getInt("GeneratorVersion") : LGV_ORIGINAL;
+		caves = LevelSettings::defaultCavesForGenerator(generatorVersion);
+		ravines = LevelSettings::defaultRavinesForGenerator(generatorVersion);
+		waterLakes = LevelSettings::defaultWaterLakesForGenerator(generatorVersion);
+		lavaLakes = LevelSettings::defaultLavaLakesForGenerator(generatorVersion);
+		waterSprings = LevelSettings::defaultWaterSpringsForGenerator(generatorVersion);
+		lavaSprings = LevelSettings::defaultLavaSpringsForGenerator(generatorVersion);
+		if (tag->contains("WorldGenCaves", Tag::TAG_Byte)) caves = tag->getByte("WorldGenCaves") != 0;
+		if (tag->contains("WorldGenRavines", Tag::TAG_Byte)) ravines = tag->getByte("WorldGenRavines") != 0;
+		if (tag->contains("WorldGenWaterLakes", Tag::TAG_Byte)) waterLakes = tag->getByte("WorldGenWaterLakes") != 0;
+		if (tag->contains("WorldGenLavaLakes", Tag::TAG_Byte)) lavaLakes = tag->getByte("WorldGenLavaLakes") != 0;
+		if (tag->contains("WorldGenWaterSprings", Tag::TAG_Byte)) waterSprings = tag->getByte("WorldGenWaterSprings") != 0;
+		if (tag->contains("WorldGenLavaSprings", Tag::TAG_Byte)) lavaSprings = tag->getByte("WorldGenLavaSprings") != 0;
 
 	spawnMobs = (gameType == GameType::Survival);
 
@@ -365,3 +413,17 @@ void LevelData::setSpawnMobs( bool doSpawn )
 {
 	spawnMobs = doSpawn;
 }
+
+
+bool LevelData::getCaves() const { return caves; }
+void LevelData::setCaves(bool enabled) { caves = enabled; }
+bool LevelData::getRavines() const { return ravines; }
+void LevelData::setRavines(bool enabled) { ravines = enabled; }
+bool LevelData::getWaterLakes() const { return waterLakes; }
+void LevelData::setWaterLakes(bool enabled) { waterLakes = enabled; }
+bool LevelData::getLavaLakes() const { return lavaLakes; }
+void LevelData::setLavaLakes(bool enabled) { lavaLakes = enabled; }
+bool LevelData::getWaterSprings() const { return waterSprings; }
+void LevelData::setWaterSprings(bool enabled) { waterSprings = enabled; }
+bool LevelData::getLavaSprings() const { return lavaSprings; }
+void LevelData::setLavaSprings(bool enabled) { lavaSprings = enabled; }

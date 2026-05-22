@@ -538,6 +538,10 @@ bool Level::isEmptyTile(int x, int y, int z) {
 
 bool Level::hasChunkAt(int x, int y, int z) {
     if (y < 0 || y >= Level::DEPTH) return false;
+
+    if (levelData.getGeneratorVersion() == LGV_INFINITE)
+        return inRange(x, y, z);
+
     return hasChunk(x >> 4, z >> 4);
 }
 
@@ -548,6 +552,9 @@ bool Level::hasChunksAt(int x, int y, int z, int r) {
 
 bool Level::hasChunksAt(int x0, int y0, int z0, int x1, int y1, int z1) {
     if (y1 < 0 || y0 >= Level::DEPTH) return false;
+
+    if (levelData.getGeneratorVersion() == LGV_INFINITE)
+        return inRange(x0, y0 < 0 ? 0 : y0, z0) && inRange(x1, y1 >= Level::DEPTH ? Level::DEPTH - 1 : y1, z1);
 
     x0 >>= 4;
     z0 >>= 4;

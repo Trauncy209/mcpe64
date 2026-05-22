@@ -232,25 +232,30 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
     int zScale = random.nextInt() / 2 * 2 + 1;
     random.setSeed(((xt * xScale) + (zt * zScale)) ^ level->getSeed());
 
+	const LevelData* levelData = level->getLevelData();
+	const bool allowWaterLakes = !levelData || levelData->getWaterLakes();
+	const bool allowLavaLakes = levelData && levelData->getLavaLakes();
+	const bool allowWaterSprings = !levelData || levelData->getWaterSprings();
+	const bool allowLavaSprings = !levelData || levelData->getLavaSprings();
+
 	// //@todo: hide those chunks if they are aren't visible
-    if (random.nextInt(4) == 0) {
+    if (allowWaterLakes && random.nextInt(4) == 0) {
         int x = xo + random.nextInt(16) + 8;
         int y = random.nextInt(128);
         int z = zo + random.nextInt(16) + 8;
         LakeFeature feature(Tile::calmWater->id);
-		feature.place(level, &random, x, y, z);
+			feature.place(level, &random, x, y, z);
     }
 
-	////@todo: hide those chunks if they are aren't visible
- //   if (random.nextInt(8) == 0) {
- //       int x = xo + random.nextInt(16) + 8;
- //       int y = random.nextInt(random.nextInt(120) + 8);
- //       int z = zo + random.nextInt(16) + 8;
- //       if (y < 64 || random.nextInt(10) == 0) {
-	//		LakeFeature feature(Tile::calmLava->id);
-	//		feature.place(level, &random, x, y, z);
-	//	}
- //   }
+    if (allowLavaLakes && random.nextInt(8) == 0) {
+        int x = xo + random.nextInt(16) + 8;
+        int y = random.nextInt(random.nextInt(120) + 8);
+        int z = zo + random.nextInt(16) + 8;
+        if (y < 64 || random.nextInt(10) == 0) {
+			LakeFeature feature(Tile::calmLava->id);
+			feature.place(level, &random, x, y, z);
+		}
+    }
 
 	static float totalTime = 0;
 	const float st = getTimeS();
@@ -435,20 +440,24 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
         feature.place(level, &random, x, y, z);
     }
 
-    for (int i = 0; i < 50; i++) {
-        int x = xo + random.nextInt(16) + 8;
-        int y = random.nextInt(random.nextInt(120) + 8);
-        int z = zo + random.nextInt(16) + 8;
-        SpringFeature feature(Tile::water->id);
-		feature.place(level, &random, x, y, z);
+    if (allowWaterSprings) {
+        for (int i = 0; i < 50; i++) {
+            int x = xo + random.nextInt(16) + 8;
+            int y = random.nextInt(random.nextInt(120) + 8);
+            int z = zo + random.nextInt(16) + 8;
+            SpringFeature feature(Tile::water->id);
+			feature.place(level, &random, x, y, z);
+        }
     }
 
-    for (int i = 0; i < 20; i++) {
-        int x = xo + random.nextInt(16) + 8;
-        int y = random.nextInt(random.nextInt(random.nextInt(112) + 8) + 8);
-        int z = zo + random.nextInt(16) + 8;
-        SpringFeature feature(Tile::lava->id);
-		feature.place(level, &random, x, y, z);
+    if (allowLavaSprings) {
+        for (int i = 0; i < 20; i++) {
+            int x = xo + random.nextInt(16) + 8;
+            int y = random.nextInt(random.nextInt(random.nextInt(112) + 8) + 8);
+            int z = zo + random.nextInt(16) + 8;
+            SpringFeature feature(Tile::lava->id);
+			feature.place(level, &random, x, y, z);
+        }
     }
 
 	if (spawnMobs && !level->isClientSide)
@@ -503,8 +512,11 @@ LevelChunk* RandomLevelSource::getChunk(int xOffs, int zOffs) {
     prepareHeights(xOffs, zOffs, blocks, 0, temperatures);//biomes, temperatures);
     buildSurfaces(xOffs, zOffs, blocks, biomes);
 
-	caveFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
-	canyonFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
+	const LevelData* levelData = level->getLevelData();
+	if (!levelData || levelData->getCaves())
+		caveFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
+	if (levelData && levelData->getRavines())
+		canyonFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
     levelChunk->recalcHeightmap();
 
     return levelChunk;

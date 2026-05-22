@@ -6,13 +6,17 @@
 #include "../../world/inventory/BaseContainerMenu.h"
 #include "../../world/item/BowItem.h"
 #include "../../world/level/Level.h"
+#include "../../world/level/LevelConstants.h"
+#include "../../util/Mth.h"
 #include "../../world/level/tile/Tile.h"
 #include "../../world/level/tile/entity/TileEntity.h"
 #include "../../world/level/material/Material.h"
 #include "../../network/packet/ContainerClosePacket.h"
 #include "../../network/packet/MovePlayerPacket.h"
+#include "../../network/packet/RequestChunkPacket.h"
 #include "../../network/packet/PlayerEquipmentPacket.h"
 #include "../../network/RakNetInstance.h"
+#include "../../network/ClientSideNetworkHandler.h"
 #include "../../network/packet/DropItemPacket.h"
 #include "../../network/packet/SetHealthPacket.h"
 #include "../../network/packet/SendInventoryPacket.h"
@@ -266,10 +270,20 @@ void LocalPlayer::move(float xa, float ya, float za) {
 			input->jumping = true;
 		}
 		float prevX = x, prevZ = z;
+		const int prevChunkX = Mth::floor(prevX / (float)CHUNK_WIDTH);
+		const int prevChunkZ = Mth::floor(prevZ / (float)CHUNK_DEPTH);
 
         super::move(xa, ya, za);
 
 		float newX = x, newZ = z;
+		const int newChunkX = Mth::floor(newX / (float)CHUNK_WIDTH);
+		const int newChunkZ = Mth::floor(newZ / (float)CHUNK_DEPTH);
+
+		if (minecraft && minecraft->isOnlineClient() && minecraft->netCallback
+			&& (prevChunkX != newChunkX || prevChunkZ != newChunkZ)) {
+			ClientSideNetworkHandler* handler = static_cast<ClientSideNetworkHandler*>(minecraft->netCallback);
+			handler->recenterChunkRequests();
+		}
 
 		if (autoJumpTime <= 0 && autoJumpEnabled)
 		{

@@ -16,27 +16,37 @@ namespace GameType {
 class LevelSettings
 {
 public:
-    LevelSettings(long seed, int gameType, int generatorVersion = (int)LGV_ORIGINAL)
+    LevelSettings(long seed, int gameType, int generatorVersion = (int)LGV_ORIGINAL,
+        bool caves = false,
+        bool ravines = false,
+        bool waterLakes = false,
+        bool lavaLakes = false,
+        bool waterSprings = false,
+        bool lavaSprings = false)
     :   seed(seed),
         gameType(validateGameType(gameType)),
-        generatorVersion(validateGeneratorVersion(generatorVersion))
+        generatorVersion(validateGeneratorVersion(generatorVersion)),
+        caves(caves),
+        ravines(ravines),
+        waterLakes(waterLakes),
+        lavaLakes(lavaLakes),
+        waterSprings(waterSprings),
+        lavaSprings(lavaSprings)
     {
     }
 	static LevelSettings None() {
 		return LevelSettings(-1, -1, -1);
 	}
 
-    long getSeed() const {
-        return seed;
-    }
-
-    int getGameType() const {
-        return gameType;
-    }
-
-    int getGeneratorVersion() const {
-        return generatorVersion;
-    }
+    long getSeed() const { return seed; }
+    int getGameType() const { return gameType; }
+    int getGeneratorVersion() const { return generatorVersion; }
+    bool getCaves() const { return caves; }
+    bool getRavines() const { return ravines; }
+    bool getWaterLakes() const { return waterLakes; }
+    bool getLavaLakes() const { return lavaLakes; }
+    bool getWaterSprings() const { return waterSprings; }
+    bool getLavaSprings() const { return lavaSprings; }
 
 	//
 	// Those two should actually not be here
@@ -44,8 +54,8 @@ public:
 	//
 	static int validateGameType(int gameType) {
         switch (gameType) {
-		case GameType::Creative:
-		case GameType::Survival:
+			case GameType::Creative:
+			case GameType::Survival:
             return gameType;
         }
         return GameType::Default;
@@ -72,10 +82,23 @@ public:
 		return "Unknown";
 	}
 
+	static bool defaultCavesForGenerator(int generatorVersion) { return generatorVersion == LGV_INFINITE; }
+	static bool defaultRavinesForGenerator(int generatorVersion) { return generatorVersion == LGV_INFINITE; }
+	static bool defaultWaterLakesForGenerator(int generatorVersion) { return generatorVersion == LGV_INFINITE; }
+	static bool defaultLavaLakesForGenerator(int) { return false; }
+	static bool defaultWaterSpringsForGenerator(int generatorVersion) { return generatorVersion == LGV_INFINITE; }
+	static bool defaultLavaSpringsForGenerator(int generatorVersion) { return generatorVersion == LGV_INFINITE; }
+
 private:
     const long seed;
     const int gameType;
     const int generatorVersion;
+    const bool caves;
+    const bool ravines;
+    const bool waterLakes;
+    const bool lavaLakes;
+    const bool waterSprings;
+    const bool lavaSprings;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL__LevelSettings_H__*/

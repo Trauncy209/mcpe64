@@ -48,6 +48,15 @@ ClientSideNetworkHandler::~ClientSideNetworkHandler()
 {
 }
 
+void ClientSideNetworkHandler::recenterChunkRequests()
+{
+	if (!level)
+		return;
+
+	arrangeRequestChunkOrder();
+	requestNextChunk();
+}
+
 void ClientSideNetworkHandler::requestNextChunk()
 {
 	if (requestNextChunkIndex < NumRequestChunks)
@@ -934,10 +943,13 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, Adventur
 
 void ClientSideNetworkHandler::clearChunksLoaded()
 {
+	requestNextChunkIndex = 0;
+	requestNextChunkPosition = 0;
+
 	// Init the chunk positions
 	for (int i = 0; i < NumRequestChunks; ++i) {
-		requestNextChunkIndexList[i].x = i/CHUNK_WIDTH;
-		requestNextChunkIndexList[i].y = i%CHUNK_WIDTH;
+		requestNextChunkIndexList[i].x = i / CHUNK_CACHE_WIDTH;
+		requestNextChunkIndexList[i].y = i % CHUNK_CACHE_WIDTH;
 		chunksLoaded[i] = false;
 	}
 }
