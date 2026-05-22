@@ -266,8 +266,6 @@ void Level::tickTiles() {
 		-1,3,  0,3,  1,3,  2,3,  -1,4,  0,4,  1,4
 	};
 	const int pollChunkOffsetsSize = sizeof(pollChunkOffsets) / sizeof(int);
-	std::vector<ChunkPos> orderedChunks;
-	ChunkPosSet seenChunks;
 
 	TIMER_PUSH("buildList");
 	//static Stopwatch w;
@@ -282,35 +280,20 @@ void Level::tickTiles() {
 			const int xp = xx + pollChunkOffsets[i];
 			const int zp = zz + pollChunkOffsets[i+1];
 			if (infiniteWorld || (xp >= 0 && xp < CHUNK_CACHE_WIDTH &&
-				zp >= 0 && zp < CHUNK_CACHE_WIDTH)) {
-				ChunkPos cp(xp, zp);
-				if (seenChunks.insert(cp).second) {
-					orderedChunks.push_back(cp);
-				}
-			}
+				zp >= 0 && zp < CHUNK_CACHE_WIDTH))
+				_chunksToPoll.insert(ChunkPos(xp, zp));
 		}
     }
 	TIMER_POP();
 
-	const bool budgetChunkLoads = !isClientSide && levelData.getGeneratorVersion() == LGV_INFINITE;
-	int chunkGenerationBudget = budgetChunkLoads ? 2 : 0;
-
     //if (delayUntilNextMoodSound > 0) delayUntilNextMoodSound--;
 	TIMER_PUSH("loop");
-    for (size_t chunkIndex = 0; chunkIndex < orderedChunks.size(); ++chunkIndex) {
-		const ChunkPos& cp = orderedChunks[chunkIndex];
+    for (ChunkPosSet::iterator it = _chunksToPoll.begin(); it != _chunksToPoll.end(); ++it) {
+		const ChunkPos& cp = *it;
         int xo = cp.x * 16;
         int zo = cp.z * 16;
         // LevelSource region = new Region(this, xo, 0, zo, xo + 16, 128, zo + 16);
 		TIMER_PUSH("getChunk");
-		const bool alreadyLoaded = this->hasChunk(cp.x, cp.z);
-		if (!alreadyLoaded && budgetChunkLoads) {
-			if (chunkGenerationBudget <= 0) {
-				TIMER_POP();
-				continue;
-			}
-			chunkGenerationBudget--;
-		}
         LevelChunk* lc = this->getChunk(cp.x, cp.z);
 		TIMER_POP_PUSH("tickChunk");
 		//lc->tick();
