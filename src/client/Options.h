@@ -89,6 +89,8 @@ public:
         }
     };
 
+    static std::string getCaption(const Option* item);
+
 private:
 	static const float SOUND_MIN_VALUE;
 	static const float SOUND_MAX_VALUE;

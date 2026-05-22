@@ -3,10 +3,36 @@
 #include "Minecraft.h"
 #include "../platform/log.h"
 #include "../world/Difficulty.h"
+#include "../locale/I18n.h"
 #include <cmath>
 #include <sstream>
 /*static*/
 bool Options::debugGl = false;
+
+std::string Options::getCaption(const Option* item) {
+	std::string caption = I18n::get(item->getCaptionId());
+	if (!caption.empty() && caption[caption.size() - 1] != '<')
+		return caption;
+
+	if (item == &Option::LEFT_HANDED) return "Left-Handed Controls";
+	if (item == &Option::USE_TOUCHSCREEN) return "Touchscreen Mode";
+	if (item == &Option::USE_TOUCH_JOYPAD) return "Touch Joypad";
+	if (item == &Option::DESTROY_VIBRATION) return "Vibration";
+	if (item == &Option::PIXELS_PER_MILLIMETER) return "Touch Sensitivity";
+	if (item == &Option::VSYNC) return "VSync";
+
+	std::string id = item->getCaptionId();
+	const std::string prefix = "options.";
+	if (id.find(prefix) == 0)
+		id = id.substr(prefix.size());
+	for (size_t i = 0; i < id.size(); ++i) {
+		if (id[i] == '.' || id[i] == '_')
+			id[i] = ' ';
+	}
+	if (!id.empty())
+		id[0] = toupper((unsigned char)id[0]);
+	return id;
+}
 
 void Options::initDefaultValues() {
 	difficulty = Difficulty::NORMAL;
@@ -415,49 +441,42 @@ void Options::addOptionToSaveOutput(StringVector& stringVector, std::string name
 
 std::string Options::getMessage( const Option* item )
 {
-	return "Options::getMessage - Not implemented";
+	std::string caption = getCaption(item) + ": ";
 
-	//Language language = Language.getInstance();
-	//std::string caption = language.getElement(item.getCaptionId()) + ": ";
+	if (item->isProgress()) {
+		float progressValue = getProgressValue(item);
 
-	//if (item.isProgress()) {
-	//    float progressValue = getProgressValue(item);
+		if (item == &Option::SENSITIVITY) {
+			if (progressValue <= SENSITIVITY_MIN_VALUE)
+				return caption + I18n::get("options.sensitivity.min");
+			if (progressValue >= SENSITIVITY_MAX_VALUE)
+				return caption + I18n::get("options.sensitivity.max");
+			return caption + std::to_string((int)(progressValue * 200.0f)) + "%";
+		}
 
-	//    if (item == Option.SENSITIVITY) {
-	//        if (progressValue == 0) {
-	//            return caption + language.getElement("options.sensitivity.min");
-	//        }
-	//        if (progressValue == 1) {
-	//            return caption + language.getElement("options.sensitivity.max");
-	//        }
-	//        return caption + (int) (progressValue * 200) + "%";
-	//    } else {
-	//        if (progressValue == 0) {
-	//            return caption + language.getElement("options.off");
-	//        }
-	//        return caption + (int) (progressValue * 100) + "%";
-	//    }
-	//} else if (item.isBoolean()) {
+		if (item == &Option::PIXELS_PER_MILLIMETER) {
+			int percent = (int)(((progressValue - PIXELS_PER_MILLIMETER_MIN_VALUE) / (PIXELS_PER_MILLIMETER_MAX_VALUE - PIXELS_PER_MILLIMETER_MIN_VALUE)) * 100.0f);
+			return caption + std::to_string(percent) + "%";
+		}
 
-	//    bool booleanValue = getBooleanValue(item);
-	//    if (booleanValue) {
-	//        return caption + language.getElement("options.on");
-	//    }
-	//    return caption + language.getElement("options.off");
-	//} else if (item == Option.RENDER_DISTANCE) {
-	//    return caption + language.getElement(RENDER_DISTANCE_NAMES[viewDistance]);
-	//} else if (item == Option.DIFFICULTY) {
-	//    return caption + language.getElement(DIFFICULTY_NAMES[difficulty]);
-	//} else if (item == Option.GUI_SCALE) {
-	//    return caption + language.getElement(GUI_SCALE[guiScale]);
-	//} else if (item == Option.GRAPHICS) {
-	//    if (fancyGraphics) {
-	//        return caption + language.getElement("options.graphics.fancy");
-	//    }
-	//    return caption + language.getElement("options.graphics.fast");
-	//}
+		if (progressValue <= 0.0f)
+			return caption + I18n::get("options.off");
+		return caption + std::to_string((int)(progressValue * 100.0f)) + "%";
+	}
 
-	//return caption;
+	if (item->isBoolean())
+		return caption + I18n::get(getBooleanValue(item) ? "options.on" : "options.off");
+
+	if (item == &Option::RENDER_DISTANCE)
+		return caption + I18n::get(RENDER_DISTANCE_NAMES[viewDistance]);
+	if (item == &Option::DIFFICULTY)
+		return caption + I18n::get(DIFFICULTY_NAMES[difficulty]);
+	if (item == &Option::GUI_SCALE)
+		return caption + I18n::get(GUI_SCALE[guiScale]);
+	if (item == &Option::GRAPHICS)
+		return caption + I18n::get(fancyGraphics ? "options.graphics.fancy" : "options.graphics.fast");
+
+	return caption;
 }
 
 /*static*/

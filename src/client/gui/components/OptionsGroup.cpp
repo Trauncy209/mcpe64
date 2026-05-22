@@ -48,8 +48,8 @@ void OptionsGroup::createToggle( const Options::Option* option, Minecraft* minec
 	OptionButton* element = new OptionButton(option);
 	element->setImageDef(def, true);
 	element->updateImage(&minecraft->options);
-	std::string itemLabel = I18n::get(option->getCaptionId());
-	OptionsItem* item = new OptionsItem(itemLabel, element);
+	std::string itemLabel = Options::getCaption(option);
+	OptionsItem* item = new OptionsItem(itemLabel, element, option);
 	addChild(item);
 	setupPositions();
 }
@@ -61,8 +61,8 @@ void OptionsGroup::createProgressSlider( const Options::Option* option, Minecraf
 									minecraft->options.getProgrssMax(option));
 	element->width = 100;
 	element->height = 20;
-	std::string itemLabel = I18n::get(option->getCaptionId());
-	OptionsItem* item = new OptionsItem(itemLabel, element);
+	std::string itemLabel = Options::getCaption(option);
+	OptionsItem* item = new OptionsItem(itemLabel, element, option);
 	addChild(item);
 	setupPositions();
 }
@@ -98,8 +98,8 @@ void OptionsGroup::createStepSlider( const Options::Option* option, Minecraft* m
 	Slider* element = new Slider(minecraft, option, steps);
 	element->width = 100;
 	element->height = 20;
-	std::string itemLabel = I18n::get(option->getCaptionId());
-	OptionsItem* item = new OptionsItem(itemLabel, element);
+	std::string itemLabel = Options::getCaption(option);
+	OptionsItem* item = new OptionsItem(itemLabel, element, option);
 	addChild(item);
 	setupPositions();
 }

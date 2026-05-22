@@ -7,6 +7,7 @@
 #include "../../../AppPlatform.h"
 #include "../../../platform/input/Keyboard.h"
 #include "CreditsScreen.h"
+#include "../../../locale/I18n.h"
 
 #include "../components/OptionsPane.h"
 #include "../components/ImageButton.h"
@@ -35,7 +36,7 @@ OptionsScreen::~OptionsScreen() {
 }
 
 void OptionsScreen::init() {
-	bHeader = new Touch::THeader(0, "Options");
+	bHeader = new Touch::THeader(0, I18n::get("options.title"));
 	btnClose = new ImageButton(1, "");
 
 	ImageDef def;
@@ -45,10 +46,10 @@ void OptionsScreen::init() {
 	def.setSrc(IntRectangle(150, 0, (int)def.width, (int)def.height));
 	btnClose->setImageDef(def, true);
 
-	categoryButtons.push_back(new Touch::TButton(2, "Game"));
-	categoryButtons.push_back(new Touch::TButton(3, "Controls"));
-	categoryButtons.push_back(new Touch::TButton(4, "Graphics"));
-	categoryButtons.push_back(new Touch::TButton(5, "Audio"));
+	categoryButtons.push_back(new Touch::TButton(2, I18n::get("options.group.game")));
+	categoryButtons.push_back(new Touch::TButton(3, I18n::get("options.group.controls")));
+	categoryButtons.push_back(new Touch::TButton(4, I18n::get("options.group.graphics")));
+	categoryButtons.push_back(new Touch::TButton(5, I18n::get("options.group.audio")));
 
 	buttons.push_back(bHeader);
 	buttons.push_back(btnClose);

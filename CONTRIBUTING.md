@@ -1,4 +1,4 @@
-# Contributing to mcpe64
+# Contributing to TruancyCraftPE
 
 Thanks for wanting to help improve **Minecraft Pocket Edition 0.6.1 alpha**.
 

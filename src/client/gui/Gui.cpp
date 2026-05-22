@@ -683,7 +683,7 @@ void Gui::renderDebugInfo() {
 
 	// Build lines (NULL entry = blank gap)
 	static char ln[8][96];
-	sprintf(ln[0], "Minecraft PE 0.6.1 alpha (mcpe64)");
+	sprintf(ln[0], "Minecraft PE 0.6.1 alpha (TruancyCraftPE)");
 	sprintf(ln[1], "%.1f fps", fps);
 	ln[2][0] = '\0'; // blank separator
 	sprintf(ln[3], "XYZ: %.3f / %.3f / %.3f", px, py, pz);

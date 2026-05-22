@@ -193,7 +193,7 @@ void StartMenuScreen::render( int xm, int ym, float a )
 	if (Textures::isTextureIdValid(minecraft->textures->loadAndBindTexture("gui/logo/github.png")))
 		blit(2, height - 10, 0, 0, 8, 8, 256, 256);
 {
-			std::string txt = "Trauncy209/mcpe64";
+			std::string txt = "TruancyCraftPE";
 			float wtxt = font->width(txt);
 			Gui::drawColoredString(font, txt, 12, height - 10, 255);
 			// underline link
@@ -221,11 +221,11 @@ void StartMenuScreen::_updateLicense()
 
 void StartMenuScreen::mouseClicked(int x, int y, int buttonNum) {
 	const int logoX = 2;
-	const int logoW = 8 + 2 + font->width("Trauncy209/mcpe64");
+	const int logoW = 8 + 2 + font->width("TruancyCraftPE");
 	const int logoY = height - 10;
 	const int logoH = 10;
 	if (x >= logoX && x <= logoX + logoW && y >= logoY && y <= logoY + logoH)
-		minecraft->platform()->openURL("https://gitea.sffempire.ru/Trauncy209/mcpe64");
+		minecraft->platform()->openURL("https://github.com/Trauncy209/TruancyCraftPE");
 	else
 		Screen::mouseClicked(x, y, buttonNum);
 }

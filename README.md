@@ -90,7 +90,7 @@ C:\apkbuild\build.ps1 -NoBuild
 
 ## Project Home
 The active GitHub home for this restoration is:
-- https://github.com/Trauncy209/mcpe64
+- https://github.com/Trauncy209/TruancyCraftPE
 
 This build continues earlier community restoration work.
 
