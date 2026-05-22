@@ -380,7 +380,8 @@ void ExternalFileLevelStorage::tick()
 			}
 		}
 
-        savePendingUnsavedChunks(2);
+		const int saveBudget = infiniteWorld ? 1 : 2;
+        savePendingUnsavedChunks(saveBudget);
 	}
 	if (tickCount - lastSavedEntitiesTick > (60 * SharedConstants::TicksPerSecond)) {
 		saveEntities(level, NULL);
