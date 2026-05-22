@@ -71,11 +71,11 @@ bool ClientSideNetworkHandler::areAllChunksLoaded()
 
 bool ClientSideNetworkHandler::isChunkLoaded(int x, int z)
 {
-	if (x < 0 || x >= CHUNK_CACHE_WIDTH || z < 0 || z >= CHUNK_CACHE_WIDTH) {
-		LOGE("Error: Tried to request chunk (%d, %d)\n", x, z);
-		return true;
+	for (int i = 0; i < NumRequestChunks; ++i) {
+		if (requestNextChunkIndexList[i].x == x && requestNextChunkIndexList[i].y == z)
+			return chunksLoaded[i];
 	}
-	return chunksLoaded[x * CHUNK_CACHE_WIDTH + z];
+	return false;
 	//return areAllChunksLoaded();
 }
 
@@ -152,7 +152,7 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, StartGam
 	MultiPlayerLevel* level = new MultiPlayerLevel(
 		storageSource->selectLevel(levelId, true),
 		"temp",
-		LevelSettings(packet->levelSeed, LevelSettings::validateGameType(packet->gameType)),
+		LevelSettings(packet->levelSeed, LevelSettings::validateGameType(packet->gameType), packet->levelGeneratorVersion),
 		SharedConstants::StorageVersion);
 	level->isClientSide = true;
 
@@ -578,7 +578,12 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, ChunkDat
 	//chunk->terrainPopulated = true;
 	chunk->unsaved = false;
 
-	chunksLoaded[packet->x * CHUNK_CACHE_WIDTH + packet->z] = true;
+	for (int i = 0; i < NumRequestChunks; ++i) {
+		if (requestNextChunkIndexList[i].x == packet->x && requestNextChunkIndexList[i].y == packet->z) {
+			chunksLoaded[i] = true;
+			break;
+		}
+	}
 
 	if (areAllChunksLoaded())
 	{
@@ -625,15 +630,29 @@ private:
 void ClientSideNetworkHandler::arrangeRequestChunkOrder() {
 	clearChunksLoaded();
 
+    const bool infiniteWorld = level && level->getLevelData()->getGeneratorVersion() == LGV_INFINITE;
+    const int chunkRadius = CHUNK_CACHE_WIDTH / 2;
+
     // Default sort is around center of the world
-    int cx = CHUNK_CACHE_WIDTH / 2;
-    int cz = CHUNK_CACHE_WIDTH / 2;
+    int cx = infiniteWorld ? 0 : CHUNK_CACHE_WIDTH / 2;
+    int cz = infiniteWorld ? 0 : CHUNK_CACHE_WIDTH / 2;
 
     // If player exists, let's sort around him
     Player* p = minecraft? minecraft->player : NULL;
     if (p) {
         cx = Mth::floor(p->x / (float)CHUNK_WIDTH);
         cz = Mth::floor(p->z / (float)CHUNK_DEPTH);
+    }
+
+    if (infiniteWorld) {
+        int idx = 0;
+        for (int x = cx - chunkRadius; x < cx + chunkRadius; ++x) {
+            for (int z = cz - chunkRadius; z < cz + chunkRadius; ++z) {
+                requestNextChunkIndexList[idx].x = x;
+                requestNextChunkIndexList[idx].y = z;
+                ++idx;
+            }
+        }
     }
 
     _ChunkSorter sorter(cx, cz);

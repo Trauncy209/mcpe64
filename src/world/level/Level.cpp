@@ -275,11 +275,12 @@ void Level::tickTiles() {
         int xx = Mth::floor(player->x / 16);
         int zz = Mth::floor(player->z / 16);
 
+		const bool infiniteWorld = levelData.getGeneratorVersion() == LGV_INFINITE;
 		for (int i = 0; i < pollChunkOffsetsSize; i += 2) {
 			const int xp = xx + pollChunkOffsets[i];
 			const int zp = zz + pollChunkOffsets[i+1];
-			if (xp >= 0 && xp < CHUNK_CACHE_WIDTH &&
-				zp >= 0 && zp < CHUNK_CACHE_WIDTH)
+			if (infiniteWorld || (xp >= 0 && xp < CHUNK_CACHE_WIDTH &&
+				zp >= 0 && zp < CHUNK_CACHE_WIDTH))
 				_chunksToPoll.insert(ChunkPos(xp, zp));
 		}
     }

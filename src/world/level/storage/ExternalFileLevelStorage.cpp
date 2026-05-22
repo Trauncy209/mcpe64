@@ -298,34 +298,84 @@ void ExternalFileLevelStorage::tick()
 	tickCount++;
 	if ((tickCount % 50) == 0 && level)
 	{
-		// look for chunks that needs to be saved
-		for (int z = 0; z < CHUNK_CACHE_WIDTH; z++)
-		{
-			for (int x = 0; x < CHUNK_CACHE_WIDTH; x++)
+		auto enqueueUnsavedChunk = [this](LevelChunk* chunk) {
+			if (!chunk || !chunk->unsaved)
+				return;
+
+			const int pos = (chunk->x << 16) ^ (chunk->z & 0xffff);
+			UnsavedChunkList::iterator prev = unsavedChunkList.begin();
+			for ( ; prev != unsavedChunkList.end(); ++prev)
 			{
-				LevelChunk* chunk = level->getChunk(x, z);
-				if (chunk && chunk->unsaved)
+				if ((*prev).pos == pos)
 				{
-					int pos = x + z * CHUNK_CACHE_WIDTH;
-					UnsavedChunkList::iterator prev = unsavedChunkList.begin();
-					for ( ; prev != unsavedChunkList.end(); ++prev)
+					// the chunk has been modified again, so update its time
+					(*prev).addedToList = RakNet::GetTimeMS();
+					break;
+				}
+			}
+			if (prev == unsavedChunkList.end())
+			{
+				UnsavedLevelChunk unsaved;
+				unsaved.pos = pos;
+				unsaved.addedToList = RakNet::GetTimeMS();
+				unsaved.chunk = chunk;
+				unsavedChunkList.push_back(unsaved);
+			}
+			chunk->unsaved = false; // not actually saved, but in our working list at least
+		};
+
+		const bool infiniteWorld = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE;
+		if (infiniteWorld)
+		{
+			std::vector<LevelChunk*> visitedChunks;
+			for (size_t i = 0; i < level->players.size(); ++i)
+			{
+				Player* player = level->players[i];
+				if (!player)
+					continue;
+
+				const int px = Mth::floor(player->x / (float)CHUNK_WIDTH);
+				const int pz = Mth::floor(player->z / (float)CHUNK_DEPTH);
+				for (int dz = -8; dz <= 8; ++dz)
+				{
+					for (int dx = -8; dx <= 8; ++dx)
 					{
-						if ((*prev).pos == pos)
+						const int cx = px + dx;
+						const int cz = pz + dz;
+						if (!level->hasChunk(cx, cz))
+							continue;
+
+						LevelChunk* chunk = level->getChunk(cx, cz);
+						if (!chunk)
+							continue;
+
+						bool alreadyVisited = false;
+						for (size_t vi = 0; vi < visitedChunks.size(); ++vi)
 						{
-							// the chunk has been modified again, so update its time
-							(*prev).addedToList = RakNet::GetTimeMS();
-							break;
+							if (visitedChunks[vi] == chunk)
+							{
+								alreadyVisited = true;
+								break;
+							}
 						}
+						if (alreadyVisited)
+							continue;
+
+						visitedChunks.push_back(chunk);
+						enqueueUnsavedChunk(chunk);
 					}
-					if (prev == unsavedChunkList.end())
-					{
-						UnsavedLevelChunk unsaved;
-						unsaved.pos = pos;
-						unsaved.addedToList = RakNet::GetTimeMS();
-						unsaved.chunk = chunk;
-						unsavedChunkList.push_back(unsaved);
-					}
-					chunk->unsaved = false; // not actually saved, but in our working list at least
+				}
+			}
+		}
+		else
+		{
+			// look for chunks that needs to be saved
+			for (int z = 0; z < CHUNK_CACHE_WIDTH; z++)
+			{
+				for (int x = 0; x < CHUNK_CACHE_WIDTH; x++)
+				{
+					LevelChunk* chunk = level->getChunk(x, z);
+					enqueueUnsavedChunk(chunk);
 				}
 			}
 		}
