@@ -7,15 +7,18 @@
 #include "../../../world/level/LevelSettings.h"
 #include "../../../platform/time.h"
 #include "../../../platform/input/Keyboard.h"
+#include "../../../SharedConstants.h"
 
 SimpleChooseLevelScreen::SimpleChooseLevelScreen(const std::string& levelName)
 :   bHeader(0),
     bGamemode(0),
+    bWorldType(0),
     bBack(0),
     bCreate(0),
     levelName(levelName),
     hasChosen(false),
     gamemode(GameType::Survival),
+    generatorVersion(LGV_ORIGINAL),
     tLevelName(0, "World name"),
     tSeed(1, "World seed")
 {
@@ -25,6 +28,7 @@ SimpleChooseLevelScreen::~SimpleChooseLevelScreen()
 {
     if (bHeader) delete bHeader;
     delete bGamemode;
+    delete bWorldType;
     delete bBack;
     delete bCreate;
 }
@@ -45,18 +49,22 @@ void SimpleChooseLevelScreen::init()
     }
     if (minecraft->useTouchscreen()) {
         bGamemode = new Touch::TButton(1, "Survival mode");
+        bWorldType = new Touch::TButton(4, "Classic world");
         bCreate  = new Touch::TButton(3, "Create");
     } else {
         bGamemode = new Button(1, "Survival mode");
+        bWorldType = new Button(4, "Classic world");
         bCreate  = new Button(3, "Create");
     }
 
     buttons.push_back(bHeader);
     buttons.push_back(bBack);
     buttons.push_back(bGamemode);
+    buttons.push_back(bWorldType);
     buttons.push_back(bCreate);
 
     tabButtons.push_back(bGamemode);
+    tabButtons.push_back(bWorldType);
     tabButtons.push_back(bBack);
     tabButtons.push_back(bCreate);
 
@@ -91,16 +99,22 @@ void SimpleChooseLevelScreen::setupPositions()
     tSeed.x = tLevelName.x;
     tSeed.y = tLevelName.y + 30;
 
-    bGamemode->width = 140;
+    bGamemode->width = 170;
+    bWorldType->width = 170;
     bGamemode->x = centerX - bGamemode->width / 2;
-    // compute vertical centre for gamemode in remaining space
+    bWorldType->x = centerX - bWorldType->width / 2;
+    // compute vertical centre for world options in remaining space
     {
         int bottomPad = 20;
         int availTop = buttonHeight + 20 + 30 + 10; // just below seed
         int availBottom = height - bottomPad - bCreate->height - 10; // leave some gap before create
         int availHeight = availBottom - availTop;
         if (availHeight < 0) availHeight = 0;
-        bGamemode->y = availTop + (availHeight - bGamemode->height) / 2;
+        int gap = 28;
+        int totalButtonsHeight = bGamemode->height + gap + bWorldType->height;
+        int startY = availTop + (availHeight - totalButtonsHeight) / 2;
+        bGamemode->y = startY;
+        bWorldType->y = bGamemode->y + bGamemode->height + gap;
     }
 
     bCreate->width = 100;
@@ -121,15 +135,20 @@ void SimpleChooseLevelScreen::render( int xm, int ym, float a )
     renderDirtBackground(0);
     glEnable2(GL_BLEND);
 
-    const char* str = NULL;
+    const char* gamemodeDesc = NULL;
     if (gamemode == GameType::Survival) {
-        str = "Mobs, health and gather resources";
+        gamemodeDesc = "Mobs, health and gather resources";
     } else if (gamemode == GameType::Creative) {
-        str = "Unlimited resources and flying";
+        gamemodeDesc = "Unlimited resources and flying";
     }
-    if (str) {
-        drawCenteredString(minecraft->font, str, width/2, bGamemode->y + bGamemode->height + 4, 0xffcccccc);
+    if (gamemodeDesc) {
+        drawCenteredString(minecraft->font, gamemodeDesc, width/2, bGamemode->y + bGamemode->height + 4, 0xffcccccc);
     }
+
+    const char* worldTypeDesc = generatorVersion == LGV_INFINITE
+        ? "Infinite terrain with chunk-based saves"
+        : "Original finite 256x256 world";
+    drawCenteredString(minecraft->font, worldTypeDesc, width/2, bWorldType->y + bWorldType->height + 4, 0xffcccccc);
 
     drawString(minecraft->font, "World name:", tLevelName.x, tLevelName.y - Font::DefaultLineHeight - 2, 0xffcccccc);
     drawString(minecraft->font, "World seed:", tSeed.x, tSeed.y - Font::DefaultLineHeight - 2, 0xffcccccc);
@@ -186,6 +205,12 @@ void SimpleChooseLevelScreen::buttonClicked( Button* button )
         return;
     }
 
+    if (button == bWorldType) {
+        generatorVersion = (generatorVersion == LGV_ORIGINAL) ? LGV_INFINITE : LGV_ORIGINAL;
+        bWorldType->msg = (generatorVersion == LGV_INFINITE) ? "Infinite world" : "Classic world";
+        return;
+    }
+
     if (button == bCreate) {
         int seed = getEpochTimeS();
         if (!tSeed.text.empty()) {
@@ -198,7 +223,7 @@ void SimpleChooseLevelScreen::buttonClicked( Button* button )
             }
         }
         std::string levelId = getUniqueLevelName(tLevelName.text);
-        LevelSettings settings(seed, gamemode);
+        LevelSettings settings(seed, gamemode, generatorVersion);
         minecraft->selectLevel(levelId, levelId, settings);
         minecraft->hostMultiplayer();
         minecraft->setScreen(new ProgressScreen());

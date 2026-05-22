@@ -6,6 +6,7 @@
 enum LevelGeneratorVersion
 {
 	LGV_ORIGINAL = 0,
+	LGV_INFINITE = 1,
 };
 
 namespace Common {

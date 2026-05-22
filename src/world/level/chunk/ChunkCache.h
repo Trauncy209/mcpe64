@@ -42,18 +42,19 @@ public:
 	}
 
     bool fits(int x, int z) {
-        return (x >= 0 && z >= 0 && x < CHUNK_CACHE_WIDTH && z < CHUNK_CACHE_WIDTH);
+        if (level->getLevelData()->getGeneratorVersion() == LGV_INFINITE)
+            return true;
+        return x >= 0 && z >= 0 && x < CHUNK_CACHE_WIDTH && z < CHUNK_CACHE_WIDTH;
     }
 
     bool hasChunk(int x, int z) {
-		// with a fixed world size, chunks outside the fitting area are always available (emptyChunks)
-        if (!fits(x, z)) return true;
-
+        if (!fits(x, z))
+            return false;
         if (x == xLast && z == zLast && last != NULL) {
             return true;
         }
-        int xs = x & (CHUNK_CACHE_WIDTH - 1);
-        int zs = z & (CHUNK_CACHE_WIDTH - 1);
+        int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (CHUNK_CACHE_WIDTH - 1)) : x;
+        int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (CHUNK_CACHE_WIDTH - 1)) : z;
         int slot = xs + zs * CHUNK_CACHE_WIDTH;
         return chunks[slot] != NULL && (chunks[slot] == emptyChunk || chunks[slot]->isAt(x, z));
     }
@@ -66,13 +67,14 @@ public:
 		//static Stopwatch sw;
 		//sw.start();
 
+		if (!fits(x, z))
+			return emptyChunk;
+
 		if (x == xLast && z == zLast && last != NULL) {
             return last;
         }
-		if (!fits(x, z)) return emptyChunk;
-        //if (!level->isFindingSpawn && !fits(x, z)) return emptyChunk;
-        int xs = x & (CHUNK_CACHE_WIDTH - 1);
-        int zs = z & (CHUNK_CACHE_WIDTH - 1);
+        int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (CHUNK_CACHE_WIDTH - 1)) : x;
+        int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (CHUNK_CACHE_WIDTH - 1)) : z;
         int slot = xs + zs * CHUNK_CACHE_WIDTH;
         if (!hasChunk(x, z)) {
             if (chunks[slot] != NULL) {
@@ -198,23 +200,20 @@ public:
 	
 	void saveAll(bool onlyUnsaved) {
 		if (storage != NULL) {
-			std::vector<LevelChunk*> chunks;
-			for (int z = 0; z < CHUNK_CACHE_WIDTH; ++z)
-			for (int x = 0; x < CHUNK_CACHE_WIDTH; ++x) {
-				LevelChunk* chunk = level->getChunk(x, z);
+			std::vector<LevelChunk*> loadedChunks;
+			for (int i = 0; i < CHUNK_CACHE_WIDTH * CHUNK_CACHE_WIDTH; ++i) {
+				LevelChunk* chunk = chunks[i];
+				if (chunk == NULL || chunk == emptyChunk)
+					continue;
 				if (!onlyUnsaved || chunk->shouldSave(false))
-					chunks.push_back( chunk );
+					loadedChunks.push_back(chunk);
 			}
-			storage->saveAll(level, chunks);
+			storage->saveAll(level, loadedChunks);
 		}
 	}
 private:
     LevelChunk* load(int x, int z) {
         if (storage == NULL) return emptyChunk;
-		if (x < 0 || x >= CHUNK_CACHE_WIDTH || z < 0 || z >= CHUNK_CACHE_WIDTH)
-		{
-			return emptyChunk;
-		}
         //try {
             LevelChunk* levelChunk = storage->load(level, x, z);
             if (levelChunk != NULL) {

@@ -259,7 +259,7 @@ void Minecraft::selectLevel( const std::string& levelId, const std::string& leve
 		storageSource->selectLevel(levelId, false),
 		levelName,
 		settings,
-		SharedConstants::GeneratorVersion);
+		settings.getGeneratorVersion());
 
 	// note: settings is useless beyond this point, since it's
 	//       either copied to LevelData (or LevelData read from file)
@@ -371,11 +371,15 @@ void Minecraft::prepareLevel(const std::string& title) {
 	if (!level->isNew())
 		level->setUpdateLights(false);
 
+	const bool infiniteWorld = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE;
+	int chunkRadius = CHUNK_CACHE_WIDTH / 2;
 	int Max = CHUNK_CACHE_WIDTH * CHUNK_CACHE_WIDTH;
 	int pp = 0;
-	for (int x = 8; x < (CHUNK_CACHE_WIDTH * CHUNK_WIDTH); x += CHUNK_WIDTH) {
-        for (int z = 8; z < (CHUNK_CACHE_WIDTH * CHUNK_WIDTH); z += CHUNK_WIDTH) {
+	for (int cx = infiniteWorld ? -chunkRadius : 0; cx < (infiniteWorld ? chunkRadius : CHUNK_CACHE_WIDTH); ++cx) {
+        for (int cz = infiniteWorld ? -chunkRadius : 0; cz < (infiniteWorld ? chunkRadius : CHUNK_CACHE_WIDTH); ++cz) {
             progressStagePercentage = 100 * pp++ / Max;
+			int x = cx * CHUNK_WIDTH + 8;
+			int z = cz * CHUNK_WIDTH + 8;
             //printf("level generation progress %d\n", progressStagePercentage);
 			B.start();
             level->getTile(x, 64, z);
@@ -391,11 +395,11 @@ void Minecraft::prepareLevel(const std::string& title) {
 	level->setUpdateLights(true);
 
 	C.start();
-	for (int x = 0; x < CHUNK_CACHE_WIDTH; x++)
+	for (int cx = infiniteWorld ? -chunkRadius : 0; cx < (infiniteWorld ? chunkRadius : CHUNK_CACHE_WIDTH); cx++)
 	{
-		for (int z = 0; z < CHUNK_CACHE_WIDTH; z++)
+		for (int cz = infiniteWorld ? -chunkRadius : 0; cz < (infiniteWorld ? chunkRadius : CHUNK_CACHE_WIDTH); cz++)
 		{
-			LevelChunk* chunk = level->getChunk(x, z);
+			LevelChunk* chunk = level->getChunk(cx, cz);
 			if (chunk && !chunk->createdFromSave)
 			{
 				chunk->unsaved = false;

@@ -42,7 +42,8 @@ LevelData::LevelData( const LevelSettings& settings, const std::string& levelNam
 }
 
 LevelData::LevelData( CompoundTag* tag )
-:	loadedPlayerTag(NULL)
+:	loadedPlayerTag(NULL),
+	generatorVersion(LGV_ORIGINAL)
 {
 	//LOGI("ctor 3: %p (%p)\n", this, tag);
 	getTagData(tag);
@@ -169,6 +170,7 @@ void LevelData::setTagData( CompoundTag* tag, CompoundTag* playerTag )
 	tag->putLong("LastPlayed", getEpochTimeS());
 	tag->putString("LevelName", levelName);
 	tag->putInt("StorageVersion", storageVersion);
+	tag->putInt("GeneratorVersion", generatorVersion);
 	tag->putInt("Platform", 2);
 
 	if (playerTag != NULL) {
@@ -189,6 +191,7 @@ void LevelData::getTagData( const CompoundTag* tag )
 	sizeOnDisk = (int)tag->getLong("SizeOnDisk");
 	levelName = tag->getString("LevelName");
 	storageVersion = tag->getInt("StorageVersion");
+	generatorVersion = tag->contains("GeneratorVersion", Tag::TAG_Int) ? tag->getInt("GeneratorVersion") : LGV_ORIGINAL;
 
 	spawnMobs = (gameType == GameType::Survival);
 

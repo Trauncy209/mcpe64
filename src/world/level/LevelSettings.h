@@ -3,6 +3,8 @@
 
 //package net.minecraft.world.level;
 
+#include "../../SharedConstants.h"
+
 namespace GameType {
 	const int Undefined = -1;
 	const int Survival = 0;
@@ -14,13 +16,14 @@ namespace GameType {
 class LevelSettings
 {
 public:
-    LevelSettings(long seed, int gameType)
+    LevelSettings(long seed, int gameType, int generatorVersion = (int)LGV_ORIGINAL)
     :   seed(seed),
-        gameType(gameType)
+        gameType(validateGameType(gameType)),
+        generatorVersion(validateGeneratorVersion(generatorVersion))
     {
     }
 	static LevelSettings None() {
-		return LevelSettings(-1,-1);
+		return LevelSettings(-1, -1, -1);
 	}
 
     long getSeed() const {
@@ -29,6 +32,10 @@ public:
 
     int getGameType() const {
         return gameType;
+    }
+
+    int getGeneratorVersion() const {
+        return generatorVersion;
     }
 
 	//
@@ -50,9 +57,25 @@ public:
 		return "Undefined";
 	}
 
+	static int validateGeneratorVersion(int generatorVersion) {
+		switch (generatorVersion) {
+		case LGV_ORIGINAL:
+		case LGV_INFINITE:
+			return generatorVersion;
+		}
+		return LGV_ORIGINAL;
+	}
+
+	static std::string generatorVersionToString(int generatorVersion) {
+		if (generatorVersion == LGV_INFINITE) return "Infinite";
+		if (generatorVersion == LGV_ORIGINAL) return "Classic";
+		return "Unknown";
+	}
+
 private:
     const long seed;
     const int gameType;
+    const int generatorVersion;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL__LevelSettings_H__*/

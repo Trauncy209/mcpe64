@@ -869,10 +869,11 @@ bool Entity::load( CompoundTag* tag )
     float yy = pos->getFloat(1);
     float zz = pos->getFloat(2);
 
-    // Add a small padding if standing next to the world edges
-    const float padding = bbWidth * 0.5f + 0.001f;
-    xx = Mth::clamp(xx, padding, (float)LEVEL_WIDTH - padding);
-    zz = Mth::clamp(zz, padding, (float)LEVEL_DEPTH - padding);
+    if (level->getLevelData()->getGeneratorVersion() != LGV_INFINITE) {
+        const float padding = bbWidth * 0.5f + 0.001f;
+        xx = Mth::clamp(xx, padding, (float)LEVEL_WIDTH - padding);
+        zz = Mth::clamp(zz, padding, (float)LEVEL_DEPTH - padding);
+    }
 
     xo = xOld = x = xx;
     yo = yOld = y = yy;
