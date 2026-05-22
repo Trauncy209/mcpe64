@@ -56,7 +56,7 @@ public:
         int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (CHUNK_CACHE_WIDTH - 1)) : x;
         int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (CHUNK_CACHE_WIDTH - 1)) : z;
         int slot = xs + zs * CHUNK_CACHE_WIDTH;
-        return chunks[slot] != NULL && (chunks[slot] == emptyChunk || chunks[slot]->isAt(x, z));
+        return chunks[slot] != NULL && chunks[slot] != emptyChunk && chunks[slot]->isAt(x, z);
     }
 
     LevelChunk* create(int x, int z) {

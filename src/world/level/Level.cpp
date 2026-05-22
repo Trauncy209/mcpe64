@@ -951,7 +951,11 @@ HitResult Level::clip(const Vec3& A, const Vec3& b, bool liquid /*= false*/, boo
 		if (solidOnly && tile != NULL && tile->getAABB(this, xTile0, yTile0, zTile0) == NULL) {
 			// No collision
 		} else if (t > 0 && tile->mayPick(data, liquid)) {
-			if(xTile0 >= 0 && zTile0 >= 0 && xTile0 < LEVEL_WIDTH && zTile0 < LEVEL_WIDTH) {
+			const bool infiniteWorld = levelData.getGeneratorVersion() == LGV_INFINITE;
+			const bool insideLoadedWorld = infiniteWorld
+				? hasChunkAt(xTile0, Level::DEPTH / 2, zTile0)
+				: (xTile0 >= 0 && zTile0 >= 0 && xTile0 < LEVEL_WIDTH && zTile0 < LEVEL_DEPTH);
+			if (insideLoadedWorld) {
 				HitResult r = tile->clip(this, xTile0, yTile0, zTile0, a, b);
 				if (r.isHit()) return r;
 			}
