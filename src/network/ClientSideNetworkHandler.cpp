@@ -59,6 +59,12 @@ void ClientSideNetworkHandler::recenterChunkRequests()
 
 void ClientSideNetworkHandler::requestNextChunk()
 {
+	while (requestNextChunkIndex < NumRequestChunks && chunksLoaded[requestNextChunkIndex])
+	{
+		requestNextChunkIndex++;
+        requestNextChunkPosition++;
+	}
+
 	if (requestNextChunkIndex < NumRequestChunks)
 	{
         IntPair& chunk = requestNextChunkIndexList[requestNextChunkIndex];
@@ -636,7 +642,8 @@ private:
 
 
 void ClientSideNetworkHandler::arrangeRequestChunkOrder() {
-	clearChunksLoaded();
+	requestNextChunkIndex = 0;
+	requestNextChunkPosition = 0;
 
     const bool infiniteWorld = level && level->getLevelData()->getGeneratorVersion() == LGV_INFINITE;
     const int chunkRadius = CHUNK_CACHE_WIDTH / 2;
@@ -662,9 +669,20 @@ void ClientSideNetworkHandler::arrangeRequestChunkOrder() {
             }
         }
     }
+    else {
+        for (int i = 0; i < NumRequestChunks; ++i) {
+            requestNextChunkIndexList[i].x = i / CHUNK_CACHE_WIDTH;
+            requestNextChunkIndexList[i].y = i % CHUNK_CACHE_WIDTH;
+        }
+    }
 
     _ChunkSorter sorter(cx, cz);
     std::sort(requestNextChunkIndexList, requestNextChunkIndexList + NumRequestChunks, sorter);
+
+    for (int i = 0; i < NumRequestChunks; ++i) {
+        const IntPair& chunk = requestNextChunkIndexList[i];
+        chunksLoaded[i] = level && level->hasChunkNow(chunk.x, chunk.y);
+    }
 }
 
 void ClientSideNetworkHandler::levelGenerated(Level* level)

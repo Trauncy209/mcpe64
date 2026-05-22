@@ -1,1 +1,1 @@
-3714ab5a581392a5145ec7d05963e347602d28a514b9394c9b75c509116521bc  /home/truancy/Downloads/mcpe64-arm64-16k/.release/TruancyCraftPE-0.6.1-arm64-16k.apk
+de45a069710d830e7e1501e49b4bde95d563d323ea845ed3dd612a526c413435  /home/truancy/Downloads/mcpe64-arm64-16k/.release/TruancyCraftPE-0.6.1-arm64-16k.apk
