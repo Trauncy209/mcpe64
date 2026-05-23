@@ -1626,7 +1626,7 @@ bool Level::containsAnyLiquid(const AABB& box) {
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
-                if (!hasChunkAtNow(x, y, z)) continue;
+                if (isClientSide ? !hasChunkAtNow(x, y, z) : !hasChunkAt(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material->isLiquid()) {
                     return true;
@@ -1671,7 +1671,7 @@ bool Level::containsMaterial(const AABB& box, const Material* material) {
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
-                if (!hasChunkAtNow(x, y, z)) continue;
+                if (isClientSide ? !hasChunkAtNow(x, y, z) : !hasChunkAt(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material == material) {
                     return true;
@@ -1691,7 +1691,7 @@ bool Level::containsLiquid(const AABB& box, const Material* material) {
     for (int x = x0; x < x1; x++)
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++) {
-                if (!hasChunkAtNow(x, y, z)) continue;
+                if (isClientSide ? !hasChunkAtNow(x, y, z) : !hasChunkAt(x, y, z)) continue;
                 Tile* tile = Tile::tiles[getTile(x, y, z)];
                 if (tile != NULL && tile->material == material) {
                     int data = getData(x, y, z);
