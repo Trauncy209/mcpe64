@@ -372,7 +372,7 @@ bool Entity::isUnderLiquid(const Material* material) {
     int xt = Mth::floor(x);
     int yt = Mth::floor((float)Mth::floor(yp));
     int zt = Mth::floor(z);
-    if (!(level->isClientSide ? level->hasChunkAtNow(xt, yt, zt) : level->hasChunkAt(xt, yt, zt)))
+    if (!level->hasChunkAtNow(xt, yt, zt))
         return false;
     int t = level->getTile(xt, yt, zt);
     if (t != 0 && Tile::tiles[t]->material == material) {
