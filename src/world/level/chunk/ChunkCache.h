@@ -48,6 +48,10 @@ public:
     }
 
     bool hasChunk(int x, int z) {
+        if (!fits(x, z))
+            return false;
+        if (level->getLevelData()->getGeneratorVersion() == LGV_INFINITE)
+            return true;
         return hasChunkNow(x, z);
     }
 
