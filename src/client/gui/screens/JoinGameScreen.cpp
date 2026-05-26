@@ -58,7 +58,27 @@ std::vector<JoinGameListEntry> buildVisibleServerList(const std::vector<SavedSer
     return serverList;
 }
 
+ClientProtocol detectProtocolForServer(const JoinGameListEntry& server) {
+    if (server.address.GetPort() == 19134) {
+        return CLIENT_PROTOCOL_RAKET_COMPAT;
+    }
+
+    std::string lowerTitle = server.title;
+    for (size_t i = 0; i < lowerTitle.size(); ++i) {
+        if (lowerTitle[i] >= 'A' && lowerTitle[i] <= 'Z') {
+            lowerTitle[i] = char(lowerTitle[i] - 'A' + 'a');
+        }
+    }
+
+    if (lowerTitle.find("raket") != std::string::npos) {
+        return CLIENT_PROTOCOL_RAKET_COMPAT;
+    }
+
+    return CLIENT_PROTOCOL_CLASSIC;
+}
+
 bool connectToServer(Minecraft* minecraft, const JoinGameListEntry& server) {
+    minecraft->raknetInstance->setClientProtocol(detectProtocolForServer(server));
     if (!minecraft->netCallback) {
         minecraft->netCallback = new ClientSideNetworkHandler(minecraft, minecraft->raknetInstance);
     }

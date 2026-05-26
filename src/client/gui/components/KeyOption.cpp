@@ -1,22 +1,32 @@
 #include "KeyOption.h"
 #include <client/Minecraft.h>
+#include <sstream>
 
-KeyOption::KeyOption(Minecraft* minecraft, OptionId optId) 
-    : Touch::TButton((int)optId, Keyboard::getKeyName(minecraft->options.getIntValue(optId))) {}
+std::string KeyOption::describeKey(Minecraft* minecraft, int keyIndex) {
+    if (!minecraft || keyIndex < 0 || keyIndex >= 16 || !minecraft->options.keyMappings[keyIndex]) {
+        return "Unbound";
+    }
 
+    std::ostringstream ss;
+    ss << minecraft->options.keyMappings[keyIndex]->name << ": " << minecraft->options.keyMappings[keyIndex]->key;
+    return ss.str();
+}
+
+KeyOption::KeyOption(Minecraft* minecraft, int keyIndex)
+    : Touch::TButton(keyIndex, describeKey(minecraft, keyIndex)) {}
 
 void KeyOption::mouseClicked(Minecraft* minecraft, int x, int y, int buttonNum) {
     selected = isInside(x, y);
-    msg = (selected)? "..." : Keyboard::getKeyName(minecraft->options.getIntValue((OptionId)id));
+    msg = selected ? "..." : describeKey(minecraft, id);
 }
 
 void KeyOption::keyPressed(Minecraft* minecraft, int key) {
-    if (!selected) return;
+    if (!selected || !minecraft) return;
 
     if (key != Keyboard::KEY_ESCAPE) {
-        minecraft->options.set((OptionId)id, key);
+        minecraft->options.setKey(id, key);
     }
 
     selected = false;
-    msg = Keyboard::getKeyName(minecraft->options.getIntValue((OptionId)id));
+    msg = describeKey(minecraft, id);
 }

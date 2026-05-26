@@ -6,16 +6,28 @@
 class FoliageColor
 {
 public:
+	static bool useTint;
+
+	static void setUseTint(bool value) {
+       useTint = value;
+    }
+
 //     static void init(int[] pixels) {
 //         FoliageColor::pixels = pixels;
 //     }
-// 
+//
 //     static int get(float temp, float rain) {
 //         rain *= temp;
 //         int x = (int) ((1 - temp) * 255);
 //         int y = (int) ((1 - rain) * 255);
 //         return pixels[y << 8 | x];
 //     }
+
+    static void init(int* p) {
+        pixels = p;
+    }
+
+    static int get(float temp, float rain);
 
     static int getEvergreenColor() {
         return 0x619961;
@@ -30,7 +42,7 @@ public:
     }
 
 private:
-    //static int pixels[256*256];
+    static int* pixels;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL__FoliageColor_H__*/

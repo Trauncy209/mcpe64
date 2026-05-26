@@ -1,6 +1,5 @@
 #include "FoliageColor.h"
 
-// TODO: Probably move all the stuff from the header into here so it's a bit cleaner
 bool FoliageColor::useTint = true;
 
 int FoliageColor::get(float temp, float rain) {
@@ -10,4 +9,4 @@ int FoliageColor::get(float temp, float rain) {
 	return pixels[y << 8 | x];
 }
 
-int* FoliageColor::pixels = nullptr; 
+int* FoliageColor::pixels = nullptr;

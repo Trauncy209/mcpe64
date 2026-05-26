@@ -1,97 +1,189 @@
 # TruancyCraftPE
 
-A community-driven restoration and improvement project for **Minecraft Pocket Edition 0.6.1 alpha**.
+TruancyCraftPE is a community restoration and expansion of **Minecraft: Pocket Edition 0.6.1 alpha**.
 
-Our goal is simple: **remake Minecraft PE 0.6.1 the best way possible** while preserving the original feel that made early Pocket Edition special.
+This project is about keeping the soul of old MCPE while pushing it forward on modern devices.
 
-We want this repository to be a place where:
-- **players** can help test, report issues, and shape the experience
-- **developers** can improve performance, controls, rendering, multiplayer, UI, and platform support
-- **fans of classic Minecraft PE** can help preserve an important piece of Minecraft history
+**Our philosophy:** this should be a **community-made Minecraft, not corporate slop**.
 
-> Players and developers are both welcome here.
-> If you care about classic MCPE, you are part of the mission.
+We want to preserve what made early Pocket Edition special, fix what was broken, and steadily build a better version of it in public.
 
-## Mission
-This project exists to:
-- preserve the original **0.6.1 alpha** experience
-- make it run well on modern hardware
-- improve controls and usability without losing the old-school feel
-- restore unfinished or broken features where it makes sense
-- build an open community around classic Minecraft PE modding and restoration
+---
 
-## Project Priorities
-Current focus areas include:
-- Android compatibility and packaging
-- save reliability on modern devices
-- options/menu improvements
-- controller and non-touch input support
-- multiplayer/LAN stability
-- rendering fixes and performance
-- screen/UI cleanup for newer phones
+## What TruancyCraftPE already has
 
-## Current Status
-This repo already includes work on:
-- Android build support
-- touch control improvements
-- fog fixes
-- sound fixes
-- better debug/F3 information
-- sprinting
-- chat/commands work in progress
-- options/menu work in progress
+Current work in this repository includes:
 
-Still actively being improved:
-- controller support
-- server hosting and multiplayer polish
-- performance optimization
-- screen/layout fixes
-- modern Android compatibility
+- **Classic and infinite worlds**
+  - classic finite 256x256 worlds
+  - infinite terrain with chunk streaming
+- **Expanded world generation settings**
+  - caves toggle
+  - ravines toggle
+  - water lakes toggle
+  - lava lakes toggle
+  - water springs toggle
+  - lava springs toggle
+  - option to keep a world fully **classic**
+- **Improved settings/options work**
+  - render distance option
+  - more menu and settings work than stock 0.6.1
+  - mobile-oriented tuning options like pixels-per-millimeter
+- **Multiplayer and LAN work**
+  - LAN discovery
+  - saved server list support
+  - Add Server flow
+  - touch Join Game improvements
+- **Modern Android build support**
+- **Touch/UI cleanup for newer phones**
+- **Sprinting**
+- **Debug/F3-style information improvements**
+- **Ongoing bug fixes across the old codebase**
+
+---
+
+## Terrain and worldgen status
+
+The codebase includes support for modernized infinite-world generation pieces such as:
+
+- biome-based terrain generation
+- large cave generation
+- canyon / ravine generation
+- water lakes
+- lava lakes
+- configurable cave/ravine/lake/spring generation for world creation
+
+If you want the old feel, you can still make a **Classic world**.
+If you want expanded terrain, you can make an **Infinite world** and tune the worldgen options.
+
+---
+
+## Multiplayer status
+
+TruancyCraftPE already includes multiplayer restoration work such as:
+
+- LAN game discovery
+- Join Game screen updates
+- saved server support
+- Add Server UI
+- server MOTD ping display for saved/discovered servers
+- touch multiplayer UX improvements
+
+This is still an active area of development, especially around compatibility and protocol cleanup.
+
+---
+
+## What we are building toward
+
+Our long-term goal is not just to preserve 0.6.1, but to turn it into the best version of itself.
+
+That means work toward:
+
+- better graphics
+- better terrain
+- better NPCs / mobs / world behavior
+- better controls
+- better movement feel
+- better camera / looking-around feel
+- better UI and usability
+- better multiplayer
+- better controller support
+- better performance
+- better modding/restoration infrastructure
+- continued bug fixing as we dig through this very old game
+
+This is an old game, and a lot of the work is exactly what you would expect from reviving one:
+**fix bugs, modernize carefully, keep the feel, repeat**.
+
+---
+
+## Project goals
+
+TruancyCraftPE exists to:
+
+- preserve the original 0.6.1 alpha experience
+- keep classic worlds playable and recognizable
+- add optional improvements without forcing the game to lose its identity
+- make the game work well on modern Android devices and modern systems
+- improve multiplayer and LAN support
+- expand world generation while still allowing classic behavior
+- give the community a real place to collaborate on old MCPE restoration
+
+---
 
 ## Contributing
-We welcome contributions from both experienced developers and first-time contributors.
 
-If you want to help:
-1. open an issue for bugs, ideas, or feature requests
-2. fork the repo and make focused changes
-3. submit a pull request with a clear description
-4. include screenshots, logs, or testing notes when relevant
+If you care about classic MCPE, you are welcome here.
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+You can help by:
 
-## Community
-A dedicated community space is planned soon.
+1. opening issues for bugs and regressions
+2. suggesting gameplay, UI, worldgen, or multiplayer improvements
+3. testing APKs and reporting what works and what breaks
+4. sending pull requests with focused changes
 
-For now, this repository is the home base for:
-- development progress
-- bug reports
-- feature planning
-- testing coordination
+Please include logs, screenshots, device info, or reproduction steps whenever possible.
 
-When the Discord is ready, it can be added here as the main live community hub.
+---
 
-## How to Build
-### Android
-Download Android NDK r14b and run `build.ps1`:
+## Building
 
-```powershell
-# Full build (NDK + Java + APK + install)
-C:\apkbuild\build.ps1
+### Android build
 
-# Skip NDK recompile (Java/assets changed only)
-C:\apkbuild\build.ps1 -NoJava
+The current Android build flow uses `build.sh`.
 
-# Skip Java recompile (C++ changed only)
-C:\apkbuild\build.ps1 -NoCpp
+Example full build:
 
-# Only repackage + install (no recompile at all)
-C:\apkbuild\build.ps1 -NoBuild
+```bash
+ANDROID_SDK_ROOT=/home/Alkaline/Android/Sdk \
+ANDROID_NDK_PATH=/home/Alkaline/Android/Sdk/ndk/26.1.10909125 \
+ADB=/usr/bin/true \
+bash ./build.sh --abi arm64-v8a
 ```
 
-## Project Home
-The active GitHub home for this restoration is:
+Useful variants:
+
+```bash
+# skip Java rebuild
+bash ./build.sh --abi arm64-v8a --no-java
+
+# skip C++ rebuild
+bash ./build.sh --abi arm64-v8a --no-cpp
+
+# package only
+bash ./build.sh --abi arm64-v8a --no-java --no-cpp
+```
+
+### Important packaging note
+
+On this project, the Android `d8` / `r8` step can crash on:
+
+- `build-apk/classes/com/mojang/minecraftpe/MainActivity$1.class`
+
+If that happens, the current working fallback is:
+
+```bash
+/home/Alkaline/Android/Sdk/build-tools/30.0.3/dx \
+  --dex --output=build-apk/classes.dex build-apk/classes
+
+ANDROID_SDK_ROOT=/home/Alkaline/Android/Sdk \
+ANDROID_NDK_PATH=/home/Alkaline/Android/Sdk/ndk/26.1.10909125 \
+ADB=/usr/bin/true \
+bash ./build.sh --abi arm64-v8a --no-java --no-cpp
+```
+
+---
+
+## Repository
+
+Active GitHub home:
+
 - https://github.com/Trauncy209/TruancyCraftPE
 
-This build continues earlier community restoration work.
+---
 
-Thanks to everyone helping preserve and improve classic Minecraft PE.
+## Final note
+
+TruancyCraftPE is for people who still love old Pocket Edition and want to make it better together.
+
+If you want to help build a stronger, cleaner, community-driven version of classic MCPE, you're in the right place.

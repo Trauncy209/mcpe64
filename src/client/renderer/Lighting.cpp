@@ -10,12 +10,9 @@ void Lighting::turnOff() {
 }
 
 void Lighting::turnOn(Minecraft* minecraft) {
-	if (!minecraft->options.getBooleanValue(OPTIONS_NORMAL_LIGHTING)){ // if normal lighting is false, then just dont use the lighting system at all like in vanilla - shredder
-	turnOff();
-		return;
-	}
-	glEnable(GL_NORMALIZE);
-	// if normal lighting is true then enable GLES/OpenGL states to setup lighting
+    (void)minecraft;
+    glEnable(GL_NORMALIZE);
+    // normal lighting path
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);

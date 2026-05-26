@@ -4,7 +4,7 @@
 
 class TextOption : public TextBox {
 public:
-    TextOption(Minecraft* minecraft, OptionId optId);
+    TextOption(Minecraft* minecraft, int optId);
 
     virtual bool loseFocus(Minecraft* minecraft);
 };

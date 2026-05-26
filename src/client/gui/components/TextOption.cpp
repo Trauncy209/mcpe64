@@ -1,17 +1,13 @@
 #include "TextOption.h"
 #include <client/Minecraft.h>
 
-TextOption::TextOption(Minecraft* minecraft, OptionId optId) 
-    : TextBox((int)optId, minecraft->options.getOpt(optId)->getStringId()) 
+TextOption::TextOption(Minecraft* minecraft, int optId)
+    : TextBox(optId, "Option")
 {
-    text = minecraft->options.getStringValue(optId);
+    (void)minecraft;
 }
 
 bool TextOption::loseFocus(Minecraft* minecraft) {
-    if (TextBox::loseFocus(minecraft)) {
-        minecraft->options.set((OptionId)id, text);
-        return true;
-    }
-
-    return false;
+    (void)minecraft;
+    return TextBox::loseFocus(minecraft);
 }

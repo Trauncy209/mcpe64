@@ -1,6 +1,8 @@
 #ifndef NET_MINECRAFT_CLIENT_RENDERER__TextureData_H__
 #define NET_MINECRAFT_CLIENT_RENDERER__TextureData_H__
 
+#include <cstddef>
+
 enum TextureFormat
 {
     TEXF_UNCOMPRESSED_8888,
@@ -31,7 +33,7 @@ typedef struct TextureData {
 	bool memoryHandledExternally;
 
     TextureFormat format;
-    int identifier; 
+    int identifier;
 } TextureData;
 
 #endif /*NET_MINECRAFT_CLIENT_RENDERER__Textures_H__*/

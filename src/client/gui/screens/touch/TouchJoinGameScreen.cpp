@@ -59,7 +59,27 @@ std::vector<Touch::JoinGameListEntry> buildVisibleServerList(const std::vector<S
     return serverList;
 }
 
+ClientProtocol detectProtocolForServer(const Touch::JoinGameListEntry& server) {
+    if (server.address.GetPort() == 19134) {
+        return CLIENT_PROTOCOL_RAKET_COMPAT;
+    }
+
+    std::string lowerTitle = server.title;
+    for (size_t i = 0; i < lowerTitle.size(); ++i) {
+        if (lowerTitle[i] >= 'A' && lowerTitle[i] <= 'Z') {
+            lowerTitle[i] = char(lowerTitle[i] - 'A' + 'a');
+        }
+    }
+
+    if (lowerTitle.find("raket") != std::string::npos) {
+        return CLIENT_PROTOCOL_RAKET_COMPAT;
+    }
+
+    return CLIENT_PROTOCOL_CLASSIC;
+}
+
 bool connectToServer(Minecraft* minecraft, const Touch::JoinGameListEntry& server) {
+    minecraft->raknetInstance->setClientProtocol(detectProtocolForServer(server));
     if (!minecraft->netCallback) {
         minecraft->netCallback = new ClientSideNetworkHandler(minecraft, minecraft->raknetInstance);
     }
