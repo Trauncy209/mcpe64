@@ -3,15 +3,64 @@
 #include "../ProgressScreen.h"
 #include "../../Font.h"
 #include "../../../Minecraft.h"
+#include "../../../SavedServerList.h"
 #include "../../../renderer/Textures.h"
+#include "../../../../network/ClientSideNetworkHandler.h"
+#include "../../../../raknet/GetTime.h"
+
+namespace {
+RakNet::SystemAddress makeAddress(const SavedServerEntry& entry) {
+    return RakNet::SystemAddress(entry.address.c_str(), entry.port);
+}
+
+ServerList buildVisibleServerList(const std::vector<SavedServerEntry>& savedServers, const ServerList& discovered) {
+    ServerList serverList;
+
+    for (size_t i = 0; i < savedServers.size(); ++i) {
+        PingedCompatibleServer server;
+        server.name = savedServers[i].name.c_str();
+        server.address = makeAddress(savedServers[i]);
+        server.pingTime = 0;
+        server.isSpecial = false;
+        serverList.push_back(server);
+    }
+
+    for (size_t i = 0; i < discovered.size(); ++i) {
+        if (discovered[i].name.GetLength() == 0) {
+            continue;
+        }
+
+        bool merged = false;
+        for (size_t j = 0; j < serverList.size(); ++j) {
+            if (serverList[j].address == discovered[i].address) {
+                serverList[j].name = discovered[i].name;
+                serverList[j].pingTime = discovered[i].pingTime;
+                serverList[j].isSpecial = discovered[i].isSpecial;
+                merged = true;
+                break;
+            }
+        }
+
+        if (!merged) {
+            serverList.push_back(discovered[i]);
+        }
+    }
+
+    return serverList;
+}
+
+bool connectToServer(Minecraft* minecraft, const PingedCompatibleServer& server) {
+    if (!minecraft->netCallback) {
+        minecraft->netCallback = new ClientSideNetworkHandler(minecraft, minecraft->raknetInstance);
+    }
+    minecraft->isLookingForMultiplayer = true;
+    return minecraft->raknetInstance->connect(server.address.ToString(false), server.address.GetPort());
+}
+}
 
 namespace Touch {
 
-//
-// Games list
-//
-
-void AvailableGamesList::selectStart( int item) {
+void AvailableGamesList::selectStart(int item) {
 	startSelected = item;
 }
 
@@ -19,56 +68,46 @@ void AvailableGamesList::selectCancel() {
 	startSelected = -1;
 }
 
-void AvailableGamesList::selectItem( int item, bool doubleClick ) {
+void AvailableGamesList::selectItem(int item, bool doubleClick) {
 	LOGI("selected an item! %d\n", item);
 	selectedItem = item;
 }
 
-void AvailableGamesList::renderItem( int i, int x, int y, int h, Tesselator& t )
+void AvailableGamesList::renderItem(int i, int x, int y, int h, Tesselator& t)
 {
 	if (startSelected == i && Multitouch::getFirstActivePointerIdEx() >= 0) {
-		fill((int)x0, y, (int)x1, y+h, 0x809E684F);
+		fill((int)x0, y, (int)x1, y + h, 0x809E684F);
 	}
 
-	//static int colors[2] = {0xffffb0, 0xcccc90};
 	const PingedCompatibleServer& s = copiedServerList[i];
-	unsigned int color  = s.isSpecial? 0x6090a0 : 0xffffb0;
-	unsigned int color2 = 0xffffa0;//colors[i&1];
+	unsigned int color = s.isSpecial ? 0x6090a0 : 0xffffb0;
+	unsigned int color2 = 0xffffa0;
 
 	int xx1 = (int)x0 + 24;
 	int xx2 = xx1;
 
 	if (s.isSpecial) {
 		xx1 += 50;
-
 		glEnable2(GL_TEXTURE_2D);
-        glColor4f2(1,1,1,1);
+        glColor4f2(1, 1, 1, 1);
         glEnable2(GL_BLEND);
 		minecraft->textures->loadAndBindTexture("gui/badge/minecon140.png");
 		blit(xx2, y + 6, 0, 0, 37, 8, 140, 240);
 	}
 
-	drawString(minecraft->font, s.name.C_String(), xx1, y + 4 + 2, color);
-	drawString(minecraft->font, s.address.ToString(false), xx2, y + 18, color2);
-
-	/*
-	drawString(minecraft->font, copiedServerList[i].name.C_String(), (int)x0 + 24, y + 4, color);
-	drawString(minecraft->font, copiedServerList[i].address.ToString(false), (int)x0 + 24, y + 18, color);
-	*/
+	drawString(minecraft->font, s.name.C_String(), xx1, y + 6, color);
+	drawString(minecraft->font, s.address.ToString(true, ':'), xx2, y + 18, color2);
 }
 
-
-//
-// Join Game screen
-//
 JoinGameScreen::JoinGameScreen()
-:	bJoin(  2, "Join Game"),
-	bBack(  3, "Back"),
-	bHeader(0, ""),
-	gamesList(NULL)
+:	bJoin(2, "Join Game"),
+    bAddServer(4, "Add"),
+	bBack(3, "Back"),
+	bHeader(0, "Join Game"),
+	gamesList(NULL),
+    lastManualPingTime(0)
 {
 	bJoin.active = false;
-	//gamesList->yInertia = 0.5f;
 }
 
 JoinGameScreen::~JoinGameScreen()
@@ -78,7 +117,7 @@ JoinGameScreen::~JoinGameScreen()
 
 void JoinGameScreen::init()
 {
-	//buttons.push_back(&bJoin);
+	buttons.push_back(&bAddServer);
 	buttons.push_back(&bBack);
 	buttons.push_back(&bHeader);
 
@@ -86,25 +125,20 @@ void JoinGameScreen::init()
 	gamesList = new AvailableGamesList(minecraft, width, height);
 
 #ifdef ANDROID
-	//tabButtons.push_back(&bJoin);
+	tabButtons.push_back(&bAddServer);
 	tabButtons.push_back(&bBack);
 #endif
 }
 
 void JoinGameScreen::setupPositions() {
-	//int yBase = height - 26;
-
-	//#ifdef ANDROID
-	bJoin.y =	0;
-	bBack.y =   0;
+	bAddServer.y = 0;
+	bBack.y = 0;
 	bHeader.y = 0;
-	//#endif
 
-	// Center buttons
-	//bJoin.x = width / 2 - 4 - bJoin.w;
-	bBack.x = 0;//width / 2 + 4;
+	bBack.x = 0;
+    bAddServer.x = width - bAddServer.width;
 	bHeader.x = bBack.width;
-	bHeader.width = width - bHeader.x;
+	bHeader.width = width - bBack.width - bAddServer.width;
 }
 
 void JoinGameScreen::buttonClicked(Button* button)
@@ -114,21 +148,23 @@ void JoinGameScreen::buttonClicked(Button* button)
 		if (isIndexValid(gamesList->selectedItem))
 		{
 			PingedCompatibleServer selectedServer = gamesList->copiedServerList[gamesList->selectedItem];
-			minecraft->joinMultiplayer(selectedServer);
-			{
+            if (connectToServer(minecraft, selectedServer)) {
 				bJoin.active = false;
 				bBack.active = false;
+                bAddServer.active = false;
 				minecraft->setScreen(new ProgressScreen());
-			}
+            }
 		}
-		//minecraft->locateMultiplayer();
-		//minecraft->setScreen(new JoinGameScreen());
 	}
 	if (button->id == bBack.id)
 	{
 		minecraft->cancelLocateMultiplayer();
 		minecraft->screenChooser.setScreen(SCREEN_STARTMENU);
 	}
+    if (button->id == bAddServer.id)
+    {
+        minecraft->screenChooser.setScreen(SCREEN_JOINBYIP);
+    }
 }
 
 bool JoinGameScreen::handleBackEvent(bool isDown)
@@ -141,8 +177,7 @@ bool JoinGameScreen::handleBackEvent(bool isDown)
 	return true;
 }
 
-
-bool JoinGameScreen::isIndexValid( int index )
+bool JoinGameScreen::isIndexValid(int index)
 {
 	return gamesList && index >= 0 && index < gamesList->getNumberOfItems();
 }
@@ -154,17 +189,19 @@ void JoinGameScreen::tick()
 		return;
 	}
 
-	//gamesList->tick();
+    std::vector<SavedServerEntry> savedServers = SavedServerList::load();
+    RakNet::TimeMS now = RakNet::GetTimeMS();
+    if (now - lastManualPingTime > 1000) {
+        for (size_t i = 0; i < savedServers.size(); ++i) {
+            minecraft->raknetInstance->pingForHost(savedServers[i].address.c_str(), savedServers[i].port);
+        }
+        lastManualPingTime = now;
+    }
 
-	const ServerList& orgServerList = minecraft->raknetInstance->getServerList();
-	ServerList serverList;
-	for (unsigned int i = 0; i < orgServerList.size(); ++i)
-		if (orgServerList[i].name.GetLength() > 0)
-			serverList.push_back(orgServerList[i]);
+    ServerList serverList = buildVisibleServerList(savedServers, minecraft->raknetInstance->getServerList());
 
 	if (serverList.size() != gamesList->copiedServerList.size())
 	{
-		// copy the currently selected item
 		PingedCompatibleServer selectedServer;
 		bool hasSelection = false;
 		if (isIndexValid(gamesList->selectedItem))
@@ -176,7 +213,6 @@ void JoinGameScreen::tick()
 		gamesList->copiedServerList = serverList;
 		gamesList->selectItem(-1, false);
 
-		// re-select previous item if it still exists
 		if (hasSelection)
 		{
 			for (unsigned int i = 0; i < gamesList->copiedServerList.size(); i++)
@@ -191,7 +227,7 @@ void JoinGameScreen::tick()
 	} else {
 		for (int i = (int)gamesList->copiedServerList.size()-1; i >= 0 ; --i) {
 			for (int j = 0; j < (int) serverList.size(); ++j)
-				if (serverList[j].address == gamesList->copiedServerList[i].address)
+				if (serverList[j].address == gamesList->copiedServerList[i].address && serverList[j].name.GetLength() > 0)
 					gamesList->copiedServerList[i].name = serverList[j].name;
 		}
 	}
@@ -199,7 +235,7 @@ void JoinGameScreen::tick()
 	bJoin.active = isIndexValid(gamesList->selectedItem);
 }
 
-void JoinGameScreen::render( int xm, int ym, float a )
+void JoinGameScreen::render(int xm, int ym, float a)
 {
 	bool hasNetwork = minecraft->platform()->isNetworkEnabled(true);
 #ifdef WIN32
@@ -207,24 +243,21 @@ void JoinGameScreen::render( int xm, int ym, float a )
 #endif
 
 	renderBackground();
-	if (hasNetwork) gamesList->render(xm, ym, a);
-	else gamesList->renderDirtBackground();
+	gamesList->render(xm, ym, a);
 	Screen::render(xm, ym, a);
 
 	const int baseX = bHeader.x + bHeader.width / 2;
-
 	if (hasNetwork) {
 		std::string s = "Scanning for WiFi Games...";
 		drawCenteredString(minecraft->font, s, baseX, 8, 0xffffffff);
 
 		const int textWidth = minecraft->font->width(s);
 		const int spinnerX = baseX + textWidth / 2 + 6;
-
 		static const char* spinnerTexts[] = {"-", "\\", "|", "/"};
 		int n = ((int)(5.5f * getTimeS()) % 4);
 		drawCenteredString(minecraft->font, spinnerTexts[n], spinnerX, 8, 0xffffffff);
 	} else {
-		drawCenteredString(minecraft->font, "WiFi is disabled", baseX, 8, 0xffffffff);
+		drawCenteredString(minecraft->font, gamesList->copiedServerList.empty() ? "WiFi is disabled" : "Saved Servers", baseX, 8, 0xffffffff);
 	}
 }
 

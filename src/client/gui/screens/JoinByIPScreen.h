@@ -1,4 +1,3 @@
-
 #include "../Screen.h"
 #include "../components/Button.h"
 #include "../../Minecraft.h"
@@ -21,7 +20,9 @@ public:
 	void buttonClicked(Button* button);
     virtual bool handleBackEvent(bool isDown);
 private:
+    TextBox tName;
     TextBox tIP;
+    TextBox tPort;
     Touch::THeader bHeader;
 	Touch::TButton bJoin;
 	ImageButton bBack;

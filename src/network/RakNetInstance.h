@@ -33,6 +33,7 @@ public:
 	virtual void setIsLoggedIn(bool status) {}
 
 	virtual void pingForHosts(int port) {}
+	virtual bool pingForHost(const char* host, int port) { return false; }
 	virtual void stopPingForHosts() {}
 	virtual const ServerList& getServerList() { static ServerList l; return l; }
 	virtual void clearServerList() {}
@@ -70,6 +71,7 @@ public:
 	void setIsLoggedIn(bool status);
 
 	void pingForHosts(int basePort);
+	bool pingForHost(const char* host, int port);
 	void stopPingForHosts();
 	const ServerList& getServerList();
 	void clearServerList();

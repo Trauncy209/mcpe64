@@ -125,6 +125,20 @@ void RakNetInstance::pingForHosts(int basePort)
 		rakPeer->Ping("255.255.255.255", basePort + i, true);
 }
 
+bool RakNetInstance::pingForHost(const char* host, int port)
+{
+	if (!host || !*host)
+		return false;
+
+	if (!rakPeer->IsActive())
+	{
+		RakNet::SocketDescriptor socket(0, 0);
+		rakPeer->Startup(4, &socket, 1);
+	}
+
+	return rakPeer->Ping(host, port, true);
+}
+
 void RakNetInstance::stopPingForHosts()
 {
 	if (isPingingForServers)

@@ -30,15 +30,11 @@ public:
 	}
 
 protected:
-
 	virtual int getNumberOfItems() { return (int)copiedServerList.size(); }
-
 	virtual void selectCancel();
 	virtual void selectStart(int item);
 	virtual void selectItem(int item, bool doubleClick);
-
 	virtual bool isSelectedItem(int item) { return item == selectedItem; }
-
 	virtual void renderBackground() {}
 	virtual void renderItem(int i, int x, int y, int h, Tesselator& t);
 };
@@ -53,20 +49,18 @@ public:
 	void setupPositions();
 
 	virtual bool handleBackEvent(bool isDown);
-
 	virtual bool isIndexValid(int index);
-
 	virtual void tick();
 	void render(int xm, int ym, float a);
-
 	void buttonClicked(Button* button);
-
 	bool isInGameScreen();
 private:
 	Button bJoin;
+    TButton bAddServer;
 	TButton bBack;
 	THeader bHeader;
 	AvailableGamesList* gamesList;
+    RakNet::TimeMS lastManualPingTime;
 };
 
 };
