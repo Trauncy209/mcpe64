@@ -251,10 +251,23 @@ Java_com_mojang_minecraftpe_GLRenderer_nativeUpdate(JNIEnv* env) {
 //
 // Keyboard events
 //
+namespace {
+int convertAndroidJavaKeyCode(jint keyCode) {
+    switch (keyCode) {
+    case 67:
+        return Keyboard::KEY_BACKSPACE;
+    case 66:
+        return Keyboard::KEY_RETURN;
+    default:
+        return keyCode;
+    }
+}
+}
+
 JNIEXPORT void JNICALL
 Java_com_mojang_minecraftpe_MainActivity_nativeOnKeyDown(JNIEnv* env, jclass cls, jint keyCode) {
     LOGI("@nativeOnKeyDown: %d\n", keyCode);
-    Keyboard::feed(keyCode, true);
+    Keyboard::feed(convertAndroidJavaKeyCode(keyCode), true);
 }
 JNIEXPORT void JNICALL
 Java_com_mojang_minecraftpe_MainActivity_nativeTextChar(JNIEnv* env, jclass cls, jint unicodeChar) {
@@ -264,7 +277,7 @@ Java_com_mojang_minecraftpe_MainActivity_nativeTextChar(JNIEnv* env, jclass cls,
 JNIEXPORT void JNICALL
 Java_com_mojang_minecraftpe_MainActivity_nativeOnKeyUp(JNIEnv* env, jclass cls, jint keyCode) {
     LOGI("@nativeOnKeyUp: %d\n", (int)keyCode);
-    Keyboard::feed(keyCode, false);
+    Keyboard::feed(convertAndroidJavaKeyCode(keyCode), false);
 }
 
 JNIEXPORT jboolean JNICALL
