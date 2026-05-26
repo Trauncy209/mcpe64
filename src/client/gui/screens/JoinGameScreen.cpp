@@ -12,16 +12,21 @@ RakNet::SystemAddress makeAddress(const SavedServerEntry& entry) {
     return RakNet::SystemAddress(entry.address.c_str(), entry.port);
 }
 
-ServerList buildVisibleServerList(const std::vector<SavedServerEntry>& savedServers, const ServerList& discovered) {
-    ServerList serverList;
+std::string formatAddress(const RakNet::SystemAddress& address) {
+    return address.ToString(true, ':');
+}
+
+std::vector<JoinGameListEntry> buildVisibleServerList(const std::vector<SavedServerEntry>& savedServers, const ServerList& discovered) {
+    std::vector<JoinGameListEntry> serverList;
 
     for (size_t i = 0; i < savedServers.size(); ++i) {
-        PingedCompatibleServer server;
-        server.name = savedServers[i].name.c_str();
-        server.address = makeAddress(savedServers[i]);
-        server.pingTime = 0;
-        server.isSpecial = false;
-        serverList.push_back(server);
+        JoinGameListEntry entry;
+        entry.address = makeAddress(savedServers[i]);
+        entry.title = savedServers[i].name.empty() ? formatAddress(entry.address) : savedServers[i].name;
+        entry.subtitle = formatAddress(entry.address);
+        entry.isSpecial = false;
+        entry.isSaved = true;
+        serverList.push_back(entry);
     }
 
     for (size_t i = 0; i < discovered.size(); ++i) {
@@ -32,8 +37,7 @@ ServerList buildVisibleServerList(const std::vector<SavedServerEntry>& savedServ
         bool merged = false;
         for (size_t j = 0; j < serverList.size(); ++j) {
             if (serverList[j].address == discovered[i].address) {
-                serverList[j].name = discovered[i].name;
-                serverList[j].pingTime = discovered[i].pingTime;
+                serverList[j].title = discovered[i].name.C_String();
                 serverList[j].isSpecial = discovered[i].isSpecial;
                 merged = true;
                 break;
@@ -41,14 +45,20 @@ ServerList buildVisibleServerList(const std::vector<SavedServerEntry>& savedServ
         }
 
         if (!merged) {
-            serverList.push_back(discovered[i]);
+            JoinGameListEntry entry;
+            entry.address = discovered[i].address;
+            entry.title = discovered[i].name.C_String();
+            entry.subtitle = "LAN";
+            entry.isSpecial = discovered[i].isSpecial;
+            entry.isSaved = false;
+            serverList.push_back(entry);
         }
     }
 
     return serverList;
 }
 
-bool connectToServer(Minecraft* minecraft, const PingedCompatibleServer& server) {
+bool connectToServer(Minecraft* minecraft, const JoinGameListEntry& server) {
     if (!minecraft->netCallback) {
         minecraft->netCallback = new ClientSideNetworkHandler(minecraft, minecraft->raknetInstance);
     }
@@ -59,25 +69,43 @@ bool connectToServer(Minecraft* minecraft, const PingedCompatibleServer& server)
 
 void AvailableGamesList::renderItem(int i, int x, int y, int h, Tesselator& t)
 {
-    const PingedCompatibleServer& s = copiedServerList[i];
-    unsigned int color = s.isSpecial ? 0xff00b0 : 0xffffa0;
-    drawString(minecraft->font, s.name.C_String(), x, y + 2, color);
-    drawString(minecraft->font, s.address.ToString(true, ':'), x, y + 16, 0xffffa0);
+    const JoinGameListEntry& s = copiedServerList[i];
+    const int left = x - 4;
+    const int right = x + 216;
+    const int bottom = y + h - 2;
+    const int panelColor = isSelectedItem(i) ? 0x80576f8f : 0x60303030;
+    const int borderColor = isSelectedItem(i) ? 0xffd8e6ff : 0xff202020;
+    unsigned int titleColor = s.isSpecial ? 0xff00b0 : 0xffffffff;
+    unsigned int subtitleColor = s.isSaved ? 0xffd0d0d0 : 0xffa8ff90;
+
+    fill(left, y - 1, right, bottom, borderColor);
+    fill(left + 1, y, right - 1, bottom - 1, panelColor);
+
+    drawString(minecraft->font, s.title, x, y + 2, titleColor);
+    drawString(minecraft->font, s.subtitle, x, y + 16, subtitleColor);
 }
 
 JoinGameScreen::JoinGameScreen()
 :	bJoin(2, "Join Game"),
+    bDelete(5, "Delete"),
 	bBack(3, "Back"),
     bAddServer(4, "Add Server"),
 	gamesList(NULL),
     lastManualPingTime(0)
 {
 	bJoin.active = false;
+    bDelete.active = false;
 }
 
 JoinGameScreen::~JoinGameScreen()
 {
 	delete gamesList;
+}
+
+bool JoinGameScreen::canDeleteSelection() const
+{
+    return gamesList && gamesList->selectedItem >= 0 && gamesList->selectedItem < (int)gamesList->copiedServerList.size()
+        && gamesList->copiedServerList[gamesList->selectedItem].isSaved;
 }
 
 void JoinGameScreen::buttonClicked(Button* button)
@@ -86,15 +114,27 @@ void JoinGameScreen::buttonClicked(Button* button)
 	{
 		if (isIndexValid(gamesList->selectedItem))
 		{
-			PingedCompatibleServer selectedServer = gamesList->copiedServerList[gamesList->selectedItem];
+			JoinGameListEntry selectedServer = gamesList->copiedServerList[gamesList->selectedItem];
             if (connectToServer(minecraft, selectedServer)) {
 				bJoin.active = false;
+                bDelete.active = false;
 				bBack.active = false;
                 bAddServer.active = false;
 				minecraft->setScreen(new ProgressScreen());
             }
 		}
 	}
+    if (button->id == bDelete.id)
+    {
+        if (canDeleteSelection()) {
+            const JoinGameListEntry& selectedServer = gamesList->copiedServerList[gamesList->selectedItem];
+            if (SavedServerList::remove(selectedServer.address.ToString(false), selectedServer.address.GetPort())) {
+                gamesList->selectItem(-1, false);
+                bJoin.active = false;
+                bDelete.active = false;
+            }
+        }
+    }
 	if (button->id == bBack.id)
 	{
 		minecraft->cancelLocateMultiplayer();
@@ -132,49 +172,37 @@ void JoinGameScreen::tick()
         lastManualPingTime = now;
     }
 
-    ServerList serverList = buildVisibleServerList(savedServers, minecraft->raknetInstance->getServerList());
+    std::vector<JoinGameListEntry> serverList = buildVisibleServerList(savedServers, minecraft->raknetInstance->getServerList());
 
-	if (serverList.size() != gamesList->copiedServerList.size())
-	{
-		PingedCompatibleServer selectedServer;
-		bool hasSelection = false;
-		if (isIndexValid(gamesList->selectedItem))
-		{
-			selectedServer = gamesList->copiedServerList[gamesList->selectedItem];
-			hasSelection = true;
-		}
+    RakNet::SystemAddress selectedAddress;
+    bool hasSelection = false;
+    if (isIndexValid(gamesList->selectedItem)) {
+        selectedAddress = gamesList->copiedServerList[gamesList->selectedItem].address;
+        hasSelection = true;
+    }
 
-		gamesList->copiedServerList = serverList;
-		gamesList->selectItem(-1, false);
+    gamesList->copiedServerList = serverList;
+    gamesList->selectItem(-1, false);
 
-		if (hasSelection)
-		{
-			for (unsigned int i = 0; i < gamesList->copiedServerList.size(); ++i)
-			{
-				if (gamesList->copiedServerList[i].address == selectedServer.address)
-				{
-					gamesList->selectItem(i, false);
-					break;
-				}
-			}
-		}
-	}
-    else {
-        for (int i = (int)gamesList->copiedServerList.size() - 1; i >= 0; --i) {
-            for (int j = 0; j < (int)serverList.size(); ++j) {
-                if (serverList[j].address == gamesList->copiedServerList[i].address && serverList[j].name.GetLength() > 0) {
-                    gamesList->copiedServerList[i].name = serverList[j].name;
-                }
+    if (hasSelection) {
+        for (unsigned int i = 0; i < gamesList->copiedServerList.size(); ++i)
+        {
+            if (gamesList->copiedServerList[i].address == selectedAddress)
+            {
+                gamesList->selectItem(i, false);
+                break;
             }
         }
-	}
+    }
 
 	bJoin.active = isIndexValid(gamesList->selectedItem);
+    bDelete.active = canDeleteSelection();
 }
 
 void JoinGameScreen::init()
 {
 	buttons.push_back(&bJoin);
+    buttons.push_back(&bDelete);
 	buttons.push_back(&bBack);
     buttons.push_back(&bAddServer);
 
@@ -183,6 +211,7 @@ void JoinGameScreen::init()
 
 #ifdef ANDROID
 	tabButtons.push_back(&bJoin);
+    tabButtons.push_back(&bDelete);
 	tabButtons.push_back(&bBack);
     tabButtons.push_back(&bAddServer);
 #endif
@@ -190,13 +219,20 @@ void JoinGameScreen::init()
 
 void JoinGameScreen::setupPositions() {
 	int yBase = height - 26;
+    const int buttonWidth = 100;
+    const int gap = 6;
+    const int startX = (width - buttonWidth * 3 - gap * 2) / 2;
 
 	bJoin.y = yBase;
+    bDelete.y = yBase;
 	bBack.y = yBase;
-	bBack.width = bJoin.width = 120;
+	bJoin.width = buttonWidth;
+    bDelete.width = buttonWidth;
+	bBack.width = buttonWidth;
 
-	bJoin.x = width / 2 - 4 - bJoin.width;
-	bBack.x = width / 2 + 4;
+	bJoin.x = startX;
+    bDelete.x = startX + buttonWidth + gap;
+	bBack.x = startX + (buttonWidth + gap) * 2;
 
     bAddServer.width = 120;
     bAddServer.y = 4;

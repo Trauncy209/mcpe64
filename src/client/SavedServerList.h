@@ -13,6 +13,7 @@ class SavedServerList {
 public:
     static std::vector<SavedServerEntry> load();
     static bool addOrUpdate(const SavedServerEntry& entry);
+    static bool remove(const std::string& address, int port);
 
 private:
     static bool save(const std::vector<SavedServerEntry>& entries);

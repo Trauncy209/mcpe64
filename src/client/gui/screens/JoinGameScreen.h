@@ -1,6 +1,9 @@
 #ifndef NET_MINECRAFT_CLIENT_GUI_SCREENS__JoinGameScreen_H__
 #define NET_MINECRAFT_CLIENT_GUI_SCREENS__JoinGameScreen_H__
 
+#include <string>
+#include <vector>
+
 #include "../Screen.h"
 #include "../components/Button.h"
 #include "../components/SmallButton.h"
@@ -8,12 +11,20 @@
 #include "../../Minecraft.h"
 #include "../../../network/RakNetInstance.h"
 
+struct JoinGameListEntry {
+    std::string title;
+    std::string subtitle;
+    RakNet::SystemAddress address;
+    bool isSpecial;
+    bool isSaved;
+};
+
 class JoinGameScreen;
 
 class AvailableGamesList : public ScrolledSelectionList
 {
 	int selectedItem;
-	ServerList copiedServerList;
+	std::vector<JoinGameListEntry> copiedServerList;
 
 	friend class JoinGameScreen;
 
@@ -49,7 +60,10 @@ public:
 	void buttonClicked(Button* button);
 	bool isInGameScreen();
 private:
+    bool canDeleteSelection() const;
+
 	Button bJoin;
+    Button bDelete;
 	Button bBack;
     Button bAddServer;
 	AvailableGamesList* gamesList;

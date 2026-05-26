@@ -50,7 +50,18 @@ void TextBox::mouseClicked(Minecraft* minecraft, int x, int y, int buttonNum) {
 }
 
 void TextBox::handleChar(char c) {
-    if (focused && c >= 32 && c < 127 && (int)text.size() < 256) {
+    if (!focused) {
+        return;
+    }
+
+    if (c == '\b' || c == 127) {
+        if (!text.empty()) {
+            text.pop_back();
+        }
+        return;
+    }
+
+    if (c >= 32 && c < 127 && (int)text.size() < 256) {
         text.push_back(c);
     }
 }
@@ -86,14 +97,15 @@ void TextBox::render(Minecraft* minecraft, int xm, int ym) {
     );
 
     int textY = y + (height - Font::DefaultLineHeight) / 2;
+    int textX = x + 3;
 
     if (text.empty() && !focused) {
-        drawString(minecraft->font, hint, x + 2, textY, 0xff5e5e5e);
+        minecraft->font->draw(hint, (float)textX, (float)textY, 0xff5e5e5e);
     }
 
     if (focused && blink) text.push_back('_');
 
-    drawString(minecraft->font, text, x + 2, textY, 0xffffffff);
+    minecraft->font->draw(text, (float)textX, (float)textY, 0xffffffff);
 
     if (focused && blink) text.pop_back();
 

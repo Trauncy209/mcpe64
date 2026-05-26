@@ -220,3 +220,22 @@ bool SavedServerList::addOrUpdate(const SavedServerEntry& entry) {
     entries.push_back(cleaned);
     return save(entries);
 }
+
+bool SavedServerList::remove(const std::string& address, int port) {
+    std::string cleanedAddress = sanitizeAddress(address);
+    if (cleanedAddress.empty()) {
+        return false;
+    }
+
+    int cleanedPort = sanitizePort(port);
+    std::vector<SavedServerEntry> entries = load();
+
+    for (std::vector<SavedServerEntry>::iterator it = entries.begin(); it != entries.end(); ++it) {
+        if (sanitizeAddress(it->address) == cleanedAddress && sanitizePort(it->port) == cleanedPort) {
+            entries.erase(it);
+            return save(entries);
+        }
+    }
+
+    return false;
+}

@@ -10,8 +10,8 @@ JoinByIPScreen::JoinByIPScreen() :
     tName(0, "Server Name"),
     tIP(1, "Address or IP"),
     tPort(2, "Port"),
-    bHeader(3, "Add Server"),
-	bJoin(4, "Add Server"),
+    bHeader(3, "Server Details"),
+	bJoin(4, "Save Server"),
 	bBack(5, "")
 {
 	bJoin.active = false;
@@ -78,18 +78,20 @@ void JoinByIPScreen::init()
 }
 
 void JoinByIPScreen::setupPositions() {
-    int boxWidth = width - 40;
-    if (boxWidth > 240) boxWidth = 240;
-    const int portWidth = 80;
-    const int boxHeight = 18;
+    int boxWidth = width - 48;
+    if (boxWidth > 260) boxWidth = 260;
+    const int portWidth = 82;
+    const int boxHeight = 20;
+    const int labelGap = 9;
     const int centerX = (width - boxWidth) / 2;
-    const int baseY = height / 2 - 38;
+    const int baseY = height / 2 - 50;
 
 	bBack.x = width - bBack.width;
 	bBack.y = 0;
 	bHeader.x = 0;
 	bHeader.y = 0;
 	bHeader.width = width - bBack.width;
+    bJoin.width = 110;
 
     tName.x = centerX;
     tName.y = baseY;
@@ -97,7 +99,7 @@ void JoinByIPScreen::setupPositions() {
     tName.height = boxHeight;
 
     tIP.x = centerX;
-    tIP.y = baseY + boxHeight + 10;
+    tIP.y = baseY + boxHeight + 14 + labelGap;
     tIP.width = boxWidth - portWidth - 6;
     tIP.height = boxHeight;
 
@@ -107,12 +109,24 @@ void JoinByIPScreen::setupPositions() {
     tPort.height = boxHeight;
 
     bJoin.x = (width - bJoin.width) / 2;
-	bJoin.y = tIP.y + boxHeight + 12;
+	bJoin.y = tIP.y + boxHeight + 18 + labelGap;
 }
 
 void JoinByIPScreen::render( int xm, int ym, float a )
 {
 	renderBackground();
+
+    const int cardLeft = tName.x - 12;
+    const int cardTop = tName.y - 18;
+    const int cardRight = tName.x + tName.width + 12;
+    const int cardBottom = bJoin.y + bJoin.height + 12;
+    fill(cardLeft, cardTop, cardRight, cardBottom, 0xff202020);
+    fill(cardLeft + 1, cardTop + 1, cardRight - 1, cardBottom - 1, 0x70404040);
+
+    minecraft->font->draw("Name", (float)tName.x, (float)(tName.y - 10), 0xffffffff);
+    minecraft->font->draw("Address", (float)tIP.x, (float)(tIP.y - 10), 0xffffffff);
+    minecraft->font->draw("Port", (float)tPort.x, (float)(tPort.y - 10), 0xffffffff);
+
 	Screen::render(xm, ym, a);
 }
 

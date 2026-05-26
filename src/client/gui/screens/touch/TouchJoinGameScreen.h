@@ -1,6 +1,9 @@
 #ifndef NET_MINECRAFT_CLIENT_GUI_SCREENS_TOUCH__TouchJoinGameScreen_H__
 #define NET_MINECRAFT_CLIENT_GUI_SCREENS_TOUCH__TouchJoinGameScreen_H__
 
+#include <string>
+#include <vector>
+
 #include "../../Screen.h"
 #include "../../components/Button.h"
 #include "../../components/SmallButton.h"
@@ -11,19 +14,27 @@
 
 namespace Touch {
 
+struct JoinGameListEntry {
+    std::string title;
+    std::string subtitle;
+    RakNet::SystemAddress address;
+    bool isSpecial;
+    bool isSaved;
+};
+
 class JoinGameScreen;
 
 class AvailableGamesList : public RolledSelectionListV
 {
 	int startSelected;
 	int selectedItem;
-	ServerList copiedServerList;
+	std::vector<JoinGameListEntry> copiedServerList;
 
 	friend class JoinGameScreen;
 
 public:
 	AvailableGamesList(Minecraft* _minecraft, int _width, int _height)
-	:	RolledSelectionListV(_minecraft, _width, _height, 0, _width, 24, _height, 34),
+	:	RolledSelectionListV(_minecraft, _width, _height, 0, _width, 30, _height - 38, 38),
 		selectedItem(-1),
 		startSelected(-1)
 	{
@@ -55,7 +66,10 @@ public:
 	void buttonClicked(Button* button);
 	bool isInGameScreen();
 private:
-	Button bJoin;
+    bool canDeleteSelection() const;
+
+	TButton bJoin;
+    TButton bDelete;
     TButton bAddServer;
 	TButton bBack;
 	THeader bHeader;
