@@ -762,5 +762,3 @@ class TextViewReader implements StringValue {
 	}
 	private TextView _view;
 }
-/bin/bash: line 5: C:/Users/Truan/AppData/Local/hermes/cache/terminal/hermes-snap-5e2ca959862b.sh: No such file or directory
-/bin/bash: line 6: C:/Users/Truan/AppData/Local/hermes/cache/terminal/hermes-cwd-5e2ca959862b.txt: No such file or directory

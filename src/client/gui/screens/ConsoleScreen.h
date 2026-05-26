@@ -26,7 +26,7 @@ public:
     virtual void mouseClicked(int x, int y, int buttonNum);
 
 private:
-    void execute();
+    void execute(bool closeAfter);
     std::string processCommand(const std::string& cmd);
     int getVisibleHistoryLines() const;
     int getMaxHistoryOffset() const;

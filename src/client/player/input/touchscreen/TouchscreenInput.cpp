@@ -6,7 +6,6 @@
 #include "../../../../world/entity/player/Player.h"
 
 #include "../../../Minecraft.h"
-#include "../../../gui/screens/ConsoleScreen.h"
 #include "../../../../platform/log.h"
 #include "../../../renderer/Textures.h"
 #include "../../../sound/SoundEngine.h"
@@ -18,7 +17,6 @@ static const int AREA_DPAD_W = 102;
 static const int AREA_DPAD_E = 103;
 static const int AREA_DPAD_C = 104;
 static const int AREA_PAUSE = 105;
-static const int AREA_CHAT = 106;
 
 static int cPressed = 0;
 static int cReleased = 0;
@@ -78,7 +76,6 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* opti
 	aJump(0),
 	aUpLeft(0),
 	aUpRight(0),
-	aChat(0),
 	_allowHeightChange(false)
 {
 	releaseAllKeys();
@@ -169,10 +166,6 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
                                                           4,
                                                           btnRight,
                                                           4 + btnSize));
-	_model.addArea(AREA_CHAT, aChat = new RectangleArea(btnRight - btnSize * 2 - btnGap,
-                                                         4,
-                                                         btnRight - btnSize - btnGap,
-                                                         4 + btnSize));
 
 	//rebuild();
 }
@@ -222,7 +215,6 @@ void TouchscreenInput_TestFps::tick( Player* player )
 	bool tmpForward = false;
 	bool tmpNorthJump = false;
 	bool openPauseScreen = false;
-	bool openChatScreen = false;
 
 	for (int i = 0; i < 7; ++i)
 		_buttons[i] = false;
@@ -314,11 +306,6 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				openPauseScreen = true;
 			}
 		}
-		else if (areaId == AREA_CHAT) {
-			if (Multitouch::isReleased(p)) {
-				openChatScreen = true;
-			}
-		}
 		_buttons[areaId - AREA_DPAD_FIRST] = setButton;
 	}
 
@@ -326,10 +313,6 @@ void TouchscreenInput_TestFps::tick( Player* player )
 		if (openPauseScreen) {
 			_minecraft->soundEngine->playUI("random.click", 1, 1);
 			_minecraft->screenChooser.setScreen(SCREEN_PAUSE);
-		}
-		else if (openChatScreen && _minecraft->level) {
-			_minecraft->soundEngine->playUI("random.click", 1, 1);
-			_minecraft->setScreen(new ConsoleScreen());
 		}
 	}
 
@@ -388,21 +371,16 @@ static void drawRectangleArea(Tesselator& t, RectangleArea* a, int ux, int vy, f
 	t.vertexUV(x0, y0, 0, uu,	vv);
 }
 
-static void drawRectangleAreaSprite(Tesselator& t, RectangleArea* a, float ux, float vy, float uw, float vh) {
-	const float pm = 1.0f / 256.0f;
-	const float uu0 = ux * pm;
-	const float vv0 = vy * pm;
-	const float uu1 = (ux + uw) * pm;
-	const float vv1 = (vy + vh) * pm;
+static void drawRectangleAreaTexture(Tesselator& t, RectangleArea* a) {
 	const float x0 = a->_x0 * Gui::InvGuiScale;
 	const float x1 = a->_x1 * Gui::InvGuiScale;
 	const float y0 = a->_y0 * Gui::InvGuiScale;
 	const float y1 = a->_y1 * Gui::InvGuiScale;
 
-	t.vertexUV(x0, y1, 0, uu0, vv1);
-	t.vertexUV(x1, y1, 0, uu1, vv1);
-	t.vertexUV(x1, y0, 0, uu1, vv0);
-	t.vertexUV(x0, y0, 0, uu0, vv0);
+	t.vertexUV(x0, y1, 0, 0.0f, 1.0f);
+	t.vertexUV(x1, y1, 0, 1.0f, 1.0f);
+	t.vertexUV(x1, y0, 0, 1.0f, 0.0f);
+	t.vertexUV(x0, y0, 0, 0.0f, 0.0f);
 }
 
 static void drawPolygonArea(Tesselator& t, PolygonArea* a, int x, int y) {
@@ -530,24 +508,17 @@ void TouchscreenInput_TestFps::rebuild() {
 	}
 	
 
-	if (!_minecraft->screen) {
-		if (isButtonDown(AREA_PAUSE))  t.colorABGR(cPressedPause);
-		else						   t.colorABGR(cReleasedPause);
-		drawRectangleAreaSprite(t, aPause, 226.0f, 180.0f, 13.0f, 16.0f);
-
-		if (isButtonDown(AREA_CHAT)) t.colorABGR(cPressedPause);
-		else						  t.colorABGR(cReleasedPause);
-		drawRectangleAreaSprite(t, aChat, 206.0f, 149.0f, 35.0f, 28.0f);
-	}
 //t.end(true, _bufferId);
 	//return;
 
 	t.draw();
 
-	if (!_minecraft->screen && _minecraft->font) {
-		const float pauseX = aPause->_x0 * Gui::InvGuiScale;
-		const float pauseY = aPause->_y0 * Gui::InvGuiScale;
-		_minecraft->font->drawShadow("II", pauseX + 3.0f, pauseY + 4.0f, 0xffffffff);
+	if (!_minecraft->screen) {
+		_minecraft->textures->loadAndBindTexture(isButtonDown(AREA_PAUSE) ? "gui/pause_button_dark.png" : "gui/pause_button_light.png");
+		t.begin();
+		t.colorABGR(0xffffffff);
+		drawRectangleAreaTexture(t, aPause);
+		t.draw();
 	}
 	//RenderChunk _render = t.end(true, _bufferId);
 	//t.setAccessMode(Tesselator::ACCESS_STATIC);

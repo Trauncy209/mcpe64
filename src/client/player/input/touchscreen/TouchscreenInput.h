@@ -61,7 +61,6 @@ private:
 	RectangleArea* aUp;
 	RectangleArea* aDown;
 	RectangleArea* aPause;
-	RectangleArea* aChat;
 	//RectangleArea* aUpJump;
 	RectangleArea* aJump;
 	RectangleArea* aUpLeft;
