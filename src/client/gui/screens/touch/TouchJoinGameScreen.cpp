@@ -103,7 +103,7 @@ JoinGameScreen::JoinGameScreen()
 :	bJoin(2, "Join Game"),
     bAddServer(4, "Add"),
 	bBack(3, "Back"),
-	bHeader(0, "Join Game"),
+	bHeader(0, ""),
 	gamesList(NULL),
     lastManualPingTime(0)
 {

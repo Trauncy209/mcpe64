@@ -106,6 +106,14 @@ void Screen::keyboardTextEvent()
 {
 	keyboardNewChar(Keyboard::getChar());
 }
+
+void Screen::keyboardNewChar(char inputChar)
+{
+	for (unsigned int i = 0; i < textBoxes.size(); ++i) {
+		textBoxes[i]->handleChar(inputChar);
+	}
+}
+
 void Screen::renderBackground()
 {
 	renderBackground(0);

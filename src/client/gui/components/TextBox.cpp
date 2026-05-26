@@ -71,11 +71,11 @@ void TextBox::tick(Minecraft* minecraft) {
 
 void TextBox::render(Minecraft* minecraft, int xm, int ym) {
     // textbox like in beta 1.7.3
-    // change appearance when focused so the user can tell it's active
+    // keep the focused state subtle so Android fields do not turn solid yellow.
     uint32_t bgColor = focused ? 0xffc0c0c0 : 0xffa0a0a0;
-    uint32_t borderColor = focused ? 0xffffff00 : 0xff000000;
-    fill(x, y, x + width, y + height, bgColor);
-    fill(x + 1, y + 1, x + width - 1, y + height - 1, borderColor);
+    uint32_t borderColor = 0xff000000;
+    fill(x, y, x + width, y + height, borderColor);
+    fill(x + 1, y + 1, x + width - 1, y + height - 1, bgColor);
 
     glEnable2(GL_SCISSOR_TEST);
     glScissor(
@@ -85,13 +85,15 @@ void TextBox::render(Minecraft* minecraft, int xm, int ym) {
         Gui::GuiScale * (height - 2)
     );
 
+    int textY = y + (height - Font::DefaultLineHeight) / 2;
+
     if (text.empty() && !focused) {
-        drawString(minecraft->font, hint, x + 2, y + 2, 0xff5e5e5e);
+        drawString(minecraft->font, hint, x + 2, textY, 0xff5e5e5e);
     }
 
     if (focused && blink) text.push_back('_');
 
-    drawString(minecraft->font, text, x + 2, y + 2, 0xffffffff);
+    drawString(minecraft->font, text, x + 2, textY, 0xffffffff);
 
     if (focused && blink) text.pop_back();
 
