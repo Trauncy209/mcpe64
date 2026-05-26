@@ -110,7 +110,7 @@ void Gui::render(float a, bool mouseFree, int xMouse, int yMouse) {
 	renderToolBar(a, ySlot, screenWidth);
 
 	glEnable(GL_BLEND);
-	unsigned int max = 10;
+	unsigned int max = minecraft->useTouchscreen() ? 16 : 10;
     bool isChatting = false;
 	renderChatMessages(screenHeight, max, isChatting, font);
 #if !defined(RPI)
@@ -255,7 +255,7 @@ void Gui::addMessage(const std::string& _string) {
 	message.message = string;
 	message.ticks = 0;
 	guiMessages.insert(guiMessages.begin(), message);
-	while (guiMessages.size() > 30) {
+	while (guiMessages.size() > 100) {
 		guiMessages.pop_back();
 	}
 }

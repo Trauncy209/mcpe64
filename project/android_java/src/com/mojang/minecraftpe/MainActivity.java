@@ -419,6 +419,21 @@ public class MainActivity extends Activity {
     			R.id.button_createworld_create,
     			R.id.button_createworld_cancel
     		); 
+	} else if (dialogId == DialogDefinitions.DIALOG_NEW_CHAT_MESSAGE) {
+		_userInputValues.clear();
+		runOnUiThread(new Runnable() {
+			public void run() {
+				createAlertDialog(true, true, false);
+				EditText input = new EditText(MainActivity.this);
+				input.setSingleLine(true);
+				input.setHint("Type a message");
+				_userInputValues.add(new TextViewReader(input));
+				MainActivity.this.mDialog.setView(input);
+				MainActivity.this.mDialog.show();
+				MainActivity.this.mDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+				MainActivity.this.mDialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			}
+		});
     	} else if (dialogId == DialogDefinitions.DIALOG_MAINMENU_OPTIONS) { 
     		Intent intent = new Intent(this, MainMenuOptionsActivity.class);
     		intent.putExtra("preferenceId", R.xml.preferences);
@@ -747,3 +762,5 @@ class TextViewReader implements StringValue {
 	}
 	private TextView _view;
 }
+/bin/bash: line 5: C:/Users/Truan/AppData/Local/hermes/cache/terminal/hermes-snap-5e2ca959862b.sh: No such file or directory
+/bin/bash: line 6: C:/Users/Truan/AppData/Local/hermes/cache/terminal/hermes-cwd-5e2ca959862b.txt: No such file or directory

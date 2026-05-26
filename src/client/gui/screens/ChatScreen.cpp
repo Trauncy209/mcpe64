@@ -2,23 +2,40 @@
 #include "DialogDefinitions.h"
 #include "../Gui.h"
 #include "../../Minecraft.h"
+#include "../../player/LocalPlayer.h"
 #include "../../../AppPlatform.h"
-#include "../../../platform/log.h"
+#include "../../../network/RakNetInstance.h"
+#include "../../../network/ServerSideNetworkHandler.h"
+#include "../../../network/packet/ChatPacket.h"
 
 void ChatScreen::init() {
-	minecraft->platform()->createUserInput(DialogDefinitions::DIALOG_NEW_CHAT_MESSAGE);
+    minecraft->platform()->createUserInput(DialogDefinitions::DIALOG_NEW_CHAT_MESSAGE);
 }
 
 void ChatScreen::render(int xm, int ym, float a)
 {
-	int status = minecraft->platform()->getUserInputStatus();
-	if (status > -1) {
-		if (status == 1) {
-			std::vector<std::string> v = minecraft->platform()->getUserInput();
-			if (v.size() && v[0].length() > 0)
-				minecraft->gui.addMessage(v[0]);
-		}
+    (void)xm;
+    (void)ym;
+    (void)a;
 
-		minecraft->setScreen(NULL);
-	}
+    int status = minecraft->platform()->getUserInputStatus();
+    if (status < 0)
+        return;
+
+    if (status == 1) {
+        std::vector<std::string> v = minecraft->platform()->getUserInput();
+        if (!v.empty() && !v[0].empty()) {
+            std::string msg = std::string("<") + minecraft->player->name + "> " + v[0];
+            if (minecraft->netCallback && minecraft->raknetInstance->isServer()) {
+                static_cast<ServerSideNetworkHandler*>(minecraft->netCallback)->displayGameMessage(msg);
+            } else if (minecraft->netCallback) {
+                ChatPacket chatPkt(msg);
+                minecraft->raknetInstance->send(chatPkt);
+            } else {
+                minecraft->gui.addMessage(msg);
+            }
+        }
+    }
+
+    minecraft->setScreen(NULL);
 }
