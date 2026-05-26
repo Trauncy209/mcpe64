@@ -317,7 +317,7 @@ void Minecraft::leaveGame(bool renameLevel /*=false*/)
 {
     if (isGeneratingLevel || !_hasSignaledGeneratingLevelFinished)
         return;
-    
+
 	isGeneratingLevel = false;
 	bool saveLevel = level && (!level->isClientSide || renameLevel);
 
@@ -865,7 +865,7 @@ void Minecraft::tickInput() {
 	}
 
 	TIMER_POP_PUSH("handlemouse");
-	
+
 	static bool prevMouseDownLeft = false;
 
 	if (useTouchscreen()) {
@@ -964,7 +964,7 @@ void Minecraft::handleBuildAction(BuildActionIntention* action) {
 
 			//LOGI("tile: %s - %d, %d, %d. b: %f - %f\n", oldTile->getDescriptionId().c_str(), x, y, z, oldTile->getBrightness(level, x, y, z), oldTile->getBrightness(level, x, y+1, z));
             level->extinguishFire(x, y, z, hitResult.f);
-			
+
 			if (action->isFirstRemove()) {
 				gameMode->startDestroyBlock(x, y, z, hitResult.f);
 			} else {
@@ -1192,7 +1192,7 @@ void Minecraft::setSize(int w, int h) {
 
 	Config config = createConfig(this);
 	gui.onConfigChanged(config);
-    
+
 	if (screen)
 		screen->setSize(screenWidth, screenHeight);
 
@@ -1239,7 +1239,7 @@ void Minecraft::_reloadInput() {
 	if (useTouchHolder) {
 		inputHolder = new TouchInputHolder(this, &options);
 	} else {
-		#if defined(ANDROID) || defined(__APPLE__) 
+		#if defined(ANDROID) || defined(__APPLE__)
 			inputHolder = new CustomInputHolder(
 				new XperiaPlayInput(&options),
 				new ControllerTurnInput(2, ControllerTurnInput::MODE_DELTA),
@@ -1348,9 +1348,13 @@ void Minecraft::_levelGenerated()
 #endif
 
 	level->validateSpawn();
+	const bool hadSavedPlayerData = level->getLevelData()->getLoadedPlayerTag() != NULL || level->getLevelData()->playerDataVersion == 1;
 	level->loadPlayer(player, true);
-	// if we are client side, we trust the server to have given us a correct position
-	if (player && !level->isClientSide) {
+	// If we are client side, we trust the server to have given us a correct position.
+	// For local saved worlds, also trust the stored player position instead of always
+	// running collision-based resetPos(), which can shove underground saves upward
+	// while chunks/collision are still settling during load.
+	if (player && !level->isClientSide && (!hadSavedPlayerData || level->isNew())) {
 		player->resetPos(false);
 	}
 
@@ -1424,7 +1428,7 @@ void Minecraft::onGraphicsReset()
 {
 #ifndef STANDALONE_SERVER
 	textures->clear();
-	
+
 	font->onGraphicsReset();
 	gui.onGraphicsReset();
 

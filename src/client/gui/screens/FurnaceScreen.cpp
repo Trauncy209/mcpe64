@@ -19,6 +19,7 @@
 #include "../../../util/StringUtils.h"
 #include "../../../world/inventory/FurnaceMenu.h"
 #include "../../../network/packet/ContainerSetSlotPacket.h"
+#include "../../../network/packet/SendInventoryPacket.h"
 #include "../../../network/RakNetInstance.h"
 
 static int heldMs = -1;
@@ -195,7 +196,7 @@ void FurnaceScreen::handleRenderPane(Touch::InventoryPane* pane, Tesselator& t, 
 		pane->markerIndex = -1;
 		if (pane->queryHoldTime(&id, &ms)) {
 			heldMs = ms;
-			
+
 			const ItemInstance* item = inventoryItems[id];
 			int count = (item && !item->isNull())? item->count : 0;
 			float maxHoldMs = item? 700 + 10 * item->count: MaxHoldMs;
@@ -520,6 +521,11 @@ void FurnaceScreen::takeAndClearSlot( int slot )
 	if (!minecraft->player->inventory->add(&oldItem))
 		minecraft->player->drop(new ItemInstance(oldItem), false);
 
+	if (minecraft->level->isClientSide) {
+		SendInventoryPacket inventoryPacket(minecraft->player, false);
+		minecraft->raknetInstance->send(inventoryPacket);
+	}
+
 	int newSize = minecraft->player->inventory->getNumEmptySlots();
 	setIfNotSet(doRecreatePane, newSize != oldSize);
 }
@@ -544,10 +550,12 @@ bool FurnaceScreen::handleAddItem( int slot, const ItemInstance* item )
 		ItemInstance moved = moveOver(item, item->getMaxStackSize());
 		player->containerMenu->setSlot(slot, &moved);
 	}
-	 
+
 	if (minecraft->level->isClientSide) {
 		ContainerSetSlotPacket p(menu->containerId, slot, *furnaceItem);
 		minecraft->raknetInstance->send(p);
+		SendInventoryPacket inventoryPacket(minecraft->player, false);
+		minecraft->raknetInstance->send(inventoryPacket);
 	}
 
 	int newSize = minecraft->player->inventory->getNumEmptySlots();

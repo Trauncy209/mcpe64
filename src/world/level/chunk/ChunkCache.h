@@ -12,11 +12,14 @@
 class ChunkCache: public ChunkSource {
     //static const int CHUNK_CACHE_WIDTH = CHUNK_CACHE_WIDTH; // WAS 32;
     static const int MAX_SAVES = 2;
+    static const int INFINITE_CACHE_WIDTH = 32;
 public:
     ChunkCache(Level* level_, ChunkStorage* storage_, ChunkSource* source_)
 	:	xLast(-999999999),
 		zLast(-999999999),
 		last(NULL),
+		cacheWidth(level_ && level_->getLevelData() && level_->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? INFINITE_CACHE_WIDTH : CHUNK_CACHE_WIDTH),
+		chunks(NULL),
 		level(level_),
 		storage(storage_),
 		source(source_)
@@ -24,14 +27,15 @@ public:
 		isChunkCache = true;
         //emptyChunk = new EmptyLevelChunk(level_, emptyChunkBlocks, 0, 0);
 		emptyChunk = new EmptyLevelChunk(level_, NULL, 0, 0);
-		memset(chunks, 0, sizeof(LevelChunk*) * CHUNK_CACHE_WIDTH * CHUNK_CACHE_WIDTH);
+		chunks = new LevelChunk*[cacheWidth * cacheWidth];
+		memset(chunks, 0, sizeof(LevelChunk*) * cacheWidth * cacheWidth);
     }
 
 	~ChunkCache() {
 		delete source;
 		delete emptyChunk;
 
-		for (int i = 0; i < CHUNK_CACHE_WIDTH * CHUNK_CACHE_WIDTH; i++)
+		for (int i = 0; i < cacheWidth * cacheWidth; i++)
 		{
 			if (chunks[i])
 			{
@@ -39,6 +43,7 @@ public:
 				delete chunks[i];
 			}
 		}
+		delete[] chunks;
 	}
 
     bool fits(int x, int z) {
@@ -57,9 +62,9 @@ public:
         if (x == xLast && z == zLast && last != NULL) {
             return last != emptyChunk && last->isAt(x, z);
         }
-        int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (CHUNK_CACHE_WIDTH - 1)) : x;
-        int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (CHUNK_CACHE_WIDTH - 1)) : z;
-        int slot = xs + zs * CHUNK_CACHE_WIDTH;
+		int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (cacheWidth - 1)) : x;
+		int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (cacheWidth - 1)) : z;
+		int slot = xs + zs * cacheWidth;
         return chunks[slot] != NULL && chunks[slot] != emptyChunk && chunks[slot]->isAt(x, z);
     }
 
@@ -77,9 +82,9 @@ public:
 		if (x == xLast && z == zLast && last != NULL) {
             return last;
         }
-        int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (CHUNK_CACHE_WIDTH - 1)) : x;
-        int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (CHUNK_CACHE_WIDTH - 1)) : z;
-        int slot = xs + zs * CHUNK_CACHE_WIDTH;
+		int xs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (x & (cacheWidth - 1)) : x;
+		int zs = level->getLevelData()->getGeneratorVersion() == LGV_INFINITE ? (z & (cacheWidth - 1)) : z;
+		int slot = xs + zs * cacheWidth;
         if (!hasChunk(x, z)) {
             if (chunks[slot] != NULL) {
                 chunks[slot]->unload();
@@ -203,11 +208,11 @@ public:
     std::string gatherStats() {
         return "ChunkCache: 1024";
     }
-	
+
 	void saveAll(bool onlyUnsaved) {
 		if (storage != NULL) {
 			std::vector<LevelChunk*> loadedChunks;
-			for (int i = 0; i < CHUNK_CACHE_WIDTH * CHUNK_CACHE_WIDTH; ++i) {
+			for (int i = 0; i < cacheWidth * cacheWidth; ++i) {
 				LevelChunk* chunk = chunks[i];
 				if (chunk == NULL || chunk == emptyChunk)
 					continue;
@@ -259,7 +264,8 @@ private:
     LevelChunk* emptyChunk;
     ChunkSource* source;
     ChunkStorage* storage;
-    LevelChunk* chunks[CHUNK_CACHE_WIDTH * CHUNK_CACHE_WIDTH];
+	int cacheWidth;
+	LevelChunk** chunks;
     Level* level;
 
     LevelChunk* last;

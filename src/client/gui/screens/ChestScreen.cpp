@@ -14,6 +14,7 @@
 #include "../../../locale/I18n.h"
 #include "../../../util/StringUtils.h"
 #include "../../../network/packet/ContainerSetSlotPacket.h"
+#include "../../../network/packet/SendInventoryPacket.h"
 #include "../../../network/RakNetInstance.h"
 #include "../../../world/level/tile/entity/TileEntity.h"
 #include "../../../world/level/tile/entity/ChestTileEntity.h"
@@ -370,6 +371,11 @@ bool ChestScreen::handleAddItem(FillingContainer* from, FillingContainer* to, in
 		}
 		if (item->count <= 0)
 			from->clearSlot(slotIndex);
+
+		if (minecraft->level->isClientSide) {
+			SendInventoryPacket inventoryPacket(minecraft->player, false);
+			minecraft->raknetInstance->send(inventoryPacket);
+		}
 	}
 	// Clear the marker indices
 	pane->markerIndex = toPane->markerIndex = -1;
@@ -430,7 +436,7 @@ void ChestScreen::setupPane()
 	const int realWidth = InventoryColumns * ItemSize;
 	int paneWidth = realWidth;// + Bx + Bx;
 	const int realBx = (width/2 - realWidth) / 2;
-    
+
 	IntRectangle rect(realBx,
 #ifdef __APPLE__
 		24 + By - ((width==240)?1:0), realWidth, ((width==240)?1:0) + height-By-By-24);
