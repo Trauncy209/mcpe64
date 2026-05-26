@@ -17,6 +17,66 @@ We want to preserve what made early Pocket Edition special, fix what was broken,
 
 If you want updates as they drop, **star the repo and turn on notifications/watch it** — releases are frequent and you do not want to miss out.
 
+
+## Screenshots
+
+Here is what TruancyCraftPE looks like right now on-device.
+
+### Main menu and player setup
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/13-main-menu.jpeg" alt="Main menu screen" width="100%"><br><sub>Main menu with Start Game, Join Game, and Options.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/14-username-setup.jpeg" alt="Username setup screen" width="100%"><br><sub>First-run username setup for chat and multiplayer identity.</sub></td>
+</tr>
+</table>
+
+### In-game on mobile
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/01-paused-night-gameplay.jpeg" alt="Paused nighttime gameplay on mobile" width="100%"><br><sub>Pause menu over real nighttime gameplay.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/02-night-gameplay-hud.jpeg" alt="Nighttime gameplay HUD on mobile" width="100%"><br><sub>Touch HUD, hotbar, hearts, torch lighting, and in-game pause button.</sub></td>
+</tr>
+</table>
+
+### Multiplayer menus
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/12-servers-browser.jpeg" alt="Servers browser screen" width="100%"><br><sub>Server browser with scanning, Join, Delete, and Add flows.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/11-server-details.jpeg" alt="Server details add server screen" width="100%"><br><sub>Touch-friendly Add Server / Server Details form.</sub></td>
+</tr>
+</table>
+
+### Options and settings
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/03-options-audio.jpeg" alt="Audio options screen" width="100%"><br><sub>Audio settings.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/04-options-graphics.jpeg" alt="Graphics options screen" width="100%"><br><sub>Graphics settings and render-distance controls.</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/05-options-controls.jpeg" alt="Controls options screen" width="100%"><br><sub>Touchscreen, vibration, and sensitivity settings.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/06-options-game.jpeg" alt="Game options screen" width="100%"><br><sub>Game settings like difficulty, server visibility, third-person mode, and HUD controls.</sub></td>
+</tr>
+</table>
+
+### World creation and menus
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/08-create-world-infinite.jpeg" alt="Create world screen with infinite world selected" width="100%"><br><sub>Create a new world with modernized infinite terrain options.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/09-create-world-classic.jpeg" alt="Create world screen with classic world selected" width="100%"><br><sub>Classic world support is still here too.</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><img src="docs/screenshots/07-world-options-infinite.jpeg" alt="Infinite world generation options screen" width="100%"><br><sub>Tune caves, ravines, lakes, and springs for infinite worlds.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/10-select-world.jpeg" alt="World selection screen" width="100%"><br><sub>World selection and create-new flow.</sub></td>
+</tr>
+</table>
+
+More screenshots and feature callouts will be added as the game keeps improving.
+
 ---
 
 ## What TruancyCraftPE already has
