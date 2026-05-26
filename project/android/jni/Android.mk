@@ -21,6 +21,7 @@ LOCAL_SRC_FILES := ../../../src/main.cpp \
 ../../../src/client/Options.cpp \
 ../../../src/client/OptionsFile.cpp \
 ../../../src/client/OptionStrings.cpp \
+../../../src/client/SavedServerList.cpp \
 ../../../src/client/gamemode/GameMode.cpp \
 ../../../src/client/gamemode/CreativeMode.cpp \
 ../../../src/client/gamemode/SurvivalMode.cpp \
@@ -59,6 +60,7 @@ LOCAL_SRC_FILES := ../../../src/main.cpp \
 ../../../src/client/gui/screens/FurnaceScreen.cpp \
 ../../../src/client/gui/screens/InBedScreen.cpp \
 ../../../src/client/gui/screens/IngameBlockSelectionScreen.cpp \
+../../../src/client/gui/screens/JoinByIPScreen.cpp \
 ../../../src/client/gui/screens/JoinGameScreen.cpp \
 ../../../src/client/gui/screens/OptionsScreen.cpp \
                    ../../../src/client/gui/screens/CreditsScreen.cpp \
