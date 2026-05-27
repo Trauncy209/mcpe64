@@ -18,8 +18,6 @@ static const int AREA_DPAD_E = 103;
 static const int AREA_DPAD_C = 104;
 static const int AREA_PAUSE = 105;
 static const int AREA_JUMP = 106;
-static const int AREA_FLY_UP = 107;
-static const int AREA_FLY_DOWN = 108;
 
 static int cPressed = 0;
 static int cReleased = 0;
@@ -69,7 +67,6 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* opti
 	_northJump(false),
 	_forward(false),
 	_boundingRectangle(0, 0, 1, 1),
-	_actionRectangle(0, 0, 1, 1),
 	_pressedJump(false),
 	_pauseIsDown(false),
 	_sneakTapTime(-999),
@@ -79,8 +76,6 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* opti
 	aDown(0),
 	aJump(0),
 	aSneak(0),
-	aFlyUp(0),
-	aFlyDown(0),
 	aUpLeft(0),
 	aUpRight(0),
 	_allowHeightChange(false),
@@ -107,15 +102,10 @@ void TouchscreenInput_TestFps::clear() {
 
 	delete aUpLeft; aUpLeft = NULL; // @todo: SAFEDEL
 	delete aUpRight; aUpRight = NULL;
-	delete aFlyUp; aFlyUp = NULL;
-	delete aFlyDown; aFlyDown = NULL;
 }
 
 bool TouchscreenInput_TestFps::isButtonDown(int areaId) {
-	int index = areaId - AREA_DPAD_FIRST;
-	if (index < 0 || index >= NumButtons)
-		return false;
-	return _buttons[index];
+	return _buttons[areaId - AREA_DPAD_FIRST];
 }
 
 
@@ -149,11 +139,11 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	const float BaseY = -8 + h - 3.0f * Bh;
 	const float BaseX = _options->isLeftHanded? -8 + w - 3 * Bw
 											:	8 + 0;
-	const float jumpX = w - (BaseX + 2 * Bw);
+	const float jumpGap = Mth::Max(6.0f, Bw * 0.20f);
+	const float jumpX = _options->isLeftHanded ? (BaseX - jumpGap - Bw) : (BaseX + 3 * Bw + jumpGap);
 	const float jumpY = BaseY + Bh;
 	_movementRectangle = RectangleArea(BaseX, BaseY, BaseX + 3 * Bw, BaseY + 3 * Bh);
-	_boundingRectangle = _movementRectangle;
-	_actionRectangle = RectangleArea(jumpX, BaseY, jumpX + Bw, BaseY + 3 * Bh);
+	_boundingRectangle = RectangleArea(Mth::Min(BaseX, jumpX), BaseY, Mth::Max(BaseX + 3 * Bw, jumpX + Bw), BaseY + 3 * Bh);
 
 	xx = BaseX + Bw; yy = BaseY;
 	_model.addArea(AREA_DPAD_N, aUp = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
@@ -175,8 +165,6 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	_model.addArea(AREA_DPAD_E, aRight = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
 
 	_model.addArea(AREA_JUMP, aJump = new RectangleArea(jumpX, jumpY, jumpX + Bw, jumpY + Bh));
-	_model.addArea(AREA_FLY_UP, aFlyUp = new RectangleArea(jumpX, BaseY, jumpX + Bw, BaseY + Bh));
-	_model.addArea(AREA_FLY_DOWN, aFlyDown = new RectangleArea(jumpX, BaseY + 2 * Bh, jumpX + Bw, BaseY + 3 * Bh));
 
     float maxPixels = _minecraft->pixelCalc.millimetersToPixels(10);
     float btnSize = Mth::Min(18 * Gui::GuiScale, maxPixels);
@@ -214,7 +202,7 @@ void TouchscreenInput_TestFps::releaseAllKeys()
 	xa = 0;
 	ya = 0;
 
-	for (int i = 0; i < NumButtons; ++i)
+	for (int i = 0; i<8; ++i)
 		_buttons[i] = false;
 #ifdef WIN32
 	for (int i = 0; i<NumKeys; ++i)
@@ -236,7 +224,7 @@ void TouchscreenInput_TestFps::tick( Player* player )
 	bool tmpNorthJump = false;
 	bool openPauseScreen = false;
 
-	for (int i = 0; i < NumButtons; ++i)
+	for (int i = 0; i < 8; ++i)
 		_buttons[i] = false;
 
 	const int* pointerIds;
@@ -263,9 +251,9 @@ void TouchscreenInput_TestFps::tick( Player* player )
 		bool setButton = false;
 
 		if (Multitouch::isPressed(p))
-			_allowHeightChange = false;
+			_allowHeightChange = (areaId == AREA_JUMP);
 
-		if (areaId == AREA_JUMP && !player->abilities.flying)
+		if (areaId == AREA_JUMP)
 		{
 			setButton = true;
 			heldJump = true;
@@ -290,14 +278,6 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				sneaking = !sneaking;
 				player->setSneaking(sneaking);
 			}
-		}
-		else if (areaId == AREA_FLY_UP && player->abilities.flying)
-		{
-			setButton = true;
-		}
-		else if (areaId == AREA_FLY_DOWN && player->abilities.flying)
-		{
-			setButton = true;
 		}
 
 		if	(areaId == AREA_DPAD_N)
@@ -342,9 +322,7 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				openPauseScreen = true;
 			}
 		}
-		int buttonIndex = areaId - AREA_DPAD_FIRST;
-		if (buttonIndex >= 0 && buttonIndex < NumButtons)
-			_buttons[buttonIndex] = setButton;
+		_buttons[areaId - AREA_DPAD_FIRST] = setButton;
 	}
 
 	if (!_minecraft->screen) {
@@ -365,17 +343,12 @@ void TouchscreenInput_TestFps::tick( Player* player )
 	else _northJump = false;
 
 	isChangingFlightHeight = false;
-	wantUp = false;
-	wantDown = false;
-	if (player->abilities.flying)
+	wantUp   = isButtonDown(AREA_DPAD_N) && (_allowHeightChange & (_pressedJump | wantUp));
+	wantDown = isButtonDown(AREA_DPAD_S) && (_allowHeightChange & (_pressedJump | wantDown));
+	if (player->abilities.flying && (wantUp || wantDown || (heldJump && !_forward)))
 	{
-		wantUp = isButtonDown(AREA_FLY_UP);
-		wantDown = isButtonDown(AREA_FLY_DOWN);
-		if (wantUp || wantDown) {
-			isChangingFlightHeight = true;
-			ya = 0;
-			jumping = false;
-		}
+		isChangingFlightHeight = true;
+		ya = 0;
 	}
 	_renderFlightImage = player->abilities.flying;
 
@@ -472,10 +445,6 @@ const RectangleArea& TouchscreenInput_TestFps::getRectangleArea()
 {
 	return _boundingRectangle;
 }
-const RectangleArea& TouchscreenInput_TestFps::getActionRectangleArea()
-{
-	return _actionRectangle;
-}
 const RectangleArea& TouchscreenInput_TestFps::getPauseRectangleArea()
 {
     return *aPause;
@@ -546,21 +515,16 @@ void TouchscreenInput_TestFps::rebuild() {
 	else						   t.colorABGR(cReleased);
 	drawRectangleArea(t, aSneak, imageU + imageSize * 2, imageV, (float)imageSize);
 
-	// render jump button or stacked flight buttons on the right side
+	// render jump / flight button
+	if (_renderFlightImage && northDiagonals) t.colorABGR(cDiscreet);
+	else if (isButtonDown(AREA_JUMP)) t.colorABGR(cPressed);
+	else						   t.colorABGR(cReleased);
 	if (_renderFlightImage)
 	{
-		if (isButtonDown(AREA_FLY_UP)) t.colorABGR(cPressed);
-		else t.colorABGR(cReleased);
-		drawRectangleArea(t, aFlyUp, imageU, imageV, (float)imageSize);
-
-		if (isButtonDown(AREA_FLY_DOWN)) t.colorABGR(cPressed);
-		else t.colorABGR(cReleased);
-		drawRectangleArea(t, aFlyDown, imageU + imageSize * 2, imageV, (float)imageSize);
+		drawRectangleArea(t, aJump, imageU + imageSize * 4, imageV + imageSize, (float)imageSize);
 	}
 	else
 	{
-		if (isButtonDown(AREA_JUMP)) t.colorABGR(cPressed);
-		else t.colorABGR(cReleased);
 		drawRectangleArea(t, aJump, imageU + imageSize * 4, imageV, (float)imageSize);
 	}
 

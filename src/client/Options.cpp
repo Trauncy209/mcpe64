@@ -213,24 +213,6 @@ const char* Options::GUI_SCALE[] = {
 	"options.guiScale.larger"
 };
 
-float Options::getBasePixelsPerMillimeter() const
-{
-	float base = minecraft->platform()->getPixelsPerMillimeter();
-	if (base <= 0.0f)
-		base = 4.0f;
-	return base;
-}
-
-float Options::getTouchScaleMinValue() const
-{
-	return getBasePixelsPerMillimeter() * 0.5f;
-}
-
-float Options::getTouchScaleMaxValue() const
-{
-	return getBasePixelsPerMillimeter() * 3.5f;
-}
-
 void Options::update()
 {
 	viewDistance = 2;
@@ -267,8 +249,6 @@ void Options::update()
 		}
 		if (key == OptionStrings::Controls_TouchScale) {
 			readFloat(value, pixelsPerMillimeter);
-			if (pixelsPerMillimeter < getTouchScaleMinValue()) pixelsPerMillimeter = getTouchScaleMinValue();
-			if (pixelsPerMillimeter > getTouchScaleMaxValue()) pixelsPerMillimeter = getTouchScaleMaxValue();
 		}
 
 		// Feedback
@@ -479,7 +459,7 @@ std::string Options::getMessage( const Option* item )
 		}
 
 		if (item == &Option::PIXELS_PER_MILLIMETER) {
-			int percent = (int)((progressValue / getBasePixelsPerMillimeter()) * 100.0f + 0.5f);
+			int percent = (int)(((progressValue - PIXELS_PER_MILLIMETER_MIN_VALUE) / (PIXELS_PER_MILLIMETER_MAX_VALUE - PIXELS_PER_MILLIMETER_MIN_VALUE)) * 100.0f);
 			return caption + std::to_string(percent) + "%";
 		}
 

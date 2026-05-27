@@ -39,14 +39,12 @@ public:
     void releaseAllKeys();
 
 	const RectangleArea& getRectangleArea();
-    const RectangleArea& getActionRectangleArea();
     const RectangleArea& getPauseRectangleArea();
 
 private:
 	void clear();
 
 	RectangleArea _boundingRectangle;
-	RectangleArea _actionRectangle;
 
 	bool _keys[NumKeys];
 	Options* _options;
@@ -66,8 +64,6 @@ private:
 	//RectangleArea* aUpJump;
 	RectangleArea* aJump;
 	RectangleArea* aSneak;
-	RectangleArea* aFlyUp;
-	RectangleArea* aFlyDown;
 	RectangleArea* aUpLeft;
 	RectangleArea* aUpRight;
 	bool _pauseIsDown;
@@ -77,8 +73,7 @@ private:
 	bool _allowHeightChange;
 	float _sneakTapTime;
 
-	static const int NumButtons = 9;
-	bool _buttons[NumButtons];
+	bool _buttons[8];
 	bool isButtonDown(int areaId);
 	void rebuild();
 };

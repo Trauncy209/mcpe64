@@ -308,7 +308,7 @@ public:
 		if (item == &Option::MUSIC) return MUSIC_MIN_VALUE;
 		if (item == &Option::SOUND) return SOUND_MIN_VALUE;
 		if (item == &Option::SENSITIVITY) return SENSITIVITY_MIN_VALUE;
-		if (item == &Option::PIXELS_PER_MILLIMETER) return getTouchScaleMinValue();
+		if (item == &Option::PIXELS_PER_MILLIMETER) return PIXELS_PER_MILLIMETER_MIN_VALUE;
 		return 0;
 	}
 
@@ -316,7 +316,7 @@ public:
 		if (item == &Option::MUSIC) return MUSIC_MAX_VALUE;
 		if (item == &Option::SOUND) return SOUND_MAX_VALUE;
 		if (item == &Option::SENSITIVITY) return SENSITIVITY_MAX_VALUE;
-		if (item == &Option::PIXELS_PER_MILLIMETER) return getTouchScaleMaxValue();
+		if (item == &Option::PIXELS_PER_MILLIMETER) return PIXELS_PER_MILLIMETER_MAX_VALUE;
 		return 1.0f;
 	} 
 
@@ -332,9 +332,6 @@ public:
 	void notifyOptionUpdate(const Option* option, bool value);
 	void notifyOptionUpdate(const Option* option, float value);
 	void notifyOptionUpdate(const Option* option, int value);
-	float getBasePixelsPerMillimeter() const;
-	float getTouchScaleMinValue() const;
-	float getTouchScaleMaxValue() const;
 private:
     static bool readFloat(const std::string& string, float& value);
     static bool readInt(const std::string& string, int& value);

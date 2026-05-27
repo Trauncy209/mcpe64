@@ -68,7 +68,6 @@ public:
 		allowPicking(false),
 		state(State_None),
 		moveArea(-1,-1,0,0),
-		actionArea(-1,-1,0,0),
 		joyTouchArea(-1, -1, 0, 0),
 		inventoryArea(-1,-1, 0, 0),
 		pauseArea(-1, -1, 0, 0),
@@ -129,7 +128,6 @@ public:
 			_area.clear();
 			_area.include(&screenArea);
 			_area.exclude(&moveArea);
-			_area.exclude(&actionArea);
 			_area.exclude(&inventoryArea);
 #ifdef __APPLE__
             _area.exclude(&pauseArea);
@@ -361,7 +359,6 @@ public:
 	
 	RectangleArea screenArea;
 	RectangleArea moveArea;
-	RectangleArea actionArea;
 	RectangleArea joyTouchArea;
 	RectangleArea inventoryArea;
     RectangleArea pauseArea;
@@ -429,7 +426,6 @@ public:
 	virtual void onConfigChanged(const Config& c) {
 		_move.onConfigChanged(c);
 		_turnBuild.moveArea = _move.getRectangleArea();
-		_turnBuild.actionArea = _move.getActionRectangleArea();
 #ifdef __APPLE__
 		_turnBuild.pauseArea = _move.getPauseRectangleArea();
 #endif
