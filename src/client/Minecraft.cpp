@@ -1549,10 +1549,6 @@ void Minecraft::optionUpdated( const Options::Option* option, float value ) {
 		float pixelsPerMillimeter = basePixelsPerMillimeter * (0.25f + (value / 100.0f) * 1.75f);
 		pixelCalcUi.setPixelsPerMillimeter(pixelsPerMillimeter * Gui::InvGuiScale);
 		pixelCalc.setPixelsPerMillimeter(pixelsPerMillimeter);
-		Config config = createConfig(this);
-		gui.onConfigChanged(config);
-		if (inputHolder)
-			inputHolder->onConfigChanged(config);
 	}
 #endif
 }
