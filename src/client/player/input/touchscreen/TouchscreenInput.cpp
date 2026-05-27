@@ -112,7 +112,10 @@ void TouchscreenInput_TestFps::clear() {
 }
 
 bool TouchscreenInput_TestFps::isButtonDown(int areaId) {
-	return _buttons[areaId - AREA_DPAD_FIRST];
+	int index = areaId - AREA_DPAD_FIRST;
+	if (index < 0 || index >= NumButtons)
+		return false;
+	return _buttons[index];
 }
 
 
@@ -211,7 +214,7 @@ void TouchscreenInput_TestFps::releaseAllKeys()
 	xa = 0;
 	ya = 0;
 
-	for (int i = 0; i<8; ++i)
+	for (int i = 0; i < NumButtons; ++i)
 		_buttons[i] = false;
 #ifdef WIN32
 	for (int i = 0; i<NumKeys; ++i)
@@ -233,7 +236,7 @@ void TouchscreenInput_TestFps::tick( Player* player )
 	bool tmpNorthJump = false;
 	bool openPauseScreen = false;
 
-	for (int i = 0; i < 8; ++i)
+	for (int i = 0; i < NumButtons; ++i)
 		_buttons[i] = false;
 
 	const int* pointerIds;
@@ -339,7 +342,9 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				openPauseScreen = true;
 			}
 		}
-		_buttons[areaId - AREA_DPAD_FIRST] = setButton;
+		int buttonIndex = areaId - AREA_DPAD_FIRST;
+		if (buttonIndex >= 0 && buttonIndex < NumButtons)
+			_buttons[buttonIndex] = setButton;
 	}
 
 	if (!_minecraft->screen) {

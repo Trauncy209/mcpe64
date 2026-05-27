@@ -77,7 +77,8 @@ private:
 	bool _allowHeightChange;
 	float _sneakTapTime;
 
-	bool _buttons[8];
+	static const int NumButtons = 9;
+	bool _buttons[NumButtons];
 	bool isButtonDown(int areaId);
 	void rebuild();
 };
