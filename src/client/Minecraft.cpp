@@ -1185,7 +1185,9 @@ void Minecraft::setSize(int w, int h) {
 	int screenHeight = (int)(height * Gui::InvGuiScale);
 
 	if (platform()) {
-		float pixelsPerMillimeter = options.getProgressValue(&Options::Option::PIXELS_PER_MILLIMETER);
+		float touchScalePercent = options.getProgressValue(&Options::Option::PIXELS_PER_MILLIMETER);
+		float basePixelsPerMillimeter = platform()->getPixelsPerMillimeter();
+		float pixelsPerMillimeter = basePixelsPerMillimeter * (0.25f + (touchScalePercent / 100.0f) * 1.75f);
 		pixelCalc.setPixelsPerMillimeter(pixelsPerMillimeter);
 		pixelCalcUi.setPixelsPerMillimeter(pixelsPerMillimeter * Gui::InvGuiScale);
 	}
@@ -1543,8 +1545,10 @@ void Minecraft::optionUpdated( const Options::Option* option, bool value ) {
 void Minecraft::optionUpdated( const Options::Option* option, float value ) {
 #ifndef STANDALONE_SERVER
 	if(option == &Options::Option::PIXELS_PER_MILLIMETER) {
-		pixelCalcUi.setPixelsPerMillimeter(value * Gui::InvGuiScale);
-		pixelCalc.setPixelsPerMillimeter(value);
+		float basePixelsPerMillimeter = platform()->getPixelsPerMillimeter();
+		float pixelsPerMillimeter = basePixelsPerMillimeter * (0.25f + (value / 100.0f) * 1.75f);
+		pixelCalcUi.setPixelsPerMillimeter(pixelsPerMillimeter * Gui::InvGuiScale);
+		pixelCalc.setPixelsPerMillimeter(pixelsPerMillimeter);
 	}
 #endif
 }
