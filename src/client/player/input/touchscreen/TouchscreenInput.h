@@ -63,9 +63,11 @@ private:
 	RectangleArea* aPause;
 	//RectangleArea* aUpJump;
 	RectangleArea* aJump;
+	RectangleArea* aSneak;
 	RectangleArea* aUpLeft;
 	RectangleArea* aUpRight;
 	bool _pauseIsDown;
+	RectangleArea _movementRectangle;
 
 	RenderChunk _render;
 	bool _allowHeightChange;

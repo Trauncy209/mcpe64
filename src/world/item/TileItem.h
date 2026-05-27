@@ -57,6 +57,10 @@ public:
 
         if (level->mayPlace(tileId, x, y, z, false, face)) {
             Tile* tile = Tile::tiles[tileId];
+			AABB* placementAABB = tile->getAABB(level, x, y, z);
+			if (player != NULL && placementAABB != NULL && player->bb.intersects(*placementAABB)) {
+				return false;
+			}
 			int data = tile->getPlacedOnFaceDataValue(level, x, y, z, face, clickX, clickY, clickZ, getLevelDataForAuxValue(instance->getAuxValue()));
             if (level->setTileAndData(x, y, z, tileId, data)) {
                 Tile::tiles[tileId]->setPlacedBy(level, x, y, z, player);

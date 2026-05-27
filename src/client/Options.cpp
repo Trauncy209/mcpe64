@@ -18,7 +18,7 @@ std::string Options::getCaption(const Option* item) {
 	if (item == &Option::USE_TOUCHSCREEN) return "Touchscreen Mode";
 	if (item == &Option::USE_TOUCH_JOYPAD) return "Touch Joypad";
 	if (item == &Option::DESTROY_VIBRATION) return "Vibration";
-	if (item == &Option::PIXELS_PER_MILLIMETER) return "Touch Sensitivity";
+	if (item == &Option::PIXELS_PER_MILLIMETER) return "Touch Scale";
 	if (item == &Option::VSYNC) return "VSync";
 
 	std::string id = item->getCaptionId();
@@ -182,7 +182,7 @@ const float Options::MUSIC_MAX_VALUE = 1.0f;
 const float Options::SENSITIVITY_MIN_VALUE = 0.0f;
 const float Options::SENSITIVITY_MAX_VALUE = 1.0f;
 const float Options::PIXELS_PER_MILLIMETER_MIN_VALUE = 3.0f;
-const float Options::PIXELS_PER_MILLIMETER_MAX_VALUE = 4.0f;
+const float Options::PIXELS_PER_MILLIMETER_MAX_VALUE = 6.0f;
 const int DIFFICULY_LEVELS[] = {
 	Difficulty::PEACEFUL,
 	Difficulty::NORMAL
@@ -222,7 +222,7 @@ void Options::update()
 		const std::string& value = optionStrings[i+1];
 
         //LOGI("reading key: %s (%s)\n", key.c_str(), value.c_str());
-        
+
 		// Multiplayer
 		if (key == OptionStrings::Multiplayer_Username) username = value;
 		if (key == OptionStrings::Multiplayer_ServerVisible) readBool(value, serverVisible);
@@ -246,6 +246,9 @@ void Options::update()
 			readBool(value, isJoyTouchArea);
 			if (!minecraft->useTouchscreen())
 				isJoyTouchArea = false;
+		}
+		if (key == OptionStrings::Controls_TouchScale) {
+			readFloat(value, pixelsPerMillimeter);
 		}
 
 		// Feedback
@@ -299,14 +302,14 @@ void Options::update()
 				difficulty = Difficulty::NORMAL;
 		}
 	}
-    
+
 #ifdef __APPLE__
 //    if (minecraft->isSuperFast()) {
 //        viewDistance = (viewDistance>0)? --viewDistance : 0;
 //    }
 //    LOGI("Is this card super fast?: %d\n", viewDistance);
 #endif
-    
+
     //LOGI("Lefty is: %d\n", isLeftHanded);
 }
 
@@ -364,6 +367,7 @@ void Options::save()
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_IsLefthanded, isLeftHanded);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchScreen, useTouchScreen);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchJoypad, isJoyTouchArea);
+	addOptionToSaveOutput(stringVec, OptionStrings::Controls_TouchScale, pixelsPerMillimeter);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_FeedbackVibration, destroyVibration);
 	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_Fancy, fancyGraphics);
 	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_RenderDistance, viewDistance);
@@ -375,7 +379,7 @@ void Options::save()
 	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_GUIScale, guiScale);
 	addOptionToSaveOutput(stringVec, OptionStrings::Audio_Music, music);
 	addOptionToSaveOutput(stringVec, OptionStrings::Audio_Sound, sound);
-// 
+//
 // 	static const Option MUSIC;
 // 	static const Option SOUND;
 // 	static const Option INVERT_MOUSE;
@@ -388,7 +392,7 @@ void Options::save()
 // 	static const Option GRAPHICS;
 // 	static const Option AMBIENT_OCCLUSION;
 // 	static const Option GUI_SCALE;
-// 
+//
 // 	static const Option THIRD_PERSON;
 // 	static const Option HIDE_GUI;
 	//try {

@@ -5,7 +5,7 @@ class OptionStrings {
 public:
     static const char* Multiplayer_Username;
     static const char* Multiplayer_ServerVisible;
-    
+
     static const char* Graphics_Fancy;
     static const char* Graphics_LowQuality;
     static const char* Graphics_RenderDistance;
@@ -20,6 +20,7 @@ public:
     static const char* Controls_UseTouchScreen;
 	static const char* Controls_UseTouchJoypad;
     static const char* Controls_IsLefthanded;
+    static const char* Controls_TouchScale;
     static const char* Controls_FeedbackVibration;
 
 	static const char* Game_DifficultyLevel;
