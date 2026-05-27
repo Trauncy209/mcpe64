@@ -1551,8 +1551,6 @@ void Minecraft::optionUpdated( const Options::Option* option, float value ) {
 		pixelCalc.setPixelsPerMillimeter(pixelsPerMillimeter);
 		Config config = createConfig(this);
 		gui.onConfigChanged(config);
-		if (screen)
-			screen->setSize(width, height);
 		if (inputHolder)
 			inputHolder->onConfigChanged(config);
 	}
