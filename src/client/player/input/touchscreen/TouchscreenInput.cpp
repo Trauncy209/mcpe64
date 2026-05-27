@@ -9,6 +9,7 @@
 #include "../../../../platform/log.h"
 #include "../../../renderer/Textures.h"
 #include "../../../sound/SoundEngine.h"
+#include "../../../gui/screens/ChatScreen.h"
 
 static const int AREA_DPAD_FIRST = 100;
 static const int AREA_DPAD_N = 100;
@@ -18,6 +19,7 @@ static const int AREA_DPAD_E = 103;
 static const int AREA_DPAD_C = 104;
 static const int AREA_PAUSE = 105;
 static const int AREA_JUMP = 106;
+static const int AREA_CHAT = 107;
 
 static int cPressed = 0;
 static int cReleased = 0;
@@ -74,6 +76,8 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* opti
 	aRight(0),
 	aUp(0),
 	aDown(0),
+	aPause(0),
+	aChat(0),
 	aJump(0),
 	aSneak(0),
 	aUpLeft(0),
@@ -170,10 +174,17 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
     float btnSize = Mth::Min(18 * Gui::GuiScale, maxPixels);
     float btnGap = Mth::Max(2.0f, 2.0f * Gui::GuiScale);
     float btnRight = w - 4;
-	_model.addArea(AREA_PAUSE, aPause = new RectangleArea(btnRight - btnSize,
-                                                          4,
+    float btnTop = 4;
+    float pauseLeft = btnRight - btnSize;
+    float chatRight = pauseLeft - btnGap;
+	_model.addArea(AREA_PAUSE, aPause = new RectangleArea(pauseLeft,
+                                                          btnTop,
                                                           btnRight,
-                                                          4 + btnSize));
+                                                          btnTop + btnSize));
+	_model.addArea(AREA_CHAT, aChat = new RectangleArea(chatRight - btnSize,
+                                                        btnTop,
+                                                        chatRight,
+                                                        btnTop + btnSize));
 
 	//rebuild();
 }
@@ -223,6 +234,7 @@ void TouchscreenInput_TestFps::tick( Player* player )
 	bool tmpForward = false;
 	bool tmpNorthJump = false;
 	bool openPauseScreen = false;
+	bool openChatScreen = false;
 
 	for (int i = 0; i < 8; ++i)
 		_buttons[i] = false;
@@ -322,6 +334,11 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				openPauseScreen = true;
 			}
 		}
+		else if (areaId == AREA_CHAT) {
+			if (Multitouch::isReleased(p)) {
+				openChatScreen = true;
+			}
+		}
 		_buttons[areaId - AREA_DPAD_FIRST] = setButton;
 	}
 
@@ -329,6 +346,10 @@ void TouchscreenInput_TestFps::tick( Player* player )
 		if (openPauseScreen) {
 			_minecraft->soundEngine->playUI("random.click", 1, 1);
 			_minecraft->screenChooser.setScreen(SCREEN_PAUSE);
+		}
+		else if (openChatScreen) {
+			_minecraft->soundEngine->playUI("random.click", 1, 1);
+			_minecraft->setScreen(new ChatScreen());
 		}
 	}
 
@@ -539,6 +560,12 @@ void TouchscreenInput_TestFps::rebuild() {
 		t.begin();
 		t.colorABGR(0xffffffff);
 		drawRectangleAreaTexture(t, aPause);
+		t.draw();
+
+		_minecraft->textures->loadAndBindTexture(isButtonDown(AREA_CHAT) ? "gui/chat_button_dark.png" : "gui/chat_button_light.png");
+		t.begin();
+		t.colorABGR(0xffffffff);
+		drawRectangleAreaTexture(t, aChat);
 		t.draw();
 	}
 	//RenderChunk _render = t.end(true, _bufferId);

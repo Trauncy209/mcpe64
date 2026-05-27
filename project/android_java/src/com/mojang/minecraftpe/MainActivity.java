@@ -40,13 +40,19 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.text.InputType;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.ViewGroup.LayoutParams;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mojang.minecraftpe.R;
@@ -424,14 +430,35 @@ public class MainActivity extends Activity {
 		runOnUiThread(new Runnable() {
 			public void run() {
 				createAlertDialog(true, true, false);
-				EditText input = new EditText(MainActivity.this);
+				final EditText input = new EditText(MainActivity.this);
 				input.setSingleLine(true);
 				input.setHint("Type a message");
+				input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+				input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+				LinearLayout container = new LinearLayout(MainActivity.this);
+				container.setOrientation(LinearLayout.VERTICAL);
+				int padding = (int)(16 * getResources().getDisplayMetrics().density);
+				container.setPadding(padding, padding, padding, padding);
+				container.addView(input, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+
 				_userInputValues.add(new TextViewReader(input));
-				MainActivity.this.mDialog.setView(input);
+				MainActivity.this.mDialog.setView(container);
 				MainActivity.this.mDialog.show();
-				MainActivity.this.mDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-				MainActivity.this.mDialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
+				Window window = MainActivity.this.mDialog.getWindow();
+				if (window != null) {
+					window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+					window.setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+					window.setGravity(Gravity.BOTTOM);
+					window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+				}
+
+				input.requestFocus();
+				InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				if (inputManager != null) {
+					inputManager.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+				}
 			}
 		});
     	} else if (dialogId == DialogDefinitions.DIALOG_MAINMENU_OPTIONS) { 
