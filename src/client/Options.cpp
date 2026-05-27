@@ -4,6 +4,7 @@
 #include "../platform/log.h"
 #include "../world/Difficulty.h"
 #include "../locale/I18n.h"
+#include <algorithm>
 #include <cmath>
 #include <sstream>
 /*static*/
@@ -67,7 +68,8 @@ void Options::initDefaultValues() {
 		useTouchScreen = false;
 	else
 		useTouchScreen = true;
-	pixelsPerMillimeter = minecraft->platform()->getPixelsPerMillimeter();
+	float basePixelsPerMillimeter = minecraft->platform()->getPixelsPerMillimeter();
+	pixelsPerMillimeter = basePixelsPerMillimeter * 0.5f;
 	//useMouseForDigging = true;
 
 	//skin     = "Default";
@@ -181,8 +183,8 @@ const float Options::MUSIC_MIN_VALUE = 0.0f;
 const float Options::MUSIC_MAX_VALUE = 1.0f;
 const float Options::SENSITIVITY_MIN_VALUE = 0.0f;
 const float Options::SENSITIVITY_MAX_VALUE = 1.0f;
-const float Options::PIXELS_PER_MILLIMETER_MIN_VALUE = 3.0f;
-const float Options::PIXELS_PER_MILLIMETER_MAX_VALUE = 6.0f;
+const float Options::PIXELS_PER_MILLIMETER_MIN_VALUE = 0.5f;
+const float Options::PIXELS_PER_MILLIMETER_MAX_VALUE = 8.0f;
 const int DIFFICULY_LEVELS[] = {
 	Difficulty::PEACEFUL,
 	Difficulty::NORMAL
@@ -248,7 +250,13 @@ void Options::update()
 				isJoyTouchArea = false;
 		}
 		if (key == OptionStrings::Controls_TouchScale) {
-			readFloat(value, pixelsPerMillimeter);
+			if (readFloat(value, pixelsPerMillimeter)) {
+				float basePixelsPerMillimeter = minecraft->platform()->getPixelsPerMillimeter();
+				if (pixelsPerMillimeter > PIXELS_PER_MILLIMETER_MAX_VALUE) {
+					pixelsPerMillimeter = basePixelsPerMillimeter * (pixelsPerMillimeter / 100.0f);
+				}
+				pixelsPerMillimeter = std::max(PIXELS_PER_MILLIMETER_MIN_VALUE, std::min(PIXELS_PER_MILLIMETER_MAX_VALUE, pixelsPerMillimeter));
+			}
 		}
 
 		// Feedback
@@ -459,7 +467,8 @@ std::string Options::getMessage( const Option* item )
 		}
 
 		if (item == &Option::PIXELS_PER_MILLIMETER) {
-			int percent = (int)(((progressValue - PIXELS_PER_MILLIMETER_MIN_VALUE) / (PIXELS_PER_MILLIMETER_MAX_VALUE - PIXELS_PER_MILLIMETER_MIN_VALUE)) * 100.0f);
+			float basePixelsPerMillimeter = minecraft->platform()->getPixelsPerMillimeter();
+			int percent = (int)((progressValue / basePixelsPerMillimeter) * 100.0f + 0.5f);
 			return caption + std::to_string(percent) + "%";
 		}
 

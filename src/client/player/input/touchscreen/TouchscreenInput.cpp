@@ -143,8 +143,9 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	const float BaseY = -8 + h - 3.0f * Bh;
 	const float BaseX = _options->isLeftHanded? -8 + w - 3 * Bw
 											:	8 + 0;
-	const float jumpGap = Mth::Max(6.0f, Bw * 0.20f);
-	const float jumpX = _options->isLeftHanded ? (BaseX - jumpGap - Bw) : (BaseX + 3 * Bw + jumpGap);
+	const float jumpGap = Mth::Max(10.0f, Bw * 0.45f);
+	const float jumpMargin = 8.0f;
+	const float jumpX = _options->isLeftHanded ? jumpMargin : (w - jumpMargin - Bw);
 	const float jumpY = BaseY + Bh;
 	_movementRectangle = RectangleArea(BaseX, BaseY, BaseX + 3 * Bw, BaseY + 3 * Bh);
 	_boundingRectangle = RectangleArea(Mth::Min(BaseX, jumpX), BaseY, Mth::Max(BaseX + 3 * Bw, jumpX + Bw), BaseY + 3 * Bh);
