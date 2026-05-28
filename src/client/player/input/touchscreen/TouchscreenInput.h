@@ -39,7 +39,9 @@ public:
     void releaseAllKeys();
 
 	const RectangleArea& getRectangleArea();
+	const RectangleArea& getMovementRectangleArea();
 	const RectangleArea& getPauseRectangleArea();
+	const RectangleArea& getJumpRectangleArea();
 	const RectangleArea& getTurnExclusionRectangleArea();
 
 private:

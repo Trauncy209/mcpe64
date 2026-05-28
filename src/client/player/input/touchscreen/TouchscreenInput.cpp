@@ -469,9 +469,20 @@ const RectangleArea& TouchscreenInput_TestFps::getRectangleArea()
 {
 	return _boundingRectangle;
 }
+
+const RectangleArea& TouchscreenInput_TestFps::getMovementRectangleArea()
+{
+	return _movementRectangle;
+}
+
 const RectangleArea& TouchscreenInput_TestFps::getPauseRectangleArea()
 {
     return *aPause;
+}
+
+const RectangleArea& TouchscreenInput_TestFps::getJumpRectangleArea()
+{
+	return *aJump;
 }
 
 const RectangleArea& TouchscreenInput_TestFps::getTurnExclusionRectangleArea()

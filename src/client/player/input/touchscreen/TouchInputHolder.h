@@ -68,6 +68,7 @@ public:
 		allowPicking(false),
 		state(State_None),
 		moveArea(-1,-1,0,0),
+		jumpArea(-1,-1,0,0),
 		joyTouchArea(-1, -1, 0, 0),
 		inventoryArea(-1,-1, 0, 0),
 		pauseArea(-1, -1, 0, 0),
@@ -109,7 +110,7 @@ public:
 			_model.addArea(AREA_TURN, &_area);
 		} else {
 			screenArea = RectangleArea(0, 0, (float)c.width, (float)c.height);
-			// Expand the move area a bit
+			// Expand the button dead-zones a bit, but keep the middle gap free for looking.
             const float border = 10;
 			const float widen = (moveArea._x1-moveArea._x0) * 0.05f + border; // ~5% wider
 			moveArea._x0 -= widen;
@@ -117,6 +118,11 @@ public:
 			const float heighten = (moveArea._y1-moveArea._y0) * 0.05f + border; // ~5% taller
 			moveArea._y0 -= heighten;
 			moveArea._y1 += heighten;
+
+			jumpArea._x0 -= border;
+			jumpArea._x1 += border;
+			jumpArea._y0 -= border;
+			jumpArea._y1 += border;
             
             pauseArea._x0 -= border;
             pauseArea._x1 += border;
@@ -128,10 +134,9 @@ public:
 			_area.clear();
 			_area.include(&screenArea);
 			_area.exclude(&moveArea);
+			_area.exclude(&jumpArea);
 			_area.exclude(&inventoryArea);
-#ifdef __APPLE__
             _area.exclude(&pauseArea);
-#endif /*__APPLE__*/
 			//LOGI("Movearea: %f %f %f% f\n", moveArea._x0, moveArea._x1, moveArea._y0, moveArea._y1);
 
 			_model.clear();
@@ -359,6 +364,7 @@ public:
 	
 	RectangleArea screenArea;
 	RectangleArea moveArea;
+	RectangleArea jumpArea;
 	RectangleArea joyTouchArea;
 	RectangleArea inventoryArea;
     RectangleArea pauseArea;
@@ -425,9 +431,10 @@ public:
 
 	virtual void onConfigChanged(const Config& c) {
 		_move.onConfigChanged(c);
-		_turnBuild.moveArea = _move.getTurnExclusionRectangleArea();
+		_turnBuild.moveArea = _move.getMovementRectangleArea();
+		_turnBuild.jumpArea = _move.getJumpRectangleArea();
 		_turnBuild.pauseArea = _move.getPauseRectangleArea();
-		_turnBuild.inventoryArea = _mc->gui.getRectangleArea( _mc->options.isLeftHanded? 1 : -1 );
+		_turnBuild.inventoryArea = RectangleArea(-1, -1, -1, -1);
 		_turnBuild.setSensitivity(c.options->isJoyTouchArea? 1.8f : 1.0f);
 		((ITurnInput*)&_turnBuild)->onConfigChanged(c);
 	}
