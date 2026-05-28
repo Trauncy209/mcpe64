@@ -22,6 +22,7 @@
 #include "SimpleChooseLevelScreen.h"
 #include "../../renderer/Textures.h"
 #include "../../../SharedConstants.h"
+#include "../../../AppConstants.h"
 
 // Some kind of default settings, might be overridden in ::init
 StartMenuScreen::StartMenuScreen()
