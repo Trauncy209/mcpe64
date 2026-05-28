@@ -109,6 +109,7 @@ public:
 	void onGraphicsReset();
 
 	bool isLevelGenerated();
+	bool isMultiplayerReady();
 	int getLicenseId();
 
     void audioEngineOn();
@@ -161,6 +162,7 @@ public:
 #endif
 	IRakNetInstance*  raknetInstance;
 	NetEventCallback* netCallback;
+	bool multiplayerReady;
 
 	int lastTime;
 	int lastTickTime;

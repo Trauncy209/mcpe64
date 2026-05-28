@@ -174,6 +174,7 @@ Minecraft::Minecraft()
 	progressStagePercentage(0),
 	progressStageStatusId(0),
 	isLookingForMultiplayer(false),
+	multiplayerReady(false),
 	_licenseId(LicenseCodes::WAIT_PLATFORM_NOT_READY),
 	inputHolder(0),
 	_supportsNonTouchscreen(false),
@@ -1274,6 +1275,7 @@ void Minecraft::locateMultiplayer() {
 
 void Minecraft::cancelLocateMultiplayer() {
 	isLookingForMultiplayer = false;
+	multiplayerReady = false;
 
 	raknetInstance->stopPingForHosts();
 
@@ -1451,9 +1453,14 @@ const char* Minecraft::getProgressMessage()
 	return progressMessages[progressStageStatusId];
 }
 
+bool Minecraft::isMultiplayerReady()
+{
+	return !isOnlineClient() || multiplayerReady;
+}
+
 bool Minecraft::isLevelGenerated()
 {
-	return level != NULL && !isGeneratingLevel;
+	return level != NULL && !isGeneratingLevel && isMultiplayerReady();
 }
 
 LevelStorageSource* Minecraft::getLevelSource()

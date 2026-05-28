@@ -602,6 +602,7 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, ChunkDat
 	if (areAllChunksLoaded())
 	{
 		LOGI("all requested chunks loaded; sending READY_REQUESTEDCHUNKS\n");
+		minecraft->multiplayerReady = true;
 		ReadyPacket packet(ReadyPacket::READY_REQUESTEDCHUNKS);
 		raknetInstance->send(packet);
 
