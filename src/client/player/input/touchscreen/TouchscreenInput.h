@@ -39,7 +39,8 @@ public:
     void releaseAllKeys();
 
 	const RectangleArea& getRectangleArea();
-    const RectangleArea& getPauseRectangleArea();
+	const RectangleArea& getPauseRectangleArea();
+	const RectangleArea& getTurnExclusionRectangleArea();
 
 private:
 	void clear();
@@ -69,6 +70,7 @@ private:
 	RectangleArea* aUpRight;
 	bool _pauseIsDown;
 	RectangleArea _movementRectangle;
+	RectangleArea _turnExclusionRectangle;
 
 	RenderChunk _render;
 	bool _allowHeightChange;

@@ -14,7 +14,7 @@ ProgressScreen::ProgressScreen()
 
 void ProgressScreen::render( int xm, int ym, float a )
 {
-	if (minecraft->isLevelGenerated() && minecraft->isMultiplayerReady()) {
+	if (minecraft->isLevelGenerated()) {
 		minecraft->setScreen(NULL);
 		return;
 	}

@@ -83,7 +83,8 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* opti
 	aUpLeft(0),
 	aUpRight(0),
 	_allowHeightChange(false),
-	_movementRectangle(0, 0, 1, 1)
+	_movementRectangle(0, 0, 1, 1),
+	_turnExclusionRectangle(0, 0, 1, 1)
 {
 	releaseAllKeys();
 	onConfigChanged( createConfig(mc) );
@@ -148,7 +149,8 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	const float jumpX = _options->isLeftHanded ? jumpMargin : (w - jumpMargin - Bw);
 	const float jumpY = BaseY + Bh;
 	_movementRectangle = RectangleArea(BaseX, BaseY, BaseX + 3 * Bw, BaseY + 3 * Bh);
-	_boundingRectangle = RectangleArea(Mth::Min(BaseX, jumpX), BaseY, Mth::Max(BaseX + 3 * Bw, jumpX + Bw), BaseY + 3 * Bh);
+	_turnExclusionRectangle = RectangleArea(Mth::Min(BaseX, jumpX), BaseY, Mth::Max(BaseX + 3 * Bw, jumpX + Bw), BaseY + 3 * Bh);
+	_boundingRectangle = _turnExclusionRectangle;
 
 	xx = BaseX + Bw; yy = BaseY;
 	_model.addArea(AREA_DPAD_N, aUp = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
@@ -470,6 +472,11 @@ const RectangleArea& TouchscreenInput_TestFps::getRectangleArea()
 const RectangleArea& TouchscreenInput_TestFps::getPauseRectangleArea()
 {
     return *aPause;
+}
+
+const RectangleArea& TouchscreenInput_TestFps::getTurnExclusionRectangleArea()
+{
+	return _turnExclusionRectangle;
 }
 
 void TouchscreenInput_TestFps::rebuild() {

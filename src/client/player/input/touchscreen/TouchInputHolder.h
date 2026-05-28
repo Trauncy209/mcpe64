@@ -425,10 +425,8 @@ public:
 
 	virtual void onConfigChanged(const Config& c) {
 		_move.onConfigChanged(c);
-		_turnBuild.moveArea = _move.getRectangleArea();
-#ifdef __APPLE__
+		_turnBuild.moveArea = _move.getTurnExclusionRectangleArea();
 		_turnBuild.pauseArea = _move.getPauseRectangleArea();
-#endif
 		_turnBuild.inventoryArea = _mc->gui.getRectangleArea( _mc->options.isLeftHanded? 1 : -1 );
 		_turnBuild.setSensitivity(c.options->isJoyTouchArea? 1.8f : 1.0f);
 		((ITurnInput*)&_turnBuild)->onConfigChanged(c);
