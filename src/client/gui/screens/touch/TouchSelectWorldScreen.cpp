@@ -443,9 +443,13 @@ void SelectWorldScreen::tick()
 					if (sv.size() >= 3 && sv[2] == "survival")
 						isCreative = false;
 
+					bool biomeGrassTint = true;
+					if (sv.size() >= 4)
+						biomeGrassTint = (sv[3] != "false");
+
 					// Start a new level with the given name and seed
-					LOGI("Creating a level with id '%s', name '%s' and seed '%d'\n", levelId.c_str(), levelName.c_str(), seed);
-					LevelSettings settings(seed, isCreative? GameType::Creative : GameType::Survival);
+					LOGI("Creating a level with id '%s', name '%s' and seed '%d' biomeGrassTint=%d\n", levelId.c_str(), levelName.c_str(), seed, biomeGrassTint ? 1 : 0);
+					LevelSettings settings(seed, isCreative? GameType::Creative : GameType::Survival, (int)LGV_ORIGINAL, false, false, false, false, false, false, biomeGrassTint);
 					minecraft->selectLevel(levelId, levelName, settings);
 					minecraft->hostMultiplayer();
 					minecraft->setScreen(new ProgressScreen());

@@ -27,6 +27,8 @@
     <string name="mmoptions_ctrl_islefthanded_title">Lefty</string>
     <string name="mmoptions_ctrl_usetouchscreen_title">Use touch screen</string>
     <string name="mmoptions_ctrl_usetouchjoypad_title">Split touch controls</string>
+    <string name="mmoptions_ctrl_modeclassic_title">Classic controls</string>
+    <string name="mmoptions_ctrl_modeclassic_summary">Use the original source control layout instead of the modern custom touch controls</string>
     <string name="mmoptions_feedback_vibration_title">Vibration</string>
     <string name="mmoptions_feedback_vibration_summary">Slight vibration when blocks are destroyed</string>
     <string name="mmoptions_gfx_fancygraphics_title">Fancy graphics</string>

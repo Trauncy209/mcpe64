@@ -19,6 +19,7 @@ public:
     static const char* Controls_InvertMouse;
     static const char* Controls_UseTouchScreen;
 	static const char* Controls_UseTouchJoypad;
+    static const char* Controls_ModeClassic;
     static const char* Controls_IsLefthanded;
     static const char* Controls_TouchScale;
     static const char* Controls_FeedbackVibration;

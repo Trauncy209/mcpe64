@@ -4,6 +4,7 @@
 //package net.minecraft.world.level.levelgen.feature;
 
 #include "Feature.h"
+#include "../../tile/LeafTile.h"
 
 class TallgrassFeature : public Feature
 {

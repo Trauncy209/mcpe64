@@ -5,6 +5,7 @@
 #include "CactusFeature.h"
 #include "ClayFeature.h"
 #include "FlowerFeature.h"
+#include "TallgrassFeature.h"
 #include "TreeFeature.h"
 #include "LakeFeature.h"
 #include "OreFeature.h"

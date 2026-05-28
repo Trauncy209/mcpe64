@@ -6,6 +6,7 @@
 #include "../level/tile/Tile.h"
 #include "../level/tile/Sapling.h"
 #include "../level/tile/GrassTile.h"
+#include "../level/tile/TallGrass.h"
 #include "../../util/Mth.h"
 #include "../level/tile/ClothTile.h"
 #include "../level/tile/CropTile.h"
@@ -91,9 +92,10 @@ bool DyePowderItem::useOn( ItemInstance* itemInstance, Player* player, Level* le
 						  continue;
 
 					  if (level->getTile(xx, yy, zz) == 0) {
-						  /*if (random.nextInt(10) != 0) {
-						  level->setTileAndData(xx, yy, zz, Tile::tallgrass.id, TallGrass.TALL_GRASS);
-						  } else*/ if (random.nextInt(3) != 0) {
+						  if (random.nextInt(10) != 0) {
+							  int grassType = random.nextInt(6) == 0 ? TallGrass::FERN : TallGrass::TALL_GRASS;
+							  level->setTileAndData(xx, yy, zz, Tile::tallgrass->id, grassType);
+						  } else if (random.nextInt(3) != 0) {
 							  level->setTile(xx, yy, zz, Tile::flower->id);
 						  } else {
 							  level->setTile(xx, yy, zz, Tile::rose->id);

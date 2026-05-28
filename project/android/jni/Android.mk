@@ -206,6 +206,8 @@ LOCAL_SRC_FILES := ../../../src/main.cpp \
 ../../../src/world/level/MobSpawner.cpp \
 ../../../src/world/level/Region.cpp \
 ../../../src/world/level/TickNextTickData.cpp \
+../../../src/world/level/GrassColor.cpp \
+../../../src/world/level/FoliageColor.cpp \
 ../../../src/world/level/biome/Biome.cpp \
 ../../../src/world/level/biome/BiomeSource.cpp \
 ../../../src/world/level/chunk/LevelChunk.cpp \

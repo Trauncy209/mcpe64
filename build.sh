@@ -392,9 +392,9 @@ if [[ "$NO_JAVA" == false && "$NO_BUILD" == false ]]; then
   ensure_dir "$BUILD_DIR/classes"
 
   # Some JDK versions (<=8) don't support --release.
-  JAVAC_ARGS=(--release 8)
+  JAVAC_ARGS=(--release 8 -parameters)
   if "$JAVAC_CMD" -version 2>&1 | grep -qE '^javac 1\.'; then
-    JAVAC_ARGS=(-source 1.8 -target 1.8)
+    JAVAC_ARGS=(-source 1.8 -target 1.8 -parameters)
   fi
 
   "$JAVAC_CMD" "${JAVAC_ARGS[@]}" -cp "$ANDROID_PLATFORM_DIR/android.jar" -d "$BUILD_DIR/classes" "${JAVA_SOURCES[@]}"
