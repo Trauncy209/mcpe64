@@ -64,17 +64,6 @@ ClientProtocol detectProtocolForServer(const Touch::JoinGameListEntry& server) {
         return CLIENT_PROTOCOL_RAKET_COMPAT;
     }
 
-    std::string lowerTitle = server.title;
-    for (size_t i = 0; i < lowerTitle.size(); ++i) {
-        if (lowerTitle[i] >= 'A' && lowerTitle[i] <= 'Z') {
-            lowerTitle[i] = char(lowerTitle[i] - 'A' + 'a');
-        }
-    }
-
-    if (lowerTitle.find("raket") != std::string::npos) {
-        return CLIENT_PROTOCOL_RAKET_COMPAT;
-    }
-
     return CLIENT_PROTOCOL_CLASSIC;
 }
 
