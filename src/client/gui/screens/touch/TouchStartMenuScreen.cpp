@@ -15,6 +15,7 @@
 #include "../../../renderer/Textures.h"
 #include "../../../renderer/TextureData.h"
 #include "../../../../SharedConstants.h"
+#include "../../../../AppConstants.h"
 #include "../../../../AppPlatform.h"
 #include "../../../../LicenseCodes.h"
 #include "../../../../util/Mth.h"
