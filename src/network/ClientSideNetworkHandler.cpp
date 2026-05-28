@@ -71,7 +71,7 @@ void ClientSideNetworkHandler::requestNextChunk()
 		RequestChunkPacket packet(chunk.x, chunk.y);
         raknetInstance->send(packet);
 
-        LOGI("requesting chunk @ (%d, %d) idx=%d pos=%d\n", chunk.x, chunk.y, requestNextChunkIndex, requestNextChunkPosition);
+        //LOGI("requesting chunks @ (%d, %d)\n", chunk.x, chunk.y);
         
 		//raknetInstance->send(new RequestChunkPacket(requestNextChunkPosition % CHUNK_CACHE_WIDTH, requestNextChunkPosition / CHUNK_CACHE_WIDTH));
 		requestNextChunkIndex++;
@@ -151,7 +151,7 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, LoginSta
 
 void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, StartGamePacket* packet)
 {
-	LOGI("StartGamePacket seed=%u gen=%d gametype=%d eid=%d pos=%f,%f,%f\n", packet->levelSeed, packet->levelGeneratorVersion, packet->gameType, packet->entityId, packet->x, packet->y, packet->z);
+	LOGI("StartGamePacket\n");
 
 #ifdef RPI
 	if (packet->gameType != GameType::Creative) {
@@ -477,7 +477,7 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, ChunkDat
 		LOGI("level @ handle ChunkDataPacket is 0\n");
 		return;
 	}
-	LOGI("ChunkDataPacket x=%d z=%d\n", packet->x, packet->z);
+	//LOGI("ChunkDataPacket\n");
 
 	LevelChunk* chunk = level->getChunkSource()->create(packet->x, packet->z);
 	if (!chunk || chunk->isEmpty())
@@ -601,7 +601,6 @@ void ClientSideNetworkHandler::handle(const RakNet::RakNetGUID& source, ChunkDat
 
 	if (areAllChunksLoaded())
 	{
-		LOGI("all requested chunks loaded; sending READY_REQUESTEDCHUNKS\n");
 		ReadyPacket packet(ReadyPacket::READY_REQUESTEDCHUNKS);
 		raknetInstance->send(packet);
 
@@ -689,7 +688,6 @@ void ClientSideNetworkHandler::arrangeRequestChunkOrder() {
 void ClientSideNetworkHandler::levelGenerated(Level* level)
 {
 	this->level = level;
-	LOGI("levelGenerated clientside; sending READY_CLIENTGENERATION\n");
 	ReadyPacket packet(ReadyPacket::READY_CLIENTGENERATION);
 	raknetInstance->send(packet);
 

@@ -373,7 +373,6 @@ void RakNetInstance::runEvents(NetEventCallback* callback)
 		int length = currentEvent->length;
 
 		if (!_isServer && _clientProtocol == CLIENT_PROTOCOL_RAKET_COMPAT && packetData && packetData[0] >= ID_USER_PACKET_ENUM) {
-			LOGI("raket incoming rewrite packetId=%d len=%d\n", packetData[0], length);
 			if (rewriteIncomingRaketPacket(packetData, length, rewrittenPacket)) {
 				if (rewrittenPacket.empty()) {
 					rakPeer->DeallocatePacket(currentEvent);
