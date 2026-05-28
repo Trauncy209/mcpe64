@@ -249,7 +249,7 @@ void StartMenuScreen::render( int xm, int ym, float a )
 		glColor4f2(1, 1, 1, 1);
 		if (Textures::isTextureIdValid(minecraft->textures->loadAndBindTexture("gui/logo/github.png")))
 			blit(2, height - 10, 0, 0, 8, 8, 256, 256);
-		drawString(font, "TruancyCraftPE", 12, height - 10, 0xffcccccc);
+		drawString(font, std::string("TruancyCraftPE ") + APP_VERSION_STRING, 12, height - 10, 0xffcccccc);
 		//patch->draw(t, 0, 20);
 	}
 	Screen::render(xm, ym, a);

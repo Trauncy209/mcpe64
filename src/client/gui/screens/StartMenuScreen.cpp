@@ -193,7 +193,7 @@ void StartMenuScreen::render( int xm, int ym, float a )
 	if (Textures::isTextureIdValid(minecraft->textures->loadAndBindTexture("gui/logo/github.png")))
 		blit(2, height - 10, 0, 0, 8, 8, 256, 256);
 {
-			std::string txt = "TruancyCraftPE";
+			std::string txt = std::string("TruancyCraftPE ") + APP_VERSION_STRING;
 			float wtxt = font->width(txt);
 			Gui::drawColoredString(font, txt, 12, height - 10, 255);
 			// underline link
