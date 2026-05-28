@@ -12,7 +12,6 @@ We want to preserve what made early Pocket Edition special, fix what was broken,
 [![Release](https://img.shields.io/github/v/release/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Trauncy209/TruancyCraftPE/total?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/releases)
 [![Stars](https://img.shields.io/github/stars/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/stargazers)
-[![Forks](https://img.shields.io/github/forks/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/network/members)
 [![Issues](https://img.shields.io/github/issues/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/issues)
 [![Last Commit](https://img.shields.io/github/last-commit/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/commits/main)
 
@@ -60,7 +59,7 @@ Here is what TruancyCraftPE looks like right now on-device.
 <td align="center" width="50%"><img src="docs/screenshots/04-options-graphics.jpeg" alt="Graphics options screen" width="100%"><br><sub>Graphics settings and render-distance controls.</sub></td>
 </tr>
 <tr>
-<td align="center" width="50%"><img src="docs/screenshots/05-options-controls.jpeg" alt="Controls options screen" width="100%"><br><sub>Touchscreen, vibration, and sensitivity settings.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/05-options-controls.jpeg" alt="Controls options screen" width="100%"><br><sub>Touchscreen, classic-controls toggle, vibration, and sensitivity settings.</sub></td>
 <td align="center" width="50%"><img src="docs/screenshots/06-options-game.jpeg" alt="Game options screen" width="100%"><br><sub>Game settings like difficulty, server visibility, third-person mode, and HUD controls.</sub></td>
 </tr>
 </table>
@@ -73,7 +72,7 @@ Here is what TruancyCraftPE looks like right now on-device.
 <td align="center" width="50%"><img src="docs/screenshots/09-create-world-classic.jpeg" alt="Create world screen with classic world selected" width="100%"><br><sub>Classic world support is still here too.</sub></td>
 </tr>
 <tr>
-<td align="center" width="50%"><img src="docs/screenshots/07-world-options-infinite.jpeg" alt="Infinite world generation options screen" width="100%"><br><sub>Tune caves, ravines, lakes, and springs for infinite worlds.</sub></td>
+<td align="center" width="50%"><img src="docs/screenshots/07-world-options-infinite.jpeg" alt="Infinite world generation options screen" width="100%"><br><sub>Tune caves, ravines, lakes, springs, tall grass, and biome grass color for infinite worlds.</sub></td>
 <td align="center" width="50%"><img src="docs/screenshots/10-select-world.jpeg" alt="World selection screen" width="100%"><br><sub>World selection and create-new flow.</sub></td>
 </tr>
 </table>
@@ -96,8 +95,17 @@ Current work in this repository includes:
   - lava lakes toggle
   - water springs toggle
   - lava springs toggle
+  - tall grass worldgen toggle
+  - biome grass color toggle
   - option to keep a world fully **classic**
-- **Improved settings/options work**
+- **Grass and foliage improvements**
+  - grass added back into world generation instead of flower-only terrain feeling
+  - biome-colored grass block tops
+  - tall grass generation in supported biomes
+- **Improved controls and settings**
+  - classic `0.6.1` touch controls toggle
+  - modern custom touch controls toggle
+  - live control sizing refresh for newer phones
   - render distance option
   - more menu and settings work than stock 0.6.1
   - mobile-oriented tuning options like pixels-per-millimeter
@@ -111,6 +119,13 @@ Current work in this repository includes:
 - **Sprinting**
 - **Debug/F3-style information improvements**
 - **Ongoing bug fixes across the old codebase**
+
+### Latest release: 0.5.15
+
+Version `0.5.15` is the current public milestone and includes the grass/worldgen/control work shipped today.
+
+- Release page: https://github.com/Trauncy209/TruancyCraftPE/releases/tag/v0.5.15
+- APK: https://github.com/Trauncy209/TruancyCraftPE/releases/download/v0.5.15/TruancyCraftPE-0.5.15-world-options-clean.apk
 
 ---
 
