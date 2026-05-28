@@ -24,6 +24,7 @@ std::string Options::getCaption(const Option* item) {
 	if (item == &Option::LEFT_HANDED) return "Left-Handed Controls";
 	if (item == &Option::USE_TOUCHSCREEN) return "Touchscreen Mode";
 	if (item == &Option::USE_TOUCH_JOYPAD) return "Touch Joypad";
+	if (item == &Option::CLASSIC_CONTROLS) return "Classic Controls";
 	if (item == &Option::DESTROY_VIBRATION) return "Vibration";
 	if (item == &Option::PIXELS_PER_MILLIMETER) return "Touch Scale";
 	if (item == &Option::VSYNC) return "VSync";
@@ -58,6 +59,7 @@ void Options::initDefaultValues() {
 	isLeftHanded = false;
 
 	isJoyTouchArea = false;
+	useClassicControls = false;
 
 	music = 1;
 	sound = 1;
@@ -177,9 +179,10 @@ const Options::Option
 	Options::Option::LEFT_HANDED		 (15, "options.lefthanded", false, true),
 	Options::Option::USE_TOUCHSCREEN	 (16, "options.usetouchscreen", false, true),
 	Options::Option::USE_TOUCH_JOYPAD	 (17, "options.usetouchpad", false, true),
-	Options::Option::DESTROY_VIBRATION   (18, "options.destroyvibration", false, true),
-	Options::Option::PIXELS_PER_MILLIMETER(19, "options.pixelspermilimeter", true, false),
-	Options::Option::VSYNC               (20, "options.vsync",             false, true);
+	Options::Option::CLASSIC_CONTROLS    (18, "options.classiccontrols", false, true),
+	Options::Option::DESTROY_VIBRATION   (19, "options.destroyvibration", false, true),
+	Options::Option::PIXELS_PER_MILLIMETER(20, "options.pixelspermilimeter", true, false),
+	Options::Option::VSYNC               (21, "options.vsync",             false, true);
 
 /* private */
 const float Options::SOUND_MIN_VALUE = 0.0f;
@@ -253,6 +256,9 @@ void Options::update()
 			readBool(value, isJoyTouchArea);
 			if (!minecraft->useTouchscreen())
 				isJoyTouchArea = false;
+		}
+		if (key == OptionStrings::Controls_ModeClassic) {
+			readBool(value, useClassicControls);
 		}
 		if (key == OptionStrings::Controls_TouchScale) {
 			if (readFloat(value, pixelsPerMillimeter)) {
@@ -381,6 +387,7 @@ void Options::save()
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_IsLefthanded, isLeftHanded);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchScreen, useTouchScreen);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchJoypad, isJoyTouchArea);
+	addOptionToSaveOutput(stringVec, OptionStrings::Controls_ModeClassic, useClassicControls);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_TouchScale, pixelsPerMillimeter);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_FeedbackVibration, destroyVibration);
 	addOptionToSaveOutput(stringVec, OptionStrings::Graphics_Fancy, fancyGraphics);

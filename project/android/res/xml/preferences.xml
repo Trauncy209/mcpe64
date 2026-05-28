@@ -76,6 +76,13 @@
             android:defaultValue="false"
             android:enabled="true"
             />
+        <CheckBoxPreference
+            android:key="ctrl_mode_classic"
+            android:title="@string/mmoptions_ctrl_modeclassic_title"
+            android:summary="@string/mmoptions_ctrl_modeclassic_summary"
+            android:defaultValue="false"
+            android:enabled="true"
+            />
         </PreferenceCategory>
 
     <PreferenceCategory

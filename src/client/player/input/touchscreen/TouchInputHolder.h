@@ -426,6 +426,14 @@ public:
 	{
 		onConfigChanged(createConfig(mc));
 	}
+
+	TouchInputHolder(Minecraft* mc, Options* options, bool classicLayout)
+	:	_mc(mc),
+		_move(mc, options, classicLayout),
+		_turnBuild(UnifiedTurnBuild::MODE_DELTA, mc->width, mc->height, (float)MovementLimit, 1, this, mc)
+	{
+		onConfigChanged(createConfig(mc));
+	}
 	~TouchInputHolder() {
 	}
 

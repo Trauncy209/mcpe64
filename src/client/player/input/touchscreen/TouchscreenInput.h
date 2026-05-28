@@ -28,6 +28,7 @@ public:
 	static const int NumKeys = 7;
 
     TouchscreenInput_TestFps(Minecraft* mc, Options* options);
+	TouchscreenInput_TestFps(Minecraft* mc, Options* options, bool classicLayout);
 	~TouchscreenInput_TestFps();
 
 	void onConfigChanged(const Config& c);
@@ -71,6 +72,7 @@ private:
 	RectangleArea* aUpLeft;
 	RectangleArea* aUpRight;
 	bool _pauseIsDown;
+	bool _classicLayout;
 	RectangleArea _movementRectangle;
 	RectangleArea _turnExclusionRectangle;
 

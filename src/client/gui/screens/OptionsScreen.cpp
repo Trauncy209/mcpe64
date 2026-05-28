@@ -176,6 +176,7 @@ void OptionsScreen::generateOptionScreens() {
 		.addOptionItem(&Options::Option::LEFT_HANDED, minecraft)
 		.addOptionItem(&Options::Option::USE_TOUCHSCREEN, minecraft)
 		.addOptionItem(&Options::Option::USE_TOUCH_JOYPAD, minecraft)
+		.addOptionItem(&Options::Option::CLASSIC_CONTROLS, minecraft)
 		.addOptionItem(&Options::Option::DESTROY_VIBRATION, minecraft);
 
 	optionPanes[2]->createOptionsGroup("options.group.graphics")

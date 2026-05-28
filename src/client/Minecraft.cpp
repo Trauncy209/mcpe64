@@ -15,6 +15,8 @@
 //#include "../network/Packet.h"
 #include "../world/entity/player/Inventory.h"
 #include "../world/level/chunk/ChunkCache.h"
+#include "../world/level/GrassColor.h"
+#include "../world/level/FoliageColor.h"
 #include "../world/level/tile/Tile.h"
 #include "../world/level/storage/LevelStorageSource.h"
 #include "../world/level/storage/LevelStorage.h"
@@ -112,6 +114,24 @@ static void checkGlError(const char* tag) {
 	}
 #endif /*GLDEBUG*/
 }
+
+#ifndef STANDALONE_SERVER
+static void initializeBiomeColorTables(Minecraft* minecraft) {
+	if (!minecraft || !minecraft->platform()) {
+		return;
+	}
+
+	TextureData grassTex = minecraft->platform()->loadTexture("misc/grasscolor.png", true);
+	if (grassTex.data && grassTex.w == 256 && grassTex.h == 256) {
+		GrassColor::init(reinterpret_cast<int*>(grassTex.data));
+	}
+
+	TextureData foliageTex = minecraft->platform()->loadTexture("misc/foliagecolor.png", true);
+	if (foliageTex.data && foliageTex.w == 256 && foliageTex.h == 256) {
+		FoliageColor::init(reinterpret_cast<int*>(foliageTex.data));
+	}
+}
+#endif
 
 /*static*/
 const char* Minecraft::progressMessages[] = {
@@ -1119,6 +1139,7 @@ void Minecraft::init()
 	LOGI("IS TOUCHSCREEN? %d\n", options.useTouchScreen);
 
 	textures = new Textures(&options, platform());
+	initializeBiomeColorTables(this);
 	textures->addDynamicTexture(new WaterTexture());
 	textures->addDynamicTexture(new WaterSideTexture());
 	gui.texturesLoaded(textures);
@@ -1239,7 +1260,11 @@ void Minecraft::_reloadInput() {
 	const bool useTouchHolder = useTouchscreen();
 #endif
 	if (useTouchHolder) {
-		inputHolder = new TouchInputHolder(this, &options);
+		if (options.useClassicControls) {
+			inputHolder = new TouchInputHolder(this, &options, true);
+		} else {
+			inputHolder = new TouchInputHolder(this, &options);
+		}
 	} else {
 		#if defined(ANDROID) || defined(__APPLE__)
 			inputHolder = new CustomInputHolder(
@@ -1540,6 +1565,12 @@ void Minecraft::optionUpdated( const Options::Option* option, bool value ) {
 		ServerSideNetworkHandler* ss = (ServerSideNetworkHandler*) netCallback;
 		ss->allowIncomingConnections(value);
 	}
+#ifndef STANDALONE_SERVER
+	if (option == &Options::Option::CLASSIC_CONTROLS || option == &Options::Option::USE_TOUCHSCREEN || option == &Options::Option::USE_TOUCH_JOYPAD) {
+		_reloadInput();
+		setSize(width, height);
+	}
+#endif
 }
 
 void Minecraft::optionUpdated( const Options::Option* option, float value ) {
@@ -1549,6 +1580,7 @@ void Minecraft::optionUpdated( const Options::Option* option, float value ) {
 		float pixelsPerMillimeter = basePixelsPerMillimeter * (0.25f + (value / 100.0f) * 1.75f);
 		pixelCalcUi.setPixelsPerMillimeter(pixelsPerMillimeter * Gui::InvGuiScale);
 		pixelCalc.setPixelsPerMillimeter(pixelsPerMillimeter);
+		setSize(width, height);
 	}
 #endif
 }

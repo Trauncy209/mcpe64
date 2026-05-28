@@ -28,6 +28,7 @@ public class MainMenuOptionsActivity extends PreferenceActivity implements
 	static public final String Controls_Sensitivity = "ctrl_sensitivity";
 	static public final String Controls_UseTouchscreen = "ctrl_usetouchscreen";
 	static public final String Controls_UseTouchJoypad = "ctrl_usetouchjoypad";
+	static public final String Controls_ModeClassic = "ctrl_mode_classic";
 	static public final String Controls_FeedbackVibration = "feedback_vibration";
 	static public final String Game_DifficultyLevel = "game_difficulty";
 	static public final String Internal_Game_DifficultyPeaceful = "game_difficultypeaceful";

@@ -64,6 +64,10 @@ static void Transformed(int n, float* x, float* y, float* dx, float* dy, float x
 }
 
 TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* options )
+	: TouchscreenInput_TestFps(mc, options, false) {
+}
+
+TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* options, bool classicLayout )
 :	_minecraft(mc),
 	_options(options),
 	_northJump(false),
@@ -83,6 +87,7 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps( Minecraft* mc, Options* opti
 	aUpLeft(0),
 	aUpRight(0),
 	_allowHeightChange(false),
+	_classicLayout(classicLayout),
 	_movementRectangle(0, 0, 1, 1),
 	_turnExclusionRectangle(0, 0, 1, 1)
 {
@@ -144,13 +149,17 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	const float BaseY = -8 + h - 3.0f * Bh;
 	const float BaseX = _options->isLeftHanded? -8 + w - 3 * Bw
 											:	8 + 0;
-	const float jumpGap = Mth::Max(10.0f, Bw * 0.45f);
 	const float jumpMargin = 8.0f;
 	const float jumpX = _options->isLeftHanded ? jumpMargin : (w - jumpMargin - Bw);
 	const float jumpY = BaseY + Bh;
 	_movementRectangle = RectangleArea(BaseX, BaseY, BaseX + 3 * Bw, BaseY + 3 * Bh);
-	_turnExclusionRectangle = RectangleArea(Mth::Min(BaseX, jumpX), BaseY, Mth::Max(BaseX + 3 * Bw, jumpX + Bw), BaseY + 3 * Bh);
-	_boundingRectangle = _turnExclusionRectangle;
+	if (_classicLayout) {
+		_turnExclusionRectangle = _movementRectangle;
+		_boundingRectangle = _movementRectangle;
+	} else {
+		_turnExclusionRectangle = RectangleArea(Mth::Min(BaseX, jumpX), BaseY, Mth::Max(BaseX + 3 * Bw, jumpX + Bw), BaseY + 3 * Bh);
+		_boundingRectangle = _turnExclusionRectangle;
+	}
 
 	xx = BaseX + Bw; yy = BaseY;
 	_model.addArea(AREA_DPAD_N, aUp = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
@@ -160,7 +169,10 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	aUpRight = new RectangleArea(xx, yy, xx+Bw, yy+Bh);
 
 	xx = BaseX + Bw; yy = BaseY + Bh;
-	_model.addArea(AREA_DPAD_C, aSneak = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
+	if (_classicLayout)
+		_model.addArea(AREA_DPAD_C, aJump = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
+	else
+		_model.addArea(AREA_DPAD_C, aSneak = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
 
 	xx = BaseX + Bw; yy = BaseY + 2 * Bh;
 	_model.addArea(AREA_DPAD_S, aDown = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
@@ -171,23 +183,31 @@ void TouchscreenInput_TestFps::onConfigChanged(const Config& c) {
 	xx = BaseX + 2 * Bw; yy = BaseY + Bh;
 	_model.addArea(AREA_DPAD_E, aRight = new RectangleArea(xx, yy, xx+Bw, yy+Bh));
 
-	_model.addArea(AREA_JUMP, aJump = new RectangleArea(jumpX, jumpY, jumpX + Bw, jumpY + Bh));
+	if (!_classicLayout)
+		_model.addArea(AREA_JUMP, aJump = new RectangleArea(jumpX, jumpY, jumpX + Bw, jumpY + Bh));
 
-    float maxPixels = _minecraft->pixelCalc.millimetersToPixels(10);
-    float btnSize = Mth::Min(18 * Gui::GuiScale, maxPixels);
-    float btnGap = Mth::Max(2.0f, 2.0f * Gui::GuiScale);
-    float btnRight = w - 4;
-    float btnTop = 4;
-    float pauseLeft = btnRight - btnSize;
-    float chatRight = pauseLeft - btnGap;
-	_model.addArea(AREA_PAUSE, aPause = new RectangleArea(pauseLeft,
-                                                          btnTop,
-                                                          btnRight,
-                                                          btnTop + btnSize));
-	_model.addArea(AREA_CHAT, aChat = new RectangleArea(chatRight - btnSize,
-                                                        btnTop,
-                                                        chatRight,
-                                                        btnTop + btnSize));
+	float maxPixels = _minecraft->pixelCalc.millimetersToPixels(10);
+	float btnSize = Mth::Min(18 * Gui::GuiScale, maxPixels);
+	float btnGap = Mth::Max(2.0f, 2.0f * Gui::GuiScale);
+	float btnRight = w - 4;
+	float btnTop = 4;
+	float pauseLeft = btnRight - btnSize;
+	if (_classicLayout) {
+		_model.addArea(AREA_PAUSE, aPause = new RectangleArea(pauseLeft,
+		                                                      btnTop,
+		                                                      btnRight,
+		                                                      btnTop + btnSize));
+	} else {
+		float chatRight = pauseLeft - btnGap;
+		_model.addArea(AREA_PAUSE, aPause = new RectangleArea(pauseLeft,
+		                                                      btnTop,
+		                                                      btnRight,
+		                                                      btnTop + btnSize));
+		_model.addArea(AREA_CHAT, aChat = new RectangleArea(chatRight - btnSize,
+		                                                    btnTop,
+		                                                    chatRight,
+		                                                    btnTop + btnSize));
+	}
 
 	//rebuild();
 }
@@ -266,9 +286,9 @@ void TouchscreenInput_TestFps::tick( Player* player )
 		bool setButton = false;
 
 		if (Multitouch::isPressed(p))
-			_allowHeightChange = (areaId == AREA_JUMP);
+			_allowHeightChange = _classicLayout ? (areaId == AREA_DPAD_C) : (areaId == AREA_JUMP);
 
-		if (areaId == AREA_JUMP)
+		if ((!_classicLayout && areaId == AREA_JUMP) || (_classicLayout && areaId == AREA_DPAD_C))
 		{
 			setButton = true;
 			heldJump = true;
@@ -286,7 +306,7 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				ya += 1;
 			}
 		}
-		else if (areaId == AREA_DPAD_C)
+		else if (!_classicLayout && areaId == AREA_DPAD_C)
 		{
 			setButton = true;
 			if (Multitouch::isPressed(p)) {
@@ -337,7 +357,7 @@ void TouchscreenInput_TestFps::tick( Player* player )
 				openPauseScreen = true;
 			}
 		}
-		else if (areaId == AREA_CHAT) {
+		else if (!_classicLayout && areaId == AREA_CHAT) {
 			if (Multitouch::isReleased(p)) {
 				openChatScreen = true;
 			}
@@ -482,7 +502,7 @@ const RectangleArea& TouchscreenInput_TestFps::getPauseRectangleArea()
 
 const RectangleArea& TouchscreenInput_TestFps::getJumpRectangleArea()
 {
-	return *aJump;
+	return _classicLayout ? _movementRectangle : *aJump;
 }
 
 const RectangleArea& TouchscreenInput_TestFps::getTurnExclusionRectangleArea()
@@ -550,22 +570,33 @@ void TouchscreenInput_TestFps::rebuild() {
 		drawRectangleArea(t, aDown, imageU + imageSize * 2, imageV, (float)imageSize);
 	}
 
-	// render crouch button in the old center slot
-	if (isButtonDown(AREA_DPAD_C) || sneaking) t.colorABGR(cPressed);
-	else						   t.colorABGR(cReleased);
-	drawRectangleArea(t, aSneak, imageU + imageSize * 2, imageV, (float)imageSize);
+	if (_classicLayout) {
+		// classic center jump slot
+		if (_renderFlightImage && northDiagonals) t.colorABGR(cDiscreet);
+		else if (isButtonDown(AREA_DPAD_C)) t.colorABGR(cPressed);
+		else						   t.colorABGR(cReleased);
+		if (isChangingFlightHeight)
+			drawRectangleArea(t, aJump, imageU + imageSize * 2, imageV + imageSize, (float)imageSize);
+		else
+			drawRectangleArea(t, aJump, imageU + imageSize * 2, imageV, (float)imageSize);
+	} else {
+		// render crouch button in the old center slot
+		if (isButtonDown(AREA_DPAD_C) || sneaking) t.colorABGR(cPressed);
+		else						   t.colorABGR(cReleased);
+		drawRectangleArea(t, aSneak, imageU + imageSize * 2, imageV, (float)imageSize);
 
-	// render jump / flight button
-	if (_renderFlightImage && northDiagonals) t.colorABGR(cDiscreet);
-	else if (isButtonDown(AREA_JUMP)) t.colorABGR(cPressed);
-	else						   t.colorABGR(cReleased);
-	if (_renderFlightImage)
-	{
-		drawRectangleArea(t, aJump, imageU + imageSize * 4, imageV + imageSize, (float)imageSize);
-	}
-	else
-	{
-		drawRectangleArea(t, aJump, imageU + imageSize * 4, imageV, (float)imageSize);
+		// render jump / flight button
+		if (_renderFlightImage && northDiagonals) t.colorABGR(cDiscreet);
+		else if (isButtonDown(AREA_JUMP)) t.colorABGR(cPressed);
+		else						   t.colorABGR(cReleased);
+		if (_renderFlightImage)
+		{
+			drawRectangleArea(t, aJump, imageU + imageSize * 4, imageV + imageSize, (float)imageSize);
+		}
+		else
+		{
+			drawRectangleArea(t, aJump, imageU + imageSize * 4, imageV, (float)imageSize);
+		}
 	}
 
 
@@ -581,11 +612,13 @@ void TouchscreenInput_TestFps::rebuild() {
 		drawRectangleAreaTexture(t, aPause);
 		t.draw();
 
-		_minecraft->textures->loadAndBindTexture(isButtonDown(AREA_CHAT) ? "gui/chat_button_dark.png" : "gui/chat_button_light.png");
-		t.begin();
-		t.colorABGR(0xffffffff);
-		drawRectangleAreaTexture(t, aChat);
-		t.draw();
+		if (!_classicLayout) {
+			_minecraft->textures->loadAndBindTexture(isButtonDown(AREA_CHAT) ? "gui/chat_button_dark.png" : "gui/chat_button_light.png");
+			t.begin();
+			t.colorABGR(0xffffffff);
+			drawRectangleAreaTexture(t, aChat);
+			t.draw();
+		}
 	}
 	//RenderChunk _render = t.end(true, _bufferId);
 	//t.setAccessMode(Tesselator::ACCESS_STATIC);

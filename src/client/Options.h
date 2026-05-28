@@ -45,6 +45,7 @@ public:
 		static const Option LEFT_HANDED;
 		static const Option USE_TOUCHSCREEN;
 		static const Option USE_TOUCH_JOYPAD;
+		static const Option CLASSIC_CONTROLS;
 		static const Option DESTROY_VIBRATION;
 
 		static const Option PIXELS_PER_MILLIMETER;
@@ -164,6 +165,7 @@ public:
 	bool serverVisible;
 	bool isJoyTouchArea;
 	bool useTouchScreen;
+	bool useClassicControls;
 	float pixelsPerMillimeter;
     Options(Minecraft* minecraft, const std::string& workingDirectory)
 	:	minecraft(minecraft)
@@ -234,6 +236,7 @@ public:
 		if (option == &Option::LEFT_HANDED) isLeftHanded = !isLeftHanded;
 		if (option == &Option::USE_TOUCHSCREEN) useTouchScreen = !useTouchScreen;
 		if (option == &Option::USE_TOUCH_JOYPAD) isJoyTouchArea = !isJoyTouchArea;
+		if (option == &Option::CLASSIC_CONTROLS) useClassicControls = !useClassicControls;
 		if (option == &Option::DESTROY_VIBRATION) destroyVibration = !destroyVibration;
 		if (option == &Option::ANAGLYPH) {
             anaglyph3d = !anaglyph3d;
@@ -299,6 +302,8 @@ public:
 			return useTouchScreen;
 		if (item == &Option::USE_TOUCH_JOYPAD)
 			return isJoyTouchArea;
+		if (item == &Option::CLASSIC_CONTROLS)
+			return useClassicControls;
 		if (item == &Option::DESTROY_VIBRATION)
 			return destroyVibration;
 		return false;
