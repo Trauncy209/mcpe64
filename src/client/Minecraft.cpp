@@ -1460,7 +1460,7 @@ bool Minecraft::isMultiplayerReady()
 
 bool Minecraft::isLevelGenerated()
 {
-	return level != NULL && !isGeneratingLevel && isMultiplayerReady();
+	return level != NULL && !isGeneratingLevel;
 }
 
 LevelStorageSource* Minecraft::getLevelSource()
