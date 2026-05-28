@@ -92,8 +92,11 @@ void ProgressScreen::render( int xm, int ym, float a )
 bool ProgressScreen::isInGameScreen() { return false; }
 
 void ProgressScreen::tick() {
-	// After 10 seconds of not connecting -> write an error message and go back
-	if (++ticks == 10 * SharedConstants::TicksPerSecond && minecraft->getProgressStatusId() == 0) {
+	// Only fail the locate/connect phase if we never got a level at all.
+	// Multiplayer can legitimately remain on progress while chunks finish bootstrapping.
+	if (++ticks == 10 * SharedConstants::TicksPerSecond
+	&& minecraft->getProgressStatusId() == 0
+	&& !minecraft->isLevelGenerated()) {
 		minecraft->setScreen( new DisconnectionScreen("Could not connect to server. Try again.") );
 	}
 }
