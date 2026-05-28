@@ -120,13 +120,6 @@ Current work in this repository includes:
 - **Debug/F3-style information improvements**
 - **Ongoing bug fixes across the old codebase**
 
-### Latest release: 0.5.15
-
-Version `0.5.15` is the current public milestone and includes the grass/worldgen/control work shipped today.
-
-- Release page: https://github.com/Trauncy209/TruancyCraftPE/releases/tag/v0.5.15
-- APK: https://github.com/Trauncy209/TruancyCraftPE/releases/download/v0.5.15/TruancyCraftPE-0.5.15-world-options-clean.apk
-
 ---
 
 ## Terrain and worldgen status
