@@ -34,6 +34,8 @@ private:
 	Button* bOptionLavaLakes;
 	Button* bOptionWaterSprings;
 	Button* bOptionLavaSprings;
+	Button* bOptionBiomeGrassTint;
+	Button* bOptionTallGrass;
 	ImageButton* bBack;
 	Button* bCreate;
 	bool hasChosen;
@@ -47,6 +49,9 @@ private:
 	bool optLavaLakes;
 	bool optWaterSprings;
 	bool optLavaSprings;
+	bool optBiomeGrassTint;
+	bool optTallGrass;
+	int worldOptionsScroll;
 	void applyGeneratorDefaults();
 	void refreshWorldOptionLabels();
 	void setWorldOptionsVisible(bool visible);

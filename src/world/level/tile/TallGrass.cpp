@@ -1,8 +1,12 @@
 #include "TallGrass.h"
 #include "../FoliageColor.h"
+#include "../GrassColor.h"
 #include "../../entity/player/Player.h"
 #include "../../item/Item.h"
 #include "../../item/ShearsItem.h"
+#include "../Level.h"
+#include "../LevelSource.h"
+#include "../biome/BiomeSource.h"
 
 TallGrass::TallGrass( int id, int tex ) : super(id, tex, Material::replaceable_plant) {
 	float ss = 0.4f;
@@ -17,21 +21,45 @@ int TallGrass::getTexture( int face, int data ) {
 }
 
 int TallGrass::getColor() {
-	/*double temp = 0.5;
-	double rain = 1.0;
-	return GrassColor.get(temp, rain);*/
+	//double temp = 0.5;
+	//double rain = 1.0;
+	// converted to float for consistency - shredder
+	float temp = 0.5;
+	float rain = 1.0;
+	if (GrassColor::useTint){
+		return GrassColor::get(temp, rain);
+	}
 	return 0x339933;
 }
 
 int TallGrass::getColor( int auxData ) {
-	if(auxData == DEAD_SHRUB) return 0xffffffff;
+	if(auxData == DEAD_SHRUB);
+	if (!FoliageColor::useTint && auxData == DEAD_SHRUB){
+		return 0xffffff;
+	}
 	return FoliageColor::getDefaultColor();
 }
 
 int TallGrass::getColor( LevelSource* level, int x, int y, int z ) {
 	int d = level->getData(x, y, z);
-	if (d == DEAD_SHRUB) return 0xffffff;
-
+	if (d == DEAD_SHRUB); //return 0xffffff; // i removed this to make it accurate to beta 1.6.6 instead of early java release versions
+	level->getBiomeSource()->getBiomeBlock(x, z, 1, 1);
+	float temp = level->getBiomeSource()->temperatures[0]; // shredder added
+	float rain = level->getBiomeSource()->downfalls[0]; // shredder added
+	const bool biomeGrassTint = !(level && level->getLevelData()) || level->getLevelData()->getBiomeGrassTint();
+	if ((!GrassColor::useTint || !biomeGrassTint) && d == DEAD_SHRUB){
+		return 0xffffff;
+	}
+	if (!biomeGrassTint) {
+		return 0x339933;
+	}
+	if (GrassColor::useTint){
+		return GrassColor::get(temp, rain);
+	}
+	// @TODO port this function from beta 1.6.6 probably, for now im using biomesource to tint it directly above - shredder
+	//if (GrassColor::useTint){ 
+	//return level->getBiome(x, z)->getGrassColor();
+	//}
 	return 0x339933;//level->getBiome(x, z)->getGrassColor();
 }
 

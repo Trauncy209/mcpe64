@@ -131,8 +131,16 @@ bool Region::isSolidRenderTile(int x, int y, int z) {
     return tile->isSolidRender();
 }
 
+BiomeSource* Region::getBiomeSource() {
+	return level->getBiomeSource();
+}
+
 Biome* Region::getBiome( int x, int z ) {
 	return level->getBiome(x, z);
+}
+
+LevelData* Region::getLevelData() {
+	return level->getLevelData();
 }
 
 //BiomeSource getBiomeSource() {

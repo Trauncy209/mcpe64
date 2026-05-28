@@ -83,6 +83,10 @@ public:
 	void		setWaterSprings(bool enabled);
 	bool		getLavaSprings() const;
 	void		setLavaSprings(bool enabled);
+	bool		getBiomeGrassTint() const;
+	void		setBiomeGrassTint(bool enabled);
+	bool		getTallGrassEnabled() const;
+	void		setTallGrassEnabled(bool enabled);
 
 public:
 	PlayerData playerData;
@@ -108,8 +112,10 @@ private:
 	bool ravines;
 	bool waterLakes;
 	bool lavaLakes;
-	bool waterSprings;
-	bool lavaSprings;
+	bool	waterSprings;
+	bool	lavaSprings;
+	bool	biomeGrassTint;
+	bool	tallGrassEnabled;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL_STORAGE__LevelData_H__*/

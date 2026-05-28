@@ -3,14 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" android:background="@drawable/bgtiled">
-
+
+
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="18"
         android:orientation="vertical" >
-
+
+
+
+
         <LinearLayout
             android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
@@ -50,7 +54,9 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0.25" />
-
+
+
+
             <com.mojang.android.EditTextAscii
                 android:id="@+id/editText_worldName"
                 android:layout_width="0dp"
@@ -70,7 +76,8 @@
                 android:layout_weight="0.25" />
 
         </LinearLayout>
-
+
+
         <LinearLayout
             android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
@@ -164,6 +171,39 @@
                 android:layout_height="wrap_content"
                 android:text="@string/createworld_seed_info" android:typeface="monospace"/>
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutBiomeGrassTintButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_horizontal">
+
+            <com.mojang.minecraftpe.BiomeGrassTintButton
+                android:id="@+id/button_biomeGrassTint"
+                android:layout_width="173dp"
+                android:layout_height="46dp"
+                android:background="@drawable/btngamemode"
+                android:checked="true"
+                android:text="Button"
+                android:textOff=" "
+                android:textOn=" " />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutBiomeGrassTintDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingBottom="20dp" >
+
+            <TextView
+                android:id="@+id/labelBiomeGrassTintDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Grass block top color changes by biome: ON"
+                android:typeface="monospace"/>
         </LinearLayout>
     </LinearLayout>
 

@@ -14,6 +14,8 @@ LevelData::LevelData()
 		lavaLakes(LevelSettings::defaultLavaLakesForGenerator(SharedConstants::GeneratorVersion)),
 		waterSprings(LevelSettings::defaultWaterSpringsForGenerator(SharedConstants::GeneratorVersion)),
 		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(SharedConstants::GeneratorVersion)),
+		biomeGrassTint(true),
+		tallGrassEnabled(true),
 	time(0),
 	dimension(Dimension::NORMAL),
 	playerDataVersion(-1),
@@ -42,7 +44,9 @@ LevelData::LevelData( const LevelSettings& settings, const std::string& levelNam
 		waterLakes(settings.getWaterLakes()),
 		lavaLakes(settings.getLavaLakes()),
 		waterSprings(settings.getWaterSprings()),
-		lavaSprings(settings.getLavaSprings())
+		lavaSprings(settings.getLavaSprings()),
+		biomeGrassTint(settings.getBiomeGrassTint()),
+		tallGrassEnabled(settings.getTallGrassEnabled())
 {
 	//LOGI("ctor 2: %p\n", this);
 
@@ -61,7 +65,9 @@ LevelData::LevelData( CompoundTag* tag )
 		waterLakes(LevelSettings::defaultWaterLakesForGenerator(LGV_ORIGINAL)),
 		lavaLakes(LevelSettings::defaultLavaLakesForGenerator(LGV_ORIGINAL)),
 		waterSprings(LevelSettings::defaultWaterSpringsForGenerator(LGV_ORIGINAL)),
-		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(LGV_ORIGINAL))
+		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(LGV_ORIGINAL)),
+		biomeGrassTint(true),
+		tallGrassEnabled(true)
 {
 	//LOGI("ctor 3: %p (%p)\n", this, tag);
 	getTagData(tag);
@@ -88,7 +94,9 @@ LevelData::LevelData( const LevelData& rhs )
 		waterLakes(rhs.waterLakes),
 		lavaLakes(rhs.lavaLakes),
 		waterSprings(rhs.waterSprings),
-		lavaSprings(rhs.lavaSprings)
+		lavaSprings(rhs.lavaSprings),
+		biomeGrassTint(rhs.biomeGrassTint),
+		tallGrassEnabled(rhs.tallGrassEnabled)
 {
 	//LOGI("c-ctor: %p (%p)\n", this, &rhs);
 	setPlayerTag(rhs.loadedPlayerTag);
@@ -119,6 +127,8 @@ LevelData& LevelData::operator=( const LevelData& rhs )
 			lavaLakes = rhs.lavaLakes;
 			waterSprings = rhs.waterSprings;
 			lavaSprings = rhs.lavaSprings;
+			biomeGrassTint = rhs.biomeGrassTint;
+			tallGrassEnabled = rhs.tallGrassEnabled;
 		setPlayerTag(rhs.loadedPlayerTag);
 	}
 
@@ -207,6 +217,8 @@ void LevelData::setTagData( CompoundTag* tag, CompoundTag* playerTag )
 		tag->putByte("WorldGenLavaLakes", lavaLakes ? 1 : 0);
 		tag->putByte("WorldGenWaterSprings", waterSprings ? 1 : 0);
 		tag->putByte("WorldGenLavaSprings", lavaSprings ? 1 : 0);
+		tag->putByte("BiomeGrassTint", biomeGrassTint ? 1 : 0);
+		tag->putByte("TallGrassEnabled", tallGrassEnabled ? 1 : 0);
 	tag->putInt("Platform", 2);
 
 	if (playerTag != NULL) {
@@ -240,6 +252,8 @@ void LevelData::getTagData( const CompoundTag* tag )
 		if (tag->contains("WorldGenLavaLakes", Tag::TAG_Byte)) lavaLakes = tag->getByte("WorldGenLavaLakes") != 0;
 		if (tag->contains("WorldGenWaterSprings", Tag::TAG_Byte)) waterSprings = tag->getByte("WorldGenWaterSprings") != 0;
 		if (tag->contains("WorldGenLavaSprings", Tag::TAG_Byte)) lavaSprings = tag->getByte("WorldGenLavaSprings") != 0;
+		if (tag->contains("BiomeGrassTint", Tag::TAG_Byte)) biomeGrassTint = tag->getByte("BiomeGrassTint") != 0;
+		if (tag->contains("TallGrassEnabled", Tag::TAG_Byte)) tallGrassEnabled = tag->getByte("TallGrassEnabled") != 0;
 
 	spawnMobs = (gameType == GameType::Survival);
 
@@ -427,3 +441,7 @@ bool LevelData::getWaterSprings() const { return waterSprings; }
 void LevelData::setWaterSprings(bool enabled) { waterSprings = enabled; }
 bool LevelData::getLavaSprings() const { return lavaSprings; }
 void LevelData::setLavaSprings(bool enabled) { lavaSprings = enabled; }
+bool LevelData::getBiomeGrassTint() const { return biomeGrassTint; }
+void LevelData::setBiomeGrassTint(bool enabled) { biomeGrassTint = enabled; }
+bool LevelData::getTallGrassEnabled() const { return tallGrassEnabled; }
+void LevelData::setTallGrassEnabled(bool enabled) { tallGrassEnabled = enabled; }

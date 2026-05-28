@@ -10,6 +10,7 @@
 #include "../material/Material.h"
 #include "../tile/Tile.h"
 #include "../tile/HeavyTile.h"
+#include "../tile/TallGrass.h"
 #include "../../../util/Random.h"
 
 const float RandomLevelSource::SNOW_CUTOFF = 0.5f;
@@ -401,17 +402,32 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
         FlowerFeature feature(Tile::mushroom2->id);
 		feature.place(level, &random, x, y, z);
     }
-	/*int grassCount = 1;
-	for (int i = 0; i < grassCount; i++) {
-		int x = xo + random.nextInt(16) + 8;
-		int y = random.nextInt(Level::genDepth);
-		int z = zo + random.nextInt(16) + 8;
-		Feature* grassFeature = biome->getGrassFeature(&random);
-		if (grassFeature) {
-			grassFeature->place(level, &random, x, y, z);
-			delete grassFeature;
+
+	int grassCount = 0;
+	if (biome == Biome::forest) grassCount = 3;
+	else if (biome == Biome::rainForest) grassCount = 12;
+	else if (biome == Biome::seasonalForest) grassCount = 4;
+	else if (biome == Biome::taiga) grassCount = 2;
+	else if (biome == Biome::plains) grassCount = 12;
+	else if (biome == Biome::shrubland) grassCount = 5;
+	else if (biome == Biome::savanna) grassCount = 4;
+
+	if (level->getLevelData() == NULL || level->getLevelData()->getTallGrassEnabled()) {
+		for (int i = 0; i < grassCount; i++) {
+			int grassMetadata = TallGrass::TALL_GRASS;
+			if ((biome == Biome::rainForest || biome == Biome::taiga) && random.nextInt(3) != 0) {
+				grassMetadata = TallGrass::FERN;
+			}
+
+			int x = xo + random.nextInt(16) + 8;
+			int z = zo + random.nextInt(16) + 8;
+			int y = level->getHeightmap(x, z);
+
+			TallgrassFeature grassFeature(Tile::tallgrass->id, grassMetadata);
+			grassFeature.place(level, &random, x, y, z);
 		}
-	}*/
+	}
+
     for (int i = 0; i < 10; i++) {
         int x = xo + random.nextInt(16) + 8;
         int y = random.nextInt(128);

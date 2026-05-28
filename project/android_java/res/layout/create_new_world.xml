@@ -172,6 +172,39 @@
                 android:text="@string/createworld_seed_info" android:typeface="monospace"/>
 
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutBiomeGrassTintButton"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:gravity="center_horizontal">
+
+            <com.mojang.minecraftpe.BiomeGrassTintButton
+                android:id="@+id/button_biomeGrassTint"
+                android:layout_width="173dp"
+                android:layout_height="46dp"
+                android:background="@drawable/btngamemode"
+                android:checked="true"
+                android:text="Button"
+                android:textOff=" "
+                android:textOn=" " />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearLayoutBiomeGrassTintDesc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:paddingBottom="20dp" >
+
+            <TextView
+                android:id="@+id/labelBiomeGrassTintDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Grass block top color changes by biome: ON"
+                android:typeface="monospace"/>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
