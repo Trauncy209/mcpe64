@@ -399,7 +399,7 @@ void GameRenderer::tickFov() {
 /*private*/
 float GameRenderer::getFov(float a, bool applyEffects) {
     Mob* player = mc->cameraTargetPlayer;
-    float fov = 70;
+    float fov = mc->options.fov;
 
 	if (applyEffects)
 		fov *= this->oFov + (this->fov - this->oFov) * a;

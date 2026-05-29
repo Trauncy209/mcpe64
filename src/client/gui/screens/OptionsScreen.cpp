@@ -171,6 +171,7 @@ void OptionsScreen::generateOptionScreens() {
 
 	optionPanes[1]->createOptionsGroup("options.group.controls")
 		.addOptionItem(&Options::Option::SENSITIVITY, minecraft)
+		.addOptionItem(&Options::Option::FOV, minecraft)
 		.addOptionItem(&Options::Option::INVERT_MOUSE, minecraft)
 		.addOptionItem(&Options::Option::PIXELS_PER_MILLIMETER, minecraft)
 		.addOptionItem(&Options::Option::LEFT_HANDED, minecraft)

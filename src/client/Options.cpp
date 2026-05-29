@@ -25,6 +25,7 @@ std::string Options::getCaption(const Option* item) {
 	if (item == &Option::USE_TOUCHSCREEN) return "Touchscreen Mode";
 	if (item == &Option::USE_TOUCH_JOYPAD) return "Touch Joypad";
 	if (item == &Option::CLASSIC_CONTROLS) return "Classic Controls";
+	if (item == &Option::FOV) return "FOV";
 	if (item == &Option::DESTROY_VIBRATION) return "Vibration";
 	if (item == &Option::PIXELS_PER_MILLIMETER) return "Touch Scale";
 	if (item == &Option::VSYNC) return "VSync";
@@ -64,6 +65,7 @@ void Options::initDefaultValues() {
 	music = 1;
 	sound = 1;
 	sensitivity = 0.5f;
+	fov = 70.0f;
 	invertYMouse = false;
 	viewDistance = 2;
 	bobView = true;
@@ -165,24 +167,25 @@ const Options::Option
 	Options::Option::SOUND				 (1, "options.sound",		true, false),
 	Options::Option::INVERT_MOUSE		 (2, "options.invertMouse",	false, true),
 	Options::Option::SENSITIVITY		 (3, "options.sensitivity",	true, false),
-	Options::Option::RENDER_DISTANCE	 (4, "options.renderDistance",false, false),
-	Options::Option::VIEW_BOBBING		 (5, "options.viewBobbing",	false, true),
-	Options::Option::ANAGLYPH			 (6, "options.anaglyph",		false, true),
-	Options::Option::LIMIT_FRAMERATE	 (7, "options.limitFramerate",false, true),
-	Options::Option::DIFFICULTY			 (8, "options.difficulty",	false, false),
-	Options::Option::GRAPHICS			 (9, "options.graphics",		false, true),
-	Options::Option::AMBIENT_OCCLUSION	 (10, "options.ao",		false, true),
-	Options::Option::GUI_SCALE			 (11, "options.guiScale",	false, false),
-	Options::Option::THIRD_PERSON		 (12, "options.thirdperson",	false, true),
-    Options::Option::HIDE_GUI			 (13, "options.hidegui",     false, true),
-	Options::Option::SERVER_VISIBLE		 (14, "options.servervisible", false, true),
-	Options::Option::LEFT_HANDED		 (15, "options.lefthanded", false, true),
-	Options::Option::USE_TOUCHSCREEN	 (16, "options.usetouchscreen", false, true),
-	Options::Option::USE_TOUCH_JOYPAD	 (17, "options.usetouchpad", false, true),
-	Options::Option::CLASSIC_CONTROLS    (18, "options.classiccontrols", false, true),
-	Options::Option::DESTROY_VIBRATION   (19, "options.destroyvibration", false, true),
-	Options::Option::PIXELS_PER_MILLIMETER(20, "options.pixelspermilimeter", true, false),
-	Options::Option::VSYNC               (21, "options.vsync",             false, true);
+	Options::Option::FOV               	 (4, "options.fov",           	true, false),
+	Options::Option::RENDER_DISTANCE	 (5, "options.renderDistance",false, false),
+	Options::Option::VIEW_BOBBING		 (6, "options.viewBobbing",	false, true),
+	Options::Option::ANAGLYPH			 (7, "options.anaglyph",		false, true),
+	Options::Option::LIMIT_FRAMERATE	 (8, "options.limitFramerate",false, true),
+	Options::Option::DIFFICULTY			 (9, "options.difficulty",	false, false),
+	Options::Option::GRAPHICS			 (10, "options.graphics",		false, true),
+	Options::Option::AMBIENT_OCCLUSION	 (11, "options.ao",		false, true),
+	Options::Option::GUI_SCALE			 (12, "options.guiScale",	false, false),
+	Options::Option::THIRD_PERSON		 (13, "options.thirdperson",	false, true),
+    Options::Option::HIDE_GUI			 (14, "options.hidegui",     false, true),
+	Options::Option::SERVER_VISIBLE		 (15, "options.servervisible", false, true),
+	Options::Option::LEFT_HANDED		 (16, "options.lefthanded", false, true),
+	Options::Option::USE_TOUCHSCREEN	 (17, "options.usetouchscreen", false, true),
+	Options::Option::USE_TOUCH_JOYPAD	 (18, "options.usetouchpad", false, true),
+	Options::Option::CLASSIC_CONTROLS    (19, "options.classiccontrols", false, true),
+	Options::Option::DESTROY_VIBRATION   (20, "options.destroyvibration", false, true),
+	Options::Option::PIXELS_PER_MILLIMETER(21, "options.pixelspermilimeter", true, false),
+	Options::Option::VSYNC               (22, "options.vsync",             false, true);
 
 /* private */
 const float Options::SOUND_MIN_VALUE = 0.0f;
@@ -191,6 +194,8 @@ const float Options::MUSIC_MIN_VALUE = 0.0f;
 const float Options::MUSIC_MAX_VALUE = 1.0f;
 const float Options::SENSITIVITY_MIN_VALUE = 0.0f;
 const float Options::SENSITIVITY_MAX_VALUE = 1.0f;
+const float Options::FOV_MIN_VALUE = 70.0f;
+const float Options::FOV_MAX_VALUE = 110.0f;
 const float Options::PIXELS_PER_MILLIMETER_MIN_VALUE = 0.0f;
 const float Options::PIXELS_PER_MILLIMETER_MAX_VALUE = 100.0f;
 const int DIFFICULY_LEVELS[] = {
@@ -246,6 +251,12 @@ void Options::update()
                 sensitivity = 0.3f + std::pow(1.1f * sens, 1.3f) * 0.42f;
             }
         }
+		if (key == OptionStrings::Controls_Fov) {
+			float parsedFov;
+			if (readFloat(value, parsedFov)) {
+				fov = std::max(FOV_MIN_VALUE, std::min(FOV_MAX_VALUE, parsedFov));
+			}
+		}
 		if (key == OptionStrings::Controls_InvertMouse) {
 			readBool(value, invertYMouse);
 		}
@@ -384,6 +395,7 @@ void Options::save()
 	// Input
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_InvertMouse, invertYMouse);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_Sensitivity, sensitivity);
+	addOptionToSaveOutput(stringVec, OptionStrings::Controls_Fov, fov);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_IsLefthanded, isLeftHanded);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchScreen, useTouchScreen);
 	addOptionToSaveOutput(stringVec, OptionStrings::Controls_UseTouchJoypad, isJoyTouchArea);
@@ -477,6 +489,14 @@ std::string Options::getMessage( const Option* item )
 			if (progressValue >= SENSITIVITY_MAX_VALUE)
 				return caption + I18n::get("options.sensitivity.max");
 			return caption + std::to_string((int)(progressValue * 200.0f)) + "%";
+		}
+
+		if (item == &Option::FOV) {
+			if (progressValue <= FOV_MIN_VALUE)
+				return caption + I18n::get("options.fov.min");
+			if (progressValue >= FOV_MAX_VALUE)
+				return caption + I18n::get("options.fov.max");
+			return caption + std::to_string((int)progressValue);
 		}
 
 		if (item == &Option::PIXELS_PER_MILLIMETER) {

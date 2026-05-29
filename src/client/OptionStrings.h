@@ -16,6 +16,7 @@ public:
     static const char* Graphics_GUIScale;
 	static const char* Graphics_Vsync;
     static const char* Controls_Sensitivity;
+    static const char* Controls_Fov;
     static const char* Controls_InvertMouse;
     static const char* Controls_UseTouchScreen;
 	static const char* Controls_UseTouchJoypad;

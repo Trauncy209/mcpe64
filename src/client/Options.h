@@ -30,6 +30,7 @@ public:
 		static const Option SOUND;
 		static const Option INVERT_MOUSE;
 		static const Option SENSITIVITY;
+		static const Option FOV;
 		static const Option RENDER_DISTANCE;
 		static const Option VIEW_BOBBING;
 		static const Option ANAGLYPH;
@@ -99,6 +100,8 @@ private:
 	static const float MUSIC_MAX_VALUE;
 	static const float SENSITIVITY_MIN_VALUE;
 	static const float SENSITIVITY_MAX_VALUE;
+	static const float FOV_MIN_VALUE;
+	static const float FOV_MAX_VALUE;
 	static const float PIXELS_PER_MILLIMETER_MIN_VALUE;
 	static const float PIXELS_PER_MILLIMETER_MAX_VALUE;
     static const char* RENDER_DISTANCE_NAMES[];
@@ -112,6 +115,7 @@ public:
     float sound;
     //note: sensitivity is transformed in Options::update
     float sensitivity;
+    float fov;
     bool invertYMouse;
     int viewDistance;
     bool bobView;
@@ -209,6 +213,8 @@ public:
             //minecraft.soundEngine.updateOptions();
         } else if (item == &Option::SENSITIVITY) {
             sensitivity = value;
+		} else if (item == &Option::FOV) {
+			fov = value;
 		} else if (item == &Option::PIXELS_PER_MILLIMETER) {
 			 pixelsPerMillimeter = value;
 		}
@@ -268,6 +274,7 @@ public:
         if (item == &Option::MUSIC) return music;
         if (item == &Option::SOUND) return sound;
         if (item == &Option::SENSITIVITY) return sensitivity;
+		if (item == &Option::FOV) return fov;
 		if (item == &Option::PIXELS_PER_MILLIMETER) return pixelsPerMillimeter;
 		if (item == &Option::RENDER_DISTANCE) return viewDistance;
         return 0;
@@ -313,6 +320,7 @@ public:
 		if (item == &Option::MUSIC) return MUSIC_MIN_VALUE;
 		if (item == &Option::SOUND) return SOUND_MIN_VALUE;
 		if (item == &Option::SENSITIVITY) return SENSITIVITY_MIN_VALUE;
+		if (item == &Option::FOV) return FOV_MIN_VALUE;
 		if (item == &Option::PIXELS_PER_MILLIMETER) return PIXELS_PER_MILLIMETER_MIN_VALUE;
 		return 0;
 	}
@@ -321,6 +329,7 @@ public:
 		if (item == &Option::MUSIC) return MUSIC_MAX_VALUE;
 		if (item == &Option::SOUND) return SOUND_MAX_VALUE;
 		if (item == &Option::SENSITIVITY) return SENSITIVITY_MAX_VALUE;
+		if (item == &Option::FOV) return FOV_MAX_VALUE;
 		if (item == &Option::PIXELS_PER_MILLIMETER) return PIXELS_PER_MILLIMETER_MAX_VALUE;
 		return 1.0f;
 	} 

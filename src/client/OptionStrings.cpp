@@ -14,6 +14,7 @@ const char* OptionStrings::Graphics_Vsync              = "gfx_vsync";
 const char* OptionStrings::Graphics_GUIScale           = "gfx_guiscale";
 
 const char* OptionStrings::Controls_Sensitivity        = "ctrl_sensitivity";
+const char* OptionStrings::Controls_Fov                = "ctrl_fov";
 const char* OptionStrings::Controls_InvertMouse        = "ctrl_invertmouse";
 const char* OptionStrings::Controls_UseTouchScreen     = "ctrl_usetouchscreen";
 const char* OptionStrings::Controls_UseTouchJoypad     = "ctrl_usetouchjoypad";

@@ -48,6 +48,14 @@
             android:defaultValue="50"
             android:enabled="true"
             />
+        <com.mojang.android.preferences.SliderPreference
+            android:key="ctrl_fov"
+            android:title="FOV"
+            android:max="110"
+            android:summary=""
+            android:defaultValue="70"
+            android:enabled="true"
+            />
         <CheckBoxPreference
             android:key="ctrl_invertmouse"
             android:title="@string/mmoptions_ctrl_invertmouse_title"
