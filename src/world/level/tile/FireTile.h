@@ -70,8 +70,6 @@ public:
     }
 
     void tick(Level* level, int x, int y, int z, Random* random) {
-		return; //@fire
-
         bool infiniBurn = false;//level->getTile(x, y - 1, z) == Tile::hellRock->id;
 
         int age = level->getData(x, y, z);
@@ -148,7 +146,6 @@ public:
     }
 
     void neighborChanged(Level* level, int x, int y, int z, int type) {
-		return; //@fire
         if (!level->isSolidBlockingTile(x, y - 1, z) && !isValidFireLocation(level, x, y, z)) {
             level->setTile(x, y, z, 0);
             return;
@@ -156,7 +153,6 @@ public:
     }
 
     void onPlace(Level* level, int x, int y, int z) {
-		return; //@fire
         if (!level->isSolidBlockingTile(x, y - 1, z) && !isValidFireLocation(level, x, y, z)) {
             level->setTile(x, y, z, 0);
             return;
@@ -169,8 +165,6 @@ public:
     }
 
     void ignite(Level* level, int x, int y, int z) {
-		return; //@fire
-
         bool lit = false;
         if (!lit) lit = tryIgnite(level, x, y + 1, z);
         if (!lit) lit = tryIgnite(level, x - 1, y, z);
@@ -248,8 +242,6 @@ private:
     }
 
     void checkBurn(Level* level, int x, int y, int z, int chance, Random* random) {
-        return; //@fire
-
 		int odds = burnOdds[level->getTile(x, y, z)];
         if (random->nextInt(chance) < odds) {
             bool wasTnt = level->getTile(x, y, z) == Tile::tnt->id;
@@ -265,8 +257,6 @@ private:
     }
 
     bool isValidFireLocation(Level* level, int x, int y, int z) {
-		return false; //@fire
-
         if (canBurn(level, x + 1, y, z)) return true;
         if (canBurn(level, x - 1, y, z)) return true;
         if (canBurn(level, x, y - 1, z)) return true;
@@ -278,8 +268,6 @@ private:
     }
 
     int getFireOdds(Level* level, int x, int y, int z) {
-        return 0; //@fire
-
 		int odds = 0;
         if (!level->isEmptyTile(x, y, z)) return 0;
 
@@ -294,8 +282,6 @@ private:
     }
 
 	bool tryIgnite(Level* level, int x, int y, int z) {
-        return false; //@fire
-
 		int t = level->getTile(x, y, z);
         if (t == Tile::fire->id) return true;
         if (t == 0) {

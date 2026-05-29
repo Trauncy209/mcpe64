@@ -24,7 +24,8 @@ public:
         bool waterSprings = false,
         bool lavaSprings = false,
         bool biomeGrassTint = true,
-        bool tallGrassEnabled = true)
+        bool tallGrassEnabled = true,
+        bool experimentalGameplayFeatures = false)
     :   seed(seed),
         gameType(validateGameType(gameType)),
         generatorVersion(validateGeneratorVersion(generatorVersion)),
@@ -35,7 +36,8 @@ public:
         waterSprings(waterSprings),
         lavaSprings(lavaSprings),
         biomeGrassTint(biomeGrassTint),
-        tallGrassEnabled(tallGrassEnabled)
+        tallGrassEnabled(tallGrassEnabled),
+        experimentalGameplayFeatures(experimentalGameplayFeatures)
     {
     }
 	static LevelSettings None() {
@@ -53,6 +55,7 @@ public:
     bool getLavaSprings() const { return lavaSprings; }
     bool getBiomeGrassTint() const { return biomeGrassTint; }
     bool getTallGrassEnabled() const { return tallGrassEnabled; }
+    bool getExperimentalGameplayFeatures() const { return experimentalGameplayFeatures; }
 
 	//
 	// Those two should actually not be here
@@ -107,6 +110,7 @@ private:
     const bool lavaSprings;
     const bool biomeGrassTint;
     const bool tallGrassEnabled;
+    const bool experimentalGameplayFeatures;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL__LevelSettings_H__*/

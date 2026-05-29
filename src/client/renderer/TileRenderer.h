@@ -21,6 +21,7 @@ public:
 	void tesselateInWorldNoCulling(Tile* tile, int x, int y, int z);
 
 	bool tesselateTorchInWorld(Tile* tt, int x, int y, int z);
+	bool tesselateFireInWorld(Tile* tt, int x, int y, int z);
     bool tesselateLadderInWorld(Tile* tt, int x, int y, int z);
     bool tesselateCactusInWorld(Tile* tt, int x, int y, int z);
     bool tesselateCactusInWorld(Tile* tt, int x, int y, int z, float r, float g, float b);

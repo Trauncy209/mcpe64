@@ -245,6 +245,9 @@ void Inventory::setupDefault() {
 		addItem(new ItemInstance(Item::seeds_melon));
 		addItem(new ItemInstance(Item::dye_powder, 1, DyePowderItem::WHITE));
 		addItem(new ItemInstance(Item::hoe_iron));
+		if (player && player->level && player->level->getLevelData() && player->level->getLevelData()->getExperimentalGameplayFeatures()) {
+			addItem(new ItemInstance(Item::flintAndSteel));
+		}
 #ifdef RPI
 		Sel[0] = addItem(new ItemInstance(Item::sword_iron));
 #else

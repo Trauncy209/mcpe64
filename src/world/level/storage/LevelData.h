@@ -87,6 +87,8 @@ public:
 	void		setBiomeGrassTint(bool enabled);
 	bool		getTallGrassEnabled() const;
 	void		setTallGrassEnabled(bool enabled);
+	bool		getExperimentalGameplayFeatures() const;
+	void		setExperimentalGameplayFeatures(bool enabled);
 
 public:
 	PlayerData playerData;
@@ -116,6 +118,7 @@ private:
 	bool	lavaSprings;
 	bool	biomeGrassTint;
 	bool	tallGrassEnabled;
+	bool	experimentalGameplayFeatures;
 };
 
 #endif /*NET_MINECRAFT_WORLD_LEVEL_STORAGE__LevelData_H__*/
