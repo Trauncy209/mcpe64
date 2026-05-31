@@ -57,6 +57,7 @@ public:
     void tileChanged(int x, int y, int z);
     void setTilesDirty(int x0, int y0, int z0, int x1, int y1, int z1);
 	void cull(Culler* culler, float a);
+	void setAllVisible();
     void skyColorChanged();
 
 	//void addParticle(ParticleType::Id name, float x, float y, float z, float xa, float ya, float za, int data);

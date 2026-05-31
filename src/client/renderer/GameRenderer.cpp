@@ -275,7 +275,9 @@ void GameRenderer::renderLevel(float a) {
 			TIMER_POP_PUSH("sky");
 			glFogf(GL_FOG_START, renderDistance  * 0.2f);
 			glFogf(GL_FOG_END, renderDistance *0.75);
+			glDepthMask(GL_FALSE);
             levelRenderer->renderSky(a);
+			glDepthMask(GL_TRUE);
 			glFogf(GL_FOG_START, renderDistance  * 0.6f);
 			glFogf(GL_FOG_END, renderDistance);
         }
@@ -291,11 +293,16 @@ void GameRenderer::renderLevel(float a) {
         frustum.prepare(xOff, yOff, zOff);
 
 		TIMER_POP_PUSH("culling");
-        mc->levelRenderer->cull(&frustum, a);
+        if (mc->options.fancyGraphics) {
+            mc->levelRenderer->setAllVisible();
+        } else {
+            mc->levelRenderer->cull(&frustum, a);
+        }
         mc->levelRenderer->updateDirtyChunks(cameraEntity, false);
 
 		if(mc->options.fancyGraphics) {
 			prepareAndRenderClouds(levelRenderer, a);
+			setupCamera(a, i);
 		}
 
         setupFog(0);

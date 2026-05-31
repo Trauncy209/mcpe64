@@ -68,6 +68,7 @@
 #ifndef STANDALONE_SERVER
 #include "gui/screens/PrerenderTilesScreen.h"
 #include "renderer/Textures.h"
+#include "renderer/LevelRenderer.h"
 #include "gui/screens/DeathScreen.h"
 #endif
 
@@ -1596,6 +1597,9 @@ void Minecraft::optionUpdated( const Options::Option* option, bool value ) {
 	if (option == &Options::Option::CLASSIC_CONTROLS || option == &Options::Option::USE_TOUCHSCREEN || option == &Options::Option::USE_TOUCH_JOYPAD) {
 		_reloadInput();
 		setSize(width, height);
+	}
+	if ((option == &Options::Option::GRAPHICS || option == &Options::Option::AMBIENT_OCCLUSION) && levelRenderer != NULL) {
+		levelRenderer->allChanged();
 	}
 #endif
 }

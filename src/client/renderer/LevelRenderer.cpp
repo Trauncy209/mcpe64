@@ -903,6 +903,14 @@ void LevelRenderer::cull( Culler* culler, float a )
 	cullStep++;
 }
 
+void LevelRenderer::setAllVisible()
+{
+	for (int i = 0; i < chunksLength; i++) {
+		chunks[i]->visible = true;
+	}
+	cullStep++;
+}
+
 void LevelRenderer::skyColorChanged()
 {
 	for (int i = 0; i < chunksLength; i++) {
