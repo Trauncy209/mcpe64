@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
+#include <cstdlib>
+#include <cstring>
 
 Tesselator Tesselator::instance(sizeof(GLfloat) * MAX_FLOATS); // max size in bytes
 
@@ -136,6 +138,38 @@ RenderChunk Tesselator::end( bool useMine, int bufferId )
 	return RenderChunk();
 #endif
 
+}
+
+
+RenderChunk Tesselator::endClientCopy()
+{
+#ifndef STANDALONE_SERVER
+	if (!tesselating)
+		LOGI("not tesselating!\n");
+
+	if (!tesselating || _voidBeginEnd) return RenderChunk();
+
+	tesselating = false;
+	const int o_vertices = vertices;
+	RenderChunk out(1, o_vertices);
+	if (vertices > 0 && p > 0) {
+		const int bytes = p * sizeof(VERTEX);
+		out.clientData = malloc(bytes);
+		if (out.clientData != NULL) {
+			memcpy(out.clientData, _varray, bytes);
+			out.clientDataBytes = bytes;
+			out.ownsClientData = true;
+		} else {
+			out.vboId = 0;
+			out.vertexCount = 0;
+		}
+	}
+
+	clear();
+	return out;
+#else
+	return RenderChunk();
+#endif
 }
 
 void Tesselator::begin( int mode )

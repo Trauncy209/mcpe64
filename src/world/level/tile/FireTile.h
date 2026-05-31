@@ -130,12 +130,14 @@ public:
     }
 
     bool canBurn(LevelSource* level, int x, int y, int z) {
-        return flameOdds[level->getTile(x, y, z)] > 0;
+        int tile = level->getTile(x, y, z) & 0xff;
+        return tile > 0 && tile < Tile::NUM_BLOCK_TYPES && flameOdds[tile] > 0;
     }
 
     int getFlammability(Level* level, int x, int y, int z, int odds) {
 
-        int f = flameOdds[level->getTile(x, y, z)];
+        int tile = level->getTile(x, y, z) & 0xff;
+        int f = (tile > 0 && tile < Tile::NUM_BLOCK_TYPES) ? flameOdds[tile] : 0;
         if (f > odds) return f;
         return odds;
     }
@@ -242,9 +244,11 @@ private:
     }
 
     void checkBurn(Level* level, int x, int y, int z, int chance, Random* random) {
-		int odds = burnOdds[level->getTile(x, y, z)];
+		int tile = level->getTile(x, y, z) & 0xff;
+		if (tile <= 0 || tile >= Tile::NUM_BLOCK_TYPES) return;
+		int odds = burnOdds[tile];
         if (random->nextInt(chance) < odds) {
-            bool wasTnt = level->getTile(x, y, z) == Tile::tnt->id;
+            bool wasTnt = tile == Tile::tnt->id;
             if (random->nextInt(2) == 0) {
                 level->setTile(x, y, z, this->id);
             } else {
@@ -282,7 +286,7 @@ private:
     }
 
 	bool tryIgnite(Level* level, int x, int y, int z) {
-		int t = level->getTile(x, y, z);
+		int t = level->getTile(x, y, z) & 0xff;
         if (t == Tile::fire->id) return true;
         if (t == 0) {
             level->setTile(x, y, z, Tile::fire->id);

@@ -327,9 +327,11 @@ void Level::tickTiles() {
             int z = ((val >> 8) & 15);
             int y = ((val >> 16) & 127);
 
-            int id = lc->getTile(x, y, z);
-            if (Tile::shouldTick[id]) {
-                Tile::tiles[id]->tick(this, x + xo, y, z + zo, &random);
+            int id = lc->getTile(x, y, z) & 0xff;
+            if (id <= 0 || id >= Tile::NUM_BLOCK_TYPES) continue;
+            Tile* tile = Tile::tiles[id];
+            if (tile && Tile::shouldTick[id]) {
+                tile->tick(this, x + xo, y, z + zo, &random);
             }
         }
 		TIMER_POP();
@@ -350,8 +352,8 @@ bool Level::tickPendingTicks(bool force) {
 
 		int r = 8;
         if (hasChunksAt(td->x - r, td->y - r, td->z - r, td->x + r, td->y + r, td->z + r)) {
-            int id = getTile(td->x, td->y, td->z);
-            if (id == td->tileId && id > 0) {
+            int id = getTile(td->x, td->y, td->z) & 0xff;
+            if (id == td->tileId && id > 0 && id < Tile::NUM_BLOCK_TYPES && Tile::tiles[id]) {
                 Tile::tiles[id]->tick(this, td->x, td->y, td->z, &random);
             }
         }
@@ -1362,8 +1364,8 @@ void Level::addToTickNextTick(int x, int y, int z, int tileId, int tickDelay) {
     int r = 8;
     if (instaTick) {
         if (hasChunksAt(td.x - r, td.y - r, td.z - r, td.x + r, td.y + r, td.z + r)) {
-            int id = getTile(td.x, td.y, td.z);
-            if (id == td.tileId && id > 0) {
+            int id = getTile(td.x, td.y, td.z) & 0xff;
+            if (id == td.tileId && id > 0 && id < Tile::NUM_BLOCK_TYPES && Tile::tiles[id]) {
                 Tile::tiles[id]->tick(this, td.x, td.y, td.z, &random);
             }
         }

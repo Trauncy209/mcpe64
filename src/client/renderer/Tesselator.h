@@ -36,6 +36,7 @@ public:
     void begin(int mode);
 	void draw();
 	RenderChunk end(bool useMine, int bufferId);
+	RenderChunk endClientCopy();
 
 	void color(int c);
 	void color(int c, int alpha);

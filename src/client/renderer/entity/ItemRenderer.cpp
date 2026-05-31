@@ -230,9 +230,12 @@ void ItemRenderer::renderGuiItem(Font* font, Textures* textures, const ItemInsta
 
 void ItemRenderer::renderGuiItemDecorations(const ItemInstance* item, float x, float y) {
 	if (!item) return;
+	if (item->id <= 0 || item->id >= Item::MAX_ITEMS || !item->getItem()) return;
 	if (item->count > 0 && item->isDamaged()) {
-		float p = std::floor(13.5f - (float) item->getDamageValue() * 13.0f / (float) item->getMaxDamage());
-		int cc = (int) std::floor(255.5f - (float) item->getDamageValue() * 255.0f / (float) item->getMaxDamage());
+		const int maxDamage = item->getMaxDamage();
+		if (maxDamage <= 0) return;
+		float p = std::floor(13.5f - (float) item->getDamageValue() * 13.0f / (float) maxDamage);
+		int cc = (int) std::floor(255.5f - (float) item->getDamageValue() * 255.0f / (float) maxDamage);
 		//glDisable(GL_LIGHTING);
 		//glDisable(GL_DEPTH_TEST);
 		//glDisable(GL_TEXTURE_2D);

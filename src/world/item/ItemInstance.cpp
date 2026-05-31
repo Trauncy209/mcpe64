@@ -95,7 +95,8 @@ bool ItemInstance::isStackable( const ItemInstance* a, const ItemInstance* b ) {
 }
 
 bool ItemInstance::isDamageableItem() const {
-    return Item::items[id]->getMaxDamage() > 0;
+    Item* item = getItem();
+    return item && item->getMaxDamage() > 0;
 }
 
 /**
@@ -105,7 +106,8 @@ bool ItemInstance::isDamageableItem() const {
  * @return
  */
 bool ItemInstance::isStackedByData() const {
-    return Item::items[id]->isStackedByData();
+    Item* item = getItem();
+    return item && item->isStackedByData();
 }
 
 bool ItemInstance::isDamaged() const {
@@ -124,7 +126,8 @@ void ItemInstance::setAuxValue(int value) {
 }
 
 int ItemInstance::getMaxDamage() const {
-    return Item::items[id]->getMaxDamage();
+    Item* item = getItem();
+    return item ? item->getMaxDamage() : 0;
 }
 
 void ItemInstance::hurt(int i) {
@@ -194,7 +197,8 @@ bool ItemInstance::sameItem(ItemInstance* b) {
 }
 
 std::string ItemInstance::getDescriptionId() const {
-    return id? Item::items[id]->getDescriptionId(this) : "EmptyItemInstance";
+    Item* item = getItem();
+    return item ? item->getDescriptionId(this) : "EmptyItemInstance";
 }
 
 ItemInstance* ItemInstance::setDescriptionId(const std::string& id) {
@@ -258,11 +262,14 @@ ItemInstance* ItemInstance::fromTag( CompoundTag* tag ) {
 }
 
 Item* ItemInstance::getItem() const {
+	if (id <= 0 || id >= Item::MAX_ITEMS)
+		return NULL;
 	return Item::items[id];
 }
 
 int ItemInstance::getIcon() const {
-	return Item::items[id]->getIcon(this->auxValue);
+	Item* item = getItem();
+	return item ? item->getIcon(this->auxValue) : -1;
 }
 void ItemInstance::releaseUsing( Level* level, Player* player, int durationLeft ) {
 	getItem()->releaseUsing(this, level, player, durationLeft);

@@ -45,8 +45,8 @@ void Explosion::explode()
 					int xt = Mth::floor(xp);
 					int yt = Mth::floor(yp);
 					int zt = Mth::floor(zp);
-					int t = level->getTile(xt, yt, zt);
-					if (t > 0) {
+					int t = level->getTile(xt, yt, zt) & 0xff;
+					if (t > 0 && t < Tile::NUM_BLOCK_TYPES && Tile::tiles[t]) {
 						remainingPower -= (Tile::tiles[t]->getExplosionResistance(source) + 0.3f) * stepSize;
 					}
 					if (remainingPower > 0) {
@@ -104,9 +104,9 @@ void Explosion::explode()
 					int xt = tp.x;
 					int yt = tp.y;
 					int zt = tp.z;
-					int t = level->getTile(xt, yt, zt);
-					int b = level->getTile(xt, yt - 1, zt);
-					if (t == 0 && Tile::solid[b] && random.nextInt(3) == 0) {
+					int t = level->getTile(xt, yt, zt) & 0xff;
+					int b = level->getTile(xt, yt - 1, zt) & 0xff;
+					if (t == 0 && b > 0 && b < Tile::NUM_BLOCK_TYPES && Tile::solid[b] && random.nextInt(3) == 0) {
 						level->setTileNoUpdate(xt, yt, zt, ((Tile*)Tile::fire)->id);
 					}
 				}
@@ -124,7 +124,7 @@ void Explosion::finalizeExplosion()
 		int xt = tp.x;
 		int yt = tp.y;
 		int zt = tp.z;
-		int t = level->getTile(xt, yt, zt);
+		int t = level->getTile(xt, yt, zt) & 0xff;
 
 		do {
 			if (j & 7) break;
@@ -153,12 +153,13 @@ void Explosion::finalizeExplosion()
 			level->addParticle(PARTICLETYPE(smoke), xa, ya, za, xd, yd, zd);
 		} while (0);
 
-		if (t > 0) {
-			if (!level->isClientSide) Tile::tiles[t]->spawnResources(level, xt, yt, zt, level->getData(xt, yt, zt), 0.3f);
+		if (t > 0 && t < Tile::NUM_BLOCK_TYPES && Tile::tiles[t]) {
+			Tile* tile = Tile::tiles[t];
+			if (!level->isClientSide) tile->spawnResources(level, xt, yt, zt, level->getData(xt, yt, zt), 0.3f);
 			if (level->setTileNoUpdate(xt, yt, zt, 0))
 				level->updateNeighborsAt(xt, yt, zt, 0);
 			level->setTileDirty(xt, yt, zt);
-			if (!level->isClientSide) Tile::tiles[t]->wasExploded(level, xt, yt, zt);
+			if (!level->isClientSide) tile->wasExploded(level, xt, yt, zt);
 		}
 	}
 }

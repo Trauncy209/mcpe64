@@ -157,7 +157,10 @@ void Chunk::rebuild()
 		if (started) {
 
 #ifdef USE_VBO
-			renderChunk[l] = t.end(true, vboBuffers[l]);
+			if (renderChunk[l].ownsClientData && renderChunk[l].clientData != NULL) {
+				free(renderChunk[l].clientData);
+			}
+			renderChunk[l] = t.endClientCopy();
 			renderChunk[l].pos.x = (float)this->x;
 			renderChunk[l].pos.y = (float)this->y;
 			renderChunk[l].pos.z = (float)this->z;
@@ -204,8 +207,14 @@ void Chunk::reset()
 {
 	for (int i = 0; i < NumLayers; i++) {
 		empty[i] = true;
+		if (renderChunk[i].ownsClientData && renderChunk[i].clientData != NULL) {
+			free(renderChunk[i].clientData);
+		}
 		renderChunk[i].vboId = 0;
 		renderChunk[i].vertexCount = 0;
+		renderChunk[i].clientData = NULL;
+		renderChunk[i].clientDataBytes = 0;
+		renderChunk[i].ownsClientData = false;
 		renderChunk[i].pos.x = 0.0f;
 		renderChunk[i].pos.y = 0.0f;
 		renderChunk[i].pos.z = 0.0f;
