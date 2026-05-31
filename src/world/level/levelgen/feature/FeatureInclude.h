@@ -9,6 +9,7 @@
 #include "TreeFeature.h"
 #include "LakeFeature.h"
 #include "OreFeature.h"
+#include "PumpkinFeature.h"
 #include "ReedsFeature.h"
 #include "SpringFeature.h"
 

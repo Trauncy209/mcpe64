@@ -435,7 +435,8 @@ void Level::setInitialSpawn() {
     int xSpawn = infiniteWorld ? 0 : CHUNK_CACHE_WIDTH * CHUNK_WIDTH / 2;
     int ySpawn = 64;
     int zSpawn = infiniteWorld ? 0 : CHUNK_CACHE_WIDTH * CHUNK_DEPTH / 2;
-    while (!dimension->isValidSpawn(xSpawn, zSpawn)) {
+    int attempts = 0;
+    while (dimension && !dimension->isValidSpawn(xSpawn, zSpawn) && attempts++ < 4096) {
         xSpawn += random.nextInt(32) - random.nextInt(32);
         zSpawn += random.nextInt(32) - random.nextInt(32);
 
@@ -446,6 +447,17 @@ void Level::setInitialSpawn() {
 			if (zSpawn >= LEVEL_DEPTH-4) zSpawn -= 32;
         }
     }
+    if (!dimension || attempts >= 4096) {
+		// Last-resort spawn fallback: some generated chunks can expose air or
+		// unregistered tile IDs while the initial spawn search is still loading
+		// terrain. Do not crash or spin forever; put the player near the center
+		// and let validateSpawn / chunk loading settle the exact surface later.
+		xSpawn = infiniteWorld ? 0 : CHUNK_CACHE_WIDTH * CHUNK_WIDTH / 2;
+		zSpawn = infiniteWorld ? 0 : CHUNK_CACHE_WIDTH * CHUNK_DEPTH / 2;
+    }
+    ySpawn = getTopTileY(xSpawn, zSpawn) + 2;
+    if (ySpawn < 64) ySpawn = 64;
+    if (ySpawn >= DEPTH) ySpawn = DEPTH - 1;
     levelData.setSpawn(xSpawn, ySpawn, zSpawn);
     isFindingSpawn = false;
 }
@@ -475,7 +487,7 @@ void Level::validateSpawn() {
 
 int Level::getTopTile(int x, int z) {
     int y = 63;
-    while (!isEmptyTile(x, y + 1, z)) {
+    while (y + 1 < DEPTH && !isEmptyTile(x, y + 1, z)) {
         y++;
     }
     return getTile(x, y, z);
@@ -483,7 +495,7 @@ int Level::getTopTile(int x, int z) {
 
 int Level::getTopTileY(int x, int z) {
     int y = 63;
-    while (!isEmptyTile(x, y + 1, z)) {
+    while (y + 1 < DEPTH && !isEmptyTile(x, y + 1, z)) {
         y++;
     }
     return y;

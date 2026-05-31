@@ -2,7 +2,7 @@
 #define _MINECRAFT_APPCONSTANTS_H_
 
 
-#define APP_VERSION_STRING "0.5.17"
+#define APP_VERSION_STRING "0.5.18"
 #define APP_NAME "Minecraft - Pocket Edition " APP_VERSION_STRING
 
 

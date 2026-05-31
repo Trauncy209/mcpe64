@@ -38,7 +38,13 @@ void Dimension::init()
 
 /*virtual*/
 bool Dimension::isValidSpawn(int x, int z) {
+	if (!level) return false;
+
     int topTile = level->getTopTile(x, z);
+	if (topTile <= 0 || topTile >= Tile::NUM_BLOCK_TYPES)
+		return false;
+	if (Tile::tiles[topTile] == NULL)
+		return false;
 
 	if (topTile == Tile::invisible_bedrock->id)
 		return false;

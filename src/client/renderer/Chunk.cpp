@@ -204,6 +204,11 @@ void Chunk::reset()
 {
 	for (int i = 0; i < NumLayers; i++) {
 		empty[i] = true;
+		renderChunk[i].vboId = 0;
+		renderChunk[i].vertexCount = 0;
+		renderChunk[i].pos.x = 0.0f;
+		renderChunk[i].pos.y = 0.0f;
+		renderChunk[i].pos.z = 0.0f;
 	}
 	visible = false;
 	compiled = false;
@@ -219,6 +224,11 @@ int Chunk::getList( int layer )
 
 RenderChunk& Chunk::getRenderChunk( int layer )
 {
+	if (layer < 0 || layer >= NumLayers) layer = 0;
+	if (empty[layer] || renderChunk[layer].vertexCount <= 0 || renderChunk[layer].vboId == 0 || renderChunk[layer].vboId == (GLuint)-1) {
+		renderChunk[layer].vboId = 0;
+		renderChunk[layer].vertexCount = 0;
+	}
 	return renderChunk[layer];
 }
 

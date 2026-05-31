@@ -68,6 +68,7 @@ public:
 	void toggleDimension(){}
 	bool isCreativeMode();
 	void setIsCreativeMode(bool isCreative);
+	void toggleGameMode(bool persistToLevel = true);
 	void setScreen(Screen*);
 
 	virtual void selectLevel(const std::string& levelId, const std::string& levelName, const LevelSettings& settings);

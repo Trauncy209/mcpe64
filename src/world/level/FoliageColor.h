@@ -12,33 +12,19 @@ public:
        useTint = value;
     }
 
-//     static void init(int[] pixels) {
-//         FoliageColor::pixels = pixels;
-//     }
-//
-//     static int get(float temp, float rain) {
-//         rain *= temp;
-//         int x = (int) ((1 - temp) * 255);
-//         int y = (int) ((1 - rain) * 255);
-//         return pixels[y << 8 | x];
-//     }
-
-    static void init(int* p) {
-        pixels = p;
-    }
-
+    static void init(int* p);
     static int get(float temp, float rain);
 
     static int getEvergreenColor() {
-        return 0x619961;
+        return 0x2f6f3f;
     }
 
     static int getBirchColor() {
-        return 0x80a755;
+        return 0x8aaa45;
     }
 
     static int getDefaultColor() {
-        return 0x48b518;
+        return 0x4f8f32;
     }
 
 private:

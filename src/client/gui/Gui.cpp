@@ -153,6 +153,14 @@ int Gui::getNumSlots() {
 	return _numSlots;
 }
 
+int Gui::getItemBarSelectionSize() const {
+#ifndef PLATFORM_DESKTOP
+	return _numSlots > 0 ? _numSlots - 1 : 0;
+#else
+	return _numSlots;
+#endif
+}
+
 void Gui::flashSlot(int slotId) {
 	_flashSlotId = slotId;
 	_flashSlotStartTime = getTimeS();
@@ -210,7 +218,7 @@ void Gui::handleKeyPressed(int key)
 	}
 	else if (key == 4)
 	{
-		if (minecraft->player->inventory->selected < (getNumSlots() - 2))
+		if (minecraft->player->inventory->selected < (getItemBarSelectionSize() - 1))
 		{
 			minecraft->player->inventory->selected++;
 		}

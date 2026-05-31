@@ -16,6 +16,7 @@ LevelData::LevelData()
 		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(SharedConstants::GeneratorVersion)),
 		biomeGrassTint(true),
 		tallGrassEnabled(true),
+		betaWorldGeneration(false),
 		experimentalGameplayFeatures(false),
 	time(0),
 	dimension(Dimension::NORMAL),
@@ -48,6 +49,7 @@ LevelData::LevelData( const LevelSettings& settings, const std::string& levelNam
 		lavaSprings(settings.getLavaSprings()),
 		biomeGrassTint(settings.getBiomeGrassTint()),
 		tallGrassEnabled(settings.getTallGrassEnabled()),
+		betaWorldGeneration(settings.getBetaWorldGeneration()),
 		experimentalGameplayFeatures(settings.getExperimentalGameplayFeatures())
 {
 	//LOGI("ctor 2: %p\n", this);
@@ -70,6 +72,7 @@ LevelData::LevelData( CompoundTag* tag )
 		lavaSprings(LevelSettings::defaultLavaSpringsForGenerator(LGV_ORIGINAL)),
 		biomeGrassTint(true),
 		tallGrassEnabled(true),
+		betaWorldGeneration(false),
 		experimentalGameplayFeatures(false)
 {
 	//LOGI("ctor 3: %p (%p)\n", this, tag);
@@ -100,6 +103,7 @@ LevelData::LevelData( const LevelData& rhs )
 		lavaSprings(rhs.lavaSprings),
 		biomeGrassTint(rhs.biomeGrassTint),
 		tallGrassEnabled(rhs.tallGrassEnabled),
+		betaWorldGeneration(rhs.betaWorldGeneration),
 		experimentalGameplayFeatures(rhs.experimentalGameplayFeatures)
 {
 	//LOGI("c-ctor: %p (%p)\n", this, &rhs);
@@ -133,6 +137,7 @@ LevelData& LevelData::operator=( const LevelData& rhs )
 			lavaSprings = rhs.lavaSprings;
 			biomeGrassTint = rhs.biomeGrassTint;
 			tallGrassEnabled = rhs.tallGrassEnabled;
+			betaWorldGeneration = rhs.betaWorldGeneration;
 			experimentalGameplayFeatures = rhs.experimentalGameplayFeatures;
 		setPlayerTag(rhs.loadedPlayerTag);
 	}
@@ -224,6 +229,7 @@ void LevelData::setTagData( CompoundTag* tag, CompoundTag* playerTag )
 		tag->putByte("WorldGenLavaSprings", lavaSprings ? 1 : 0);
 		tag->putByte("BiomeGrassTint", biomeGrassTint ? 1 : 0);
 		tag->putByte("TallGrassEnabled", tallGrassEnabled ? 1 : 0);
+		tag->putByte("BetaWorldGeneration", betaWorldGeneration ? 1 : 0);
 		tag->putByte("ExperimentalGameplayFeatures", experimentalGameplayFeatures ? 1 : 0);
 	tag->putInt("Platform", 2);
 
@@ -260,6 +266,7 @@ void LevelData::getTagData( const CompoundTag* tag )
 		if (tag->contains("WorldGenLavaSprings", Tag::TAG_Byte)) lavaSprings = tag->getByte("WorldGenLavaSprings") != 0;
 		if (tag->contains("BiomeGrassTint", Tag::TAG_Byte)) biomeGrassTint = tag->getByte("BiomeGrassTint") != 0;
 		if (tag->contains("TallGrassEnabled", Tag::TAG_Byte)) tallGrassEnabled = tag->getByte("TallGrassEnabled") != 0;
+		if (tag->contains("BetaWorldGeneration", Tag::TAG_Byte)) betaWorldGeneration = tag->getByte("BetaWorldGeneration") != 0;
 		if (tag->contains("ExperimentalGameplayFeatures", Tag::TAG_Byte)) experimentalGameplayFeatures = tag->getByte("ExperimentalGameplayFeatures") != 0;
 
 	spawnMobs = (gameType == GameType::Survival);
@@ -452,5 +459,7 @@ bool LevelData::getBiomeGrassTint() const { return biomeGrassTint; }
 void LevelData::setBiomeGrassTint(bool enabled) { biomeGrassTint = enabled; }
 bool LevelData::getTallGrassEnabled() const { return tallGrassEnabled; }
 void LevelData::setTallGrassEnabled(bool enabled) { tallGrassEnabled = enabled; }
+bool LevelData::getBetaWorldGeneration() const { return betaWorldGeneration; }
+void LevelData::setBetaWorldGeneration(bool enabled) { betaWorldGeneration = enabled; }
 bool LevelData::getExperimentalGameplayFeatures() const { return experimentalGameplayFeatures; }
 void LevelData::setExperimentalGameplayFeatures(bool enabled) { experimentalGameplayFeatures = enabled; }

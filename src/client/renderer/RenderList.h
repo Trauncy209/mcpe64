@@ -18,7 +18,7 @@ public:
 	void add(int list);
 	void addR(const RenderChunk& chunk);
 
-	__inline void next() { ++listIndex; }
+	__inline void next() { if (listIndex < MAX_NUM_OBJECTS) ++listIndex; }
 
     void render();
 	void renderChunks();

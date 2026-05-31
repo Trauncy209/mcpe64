@@ -85,6 +85,7 @@ void InventoryPane::renderBatch( std::vector<GridItem>& items, float alpha )
 	for (unsigned int i = 0; i < items.size(); ++i) {
 		GridItem& item = items[i];
 		int j = item.id;
+		if (j < 0 || j >= (int)inventoryItems.size()) continue;
 		const ItemInstance* citem = inventoryItems[j];
 		if (!citem) continue;
 
@@ -130,6 +131,7 @@ void InventoryPane::renderBatch( std::vector<GridItem>& items, float alpha )
 		t.scale2d(ikText, ikText);
 		for (unsigned int i = 0; i < items.size(); ++i) {
 			GridItem& item = items[i];
+			if (item.id < 0 || item.id >= (int)inventoryItems.size()) continue;
 			const ItemInstance* citem = inventoryItems[item.id];
 			if (!citem) continue;
 
@@ -149,6 +151,7 @@ void InventoryPane::renderBatch( std::vector<GridItem>& items, float alpha )
 		t.beginOverride();
 		for (unsigned int i = 0; i < items.size(); ++i) {
 			GridItem& item = items[i];
+			if (item.id < 0 || item.id >= (int)inventoryItems.size()) continue;
 			const ItemInstance* citem = inventoryItems[item.id];
 			if (!citem || citem->isNull()) continue;
 

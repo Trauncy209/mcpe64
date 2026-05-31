@@ -9,6 +9,7 @@
 #include "LargeFeature.h"
 
 #include "../Level.h"
+#include "../storage/LevelData.h"
 #include "../tile/Tile.h"
 #include "../tile/GrassTile.h"
 
@@ -153,6 +154,15 @@ protected:
     void addFeature(Level* level, int x, int z, int xOffs, int zOffs, unsigned char* blocks, int blocksSize) {
         int caves = random.nextInt(random.nextInt(random.nextInt(40) + 1) + 1);
         if (random.nextInt(15) != 0) caves = 0;
+
+        // Give Beta World Generation the big, connected cave feel the user is
+        // asking for without touching Alpha worlds.  The caller's xOffs/zOffs
+        // are the chunk currently being generated; using LevelData here keeps
+        // this gated by the per-world button and reuses the stable cave carver.
+        if (level && level->getLevelData() && level->getLevelData()->getBetaWorldGeneration()) {
+            caves += 1 + random.nextInt(2);
+            if (random.nextInt(4) == 0) caves += random.nextInt(3);
+        }
 
         for (int cave = 0; cave < caves; cave++) {
             float xCave = (float)(x * 16 + random.nextInt(16));

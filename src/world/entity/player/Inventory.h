@@ -18,12 +18,15 @@ class Inventory: public FillingContainer
 public:
 	static const int INVENTORY_SIZE_DEMO = 27;
 	static const int MAX_SELECTION_SIZE = 9; // Including "More..." right now
+	static const int CREATIVE_SLOT_COUNT = 120;
 	static const int POP_TIME_DURATION = 5;
 
     Inventory(Player* player, bool creativeMode);
 	~Inventory();
 
 	void clearInventoryWithDefault();
+	void clearInventoryEmpty();
+	void setCreativeMode(bool creative);
 	//
 	// Selection slots
 	//

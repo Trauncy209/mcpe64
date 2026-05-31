@@ -39,6 +39,11 @@ OptionsGroup& OptionsGroup::addOptionItem( const Options::Option* option, Minecr
 	return *this;
 }
 
+OptionsGroup& OptionsGroup::addGameModeToggle(Minecraft* minecraft) {
+	createGameModeToggle(minecraft);
+	return *this;
+}
+
 void OptionsGroup::createToggle( const Options::Option* option, Minecraft* minecraft ) {
 	ImageDef def;
 	def.setSrc(IntRectangle(160, 206, 39, 20));
@@ -50,6 +55,20 @@ void OptionsGroup::createToggle( const Options::Option* option, Minecraft* minec
 	element->updateImage(&minecraft->options);
 	std::string itemLabel = Options::getCaption(option);
 	OptionsItem* item = new OptionsItem(itemLabel, element, option);
+	addChild(item);
+	setupPositions();
+}
+
+void OptionsGroup::createGameModeToggle( Minecraft* minecraft ) {
+	ImageDef def;
+	def.setSrc(IntRectangle(160, 206, 39, 20));
+	def.name = "gui/touchgui.png";
+	def.width = 39 * 0.7f;
+	def.height = 20 * 0.7f;
+	GameModeOptionButton* element = new GameModeOptionButton();
+	element->setImageDef(def, true);
+	element->updateImage(&minecraft->options);
+	OptionsItem* item = new OptionsItem("Game Mode", element, NULL);
 	addChild(item);
 	setupPositions();
 }

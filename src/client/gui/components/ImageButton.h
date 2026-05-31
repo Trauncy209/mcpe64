@@ -81,7 +81,7 @@ public:
 	OptionButton(const Options::Option* option, float onValue, float offValue);
 
 	void toggle(Options* options);
-	void updateImage(Options* options);
+	virtual void updateImage(Options* options);
 
 	static const int ButtonId = 9999999;
 protected:
@@ -89,7 +89,7 @@ protected:
 
 	virtual void mouseClicked( Minecraft* minecraft, int x, int y, int buttonNum );
 
-private:
+protected:
 
 	const Options::Option* _option;
 	bool _secondImage;
@@ -99,6 +99,16 @@ private:
 	float _onValue;
 	float _offValue;
 	float _current;
+};
+
+class GameModeOptionButton: public OptionButton
+{
+	typedef OptionButton super;
+public:
+	GameModeOptionButton();
+	virtual void updateImage(Options* options);
+protected:
+	virtual void mouseClicked( Minecraft* minecraft, int x, int y, int buttonNum );
 };
 
 

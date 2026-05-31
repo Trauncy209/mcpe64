@@ -20,6 +20,8 @@
 #include "../world/level/tile/Tile.h"
 #include "../world/level/storage/LevelStorageSource.h"
 #include "../world/level/storage/LevelStorage.h"
+#include "../world/level/storage/LevelData.h"
+#include "../world/level/LevelSettings.h"
 #include "player/input/KeyboardInput.h"
 #ifndef STANDALONE_SERVER
 #include "player/input/touchscreen/TouchInputHolder.h"
@@ -690,10 +692,8 @@ void Minecraft::tickInput() {
 		if (e.action == MouseAction::ACTION_WHEEL) {
 			Inventory* v = player->inventory;
 
-			int numSlots = gui.getNumSlots();
-#ifndef PLATFORM_DESKTOP
-			numSlots--;
-#endif
+			int numSlots = gui.getItemBarSelectionSize();
+			if (numSlots <= 0) continue;
 
 			int slot = (v->selected - e.dy + numSlots) % numSlots;
 			v->selectSlot(slot);
@@ -1524,6 +1524,33 @@ void Minecraft::setIsCreativeMode(bool isCreative)
 
 bool Minecraft::isCreativeMode() {
 	return _isCreativeMode;
+}
+
+void Minecraft::toggleGameMode(bool persistToLevel)
+{
+	const bool makeCreative = !isCreativeMode();
+	setIsCreativeMode(makeCreative);
+
+	if (level && level->getLevelData()) {
+		level->getLevelData()->setGameType(makeCreative ? GameType::Creative : GameType::Survival);
+		level->getLevelData()->setSpawnMobs(!makeCreative);
+		if (persistToLevel) level->saveLevelData();
+	}
+
+	if (player && player->inventory) {
+		// The player inventory object is kept alive across the in-game toggle.
+		// Keep its container-mode flag in sync too, or Survival chest pulls still
+		// behave like Creative until save/quit/rejoin constructs a new inventory.
+		player->inventory->setCreativeMode(makeCreative);
+		if (makeCreative) {
+			player->inventory->clearInventoryWithDefault();
+		} else {
+			// Do not carry the Creative drawer into Survival.  Players can still
+			// intentionally stock a chest in Creative first, then switch to Survival
+			// and retrieve those chest contents normally.
+			player->inventory->clearInventoryEmpty();
+		}
+	}
 }
 
 bool Minecraft::isKindleFire(int kindleVersion) {

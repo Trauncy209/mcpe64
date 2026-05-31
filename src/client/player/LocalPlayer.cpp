@@ -488,8 +488,10 @@ void LocalPlayer::openFurnace( FurnaceTileEntity* e ) {
 
 void LocalPlayer::openContainer( ChestTileEntity* container ) {
 #ifndef STANDALONE_SERVER
-	if (!minecraft->isCreativeMode())
-		minecraft->setScreen( new ChestScreen(this, container) );
+	// Allow chests in Creative.  This keeps the chest UI as the bridge for
+	// players who want to fill a chest while Creative is enabled, then switch
+	// back to Survival and use the stored contents normally.
+	minecraft->setScreen( new ChestScreen(this, container) );
 #endif
 }
 

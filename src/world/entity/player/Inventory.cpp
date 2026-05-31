@@ -9,7 +9,7 @@
 #include "../../level/tile/SandStoneTile.h"
 
 Inventory::Inventory( Player* player, bool creativeMode )
-:   super(	36 + Inventory::MAX_SELECTION_SIZE,
+:   super(	(creativeMode ? Inventory::CREATIVE_SLOT_COUNT : 36) + Inventory::MAX_SELECTION_SIZE,
 			MAX_SELECTION_SIZE,
 			ContainerType::INVENTORY,
 			creativeMode),
@@ -246,7 +246,12 @@ void Inventory::setupDefault() {
 		addItem(new ItemInstance(Item::dye_powder, 1, DyePowderItem::WHITE));
 		addItem(new ItemInstance(Item::hoe_iron));
 		if (player && player->level && player->level->getLevelData() && player->level->getLevelData()->getExperimentalGameplayFeatures()) {
-			addItem(new ItemInstance(Item::flintAndSteel));
+			// Experimental creative extras, restricted to entries that render cleanly
+			// through gui_blocks.png. Avoid the earlier red fallback icons/crash-prone
+			// item-only rows until their atlas mappings are verified one-by-one.
+			if (getSlot(Item::flintAndSteel->id) < 0) addItem(new ItemInstance(Item::flintAndSteel));
+			if (getSlot(Tile::ice->id) < 0) addItem(new ItemInstance(Tile::ice));
+			if (getSlot(Tile::topSnow->id) < 0) addItem(new ItemInstance(Tile::topSnow));
 		}
 #ifdef RPI
 		Sel[0] = addItem(new ItemInstance(Item::sword_iron));
@@ -284,7 +289,7 @@ void Inventory::setupDefault() {
 		}
 
 		if (item && _isCreative)
-			item->count = 5;
+			item->count = 64;
 	}
 
 	for (int i = 0; i < MAX_SELECTION_SIZE; ++i) {
@@ -298,6 +303,19 @@ void Inventory::clearInventoryWithDefault()
 {
 	clearInventory();
 	setupDefault();
+}
+
+void Inventory::clearInventoryEmpty()
+{
+	clearInventory();
+	for (int i = 0; i < MAX_SELECTION_SIZE; ++i) {
+		linkedSlots[i] = LinkedSlot(-1);
+	}
+}
+
+void Inventory::setCreativeMode(bool creative)
+{
+	setCreativeContainer(creative);
 }
 
 int Inventory::getAttackDamage( Entity* entity )

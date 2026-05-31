@@ -9,6 +9,7 @@
 #include "../../TweenData.h"
 #include "../../../player/input/touchscreen/TouchAreaModel.h"
 #include "../../../../AppPlatform.h"
+#include <vector>
 
 namespace Touch {
 
@@ -20,6 +21,14 @@ class IngameBlockSelectionScreen :	public Screen,
 public:
 	IngameBlockSelectionScreen();
 	virtual ~IngameBlockSelectionScreen();
+
+	enum CreativeCategory {
+		CATEGORY_BLOCKS = 0,
+		CATEGORY_ITEMS,
+		CATEGORY_FOOD,
+		CATEGORY_ARMOR,
+		CATEGORY_COUNT
+	};
 
 	virtual void init();
 	virtual void setupPositions();
@@ -41,6 +50,9 @@ protected:
 	virtual void mouseReleased(int x, int y, int buttonNum);
 private:
 	void renderDemoOverlay();
+	void rebuildCreativeItems();
+	void setCreativeCategory(int category);
+	void addCreativeItem(const ItemInstance& item);
 
 	//int getLinearSlotId(int x, int y);
 	int getSlotPosX(int slotX);
@@ -56,6 +68,13 @@ private:
 	TButton bCraft;
 	TButton bArmor;
 	TButton bMenu;
+	TButton bCatBlocks;
+	TButton bCatItems;
+	TButton bCatFood;
+	TButton bCatArmor;
+	std::vector<ItemInstance> creativeItems;
+	int creativeCategory;
+	int targetHotbarSlot;
 
 	IntRectangle clippingArea;
 

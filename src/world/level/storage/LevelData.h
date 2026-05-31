@@ -87,6 +87,8 @@ public:
 	void		setBiomeGrassTint(bool enabled);
 	bool		getTallGrassEnabled() const;
 	void		setTallGrassEnabled(bool enabled);
+	bool		getBetaWorldGeneration() const;
+	void		setBetaWorldGeneration(bool enabled);
 	bool		getExperimentalGameplayFeatures() const;
 	void		setExperimentalGameplayFeatures(bool enabled);
 
@@ -118,6 +120,7 @@ private:
 	bool	lavaSprings;
 	bool	biomeGrassTint;
 	bool	tallGrassEnabled;
+	bool	betaWorldGeneration;
 	bool	experimentalGameplayFeatures;
 };
 

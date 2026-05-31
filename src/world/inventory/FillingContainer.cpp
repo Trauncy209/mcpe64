@@ -312,6 +312,11 @@ int FillingContainer::getMaxStackSize() const
 	return MAX_INVENTORY_STACK_SIZE;
 }
 
+void FillingContainer::setCreativeContainer(bool creative)
+{
+	_isCreative = creative;
+}
+
 void FillingContainer::dropSlot( int slot, bool onlyClearContainer, bool randomly/*=false*/ )
 {
 	if (slot >= 0 && slot < numLinkedSlots)

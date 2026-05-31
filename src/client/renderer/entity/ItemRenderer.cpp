@@ -175,6 +175,8 @@ void ItemRenderer::renderGuiItem(Font* font, Textures* textures, const ItemInsta
 		return;
 	}
 	const int id = item->id;
+	if (id < 0 || id >= Item::MAX_ITEMS)
+		return;
 	if (!Item::items[id])
 		return;
 

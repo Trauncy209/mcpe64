@@ -158,3 +158,22 @@ void OptionButton::mouseClicked( Minecraft* minecraft, int x, int y, int buttonN
 		}
 	}
 }
+
+GameModeOptionButton::GameModeOptionButton()
+:	super(&Options::Option::THIRD_PERSON)
+{
+}
+
+void GameModeOptionButton::updateImage(Options* options)
+{
+	_secondImage = options && options->minecraft && options->minecraft->isCreativeMode();
+}
+
+void GameModeOptionButton::mouseClicked( Minecraft* minecraft, int x, int y, int buttonNum ) {
+	if(buttonNum == MouseAction::ACTION_LEFT) {
+		if(clicked(minecraft, x, y)) {
+			minecraft->toggleGameMode(true);
+			updateImage(&minecraft->options);
+		}
+	}
+}

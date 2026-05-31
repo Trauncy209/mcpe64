@@ -31,11 +31,13 @@ void RenderList::init(float xOff, float yOff, float zOff) {
 }
 
 void RenderList::add(int list) {
+	if (listIndex < 0 || listIndex >= MAX_NUM_OBJECTS) return;
 	lists[listIndex] = list;
-	if (listIndex == MAX_NUM_OBJECTS) /*lists.remaining() == 0)*/ render();
 }
 
 void RenderList::addR(const RenderChunk& chunk) {
+	if (listIndex < 0 || listIndex >= MAX_NUM_OBJECTS) return;
+	if (chunk.vboId == 0 || chunk.vboId == (GLuint)-1 || chunk.vertexCount <= 0) return;
 	rlists[listIndex] = chunk;
 }
 
@@ -47,6 +49,8 @@ void RenderList::render() {
 		listIndex = 0;
 		rendered = true;
 	}
+	if (bufferLimit <= 0) return;
+	if (bufferLimit > MAX_NUM_OBJECTS) bufferLimit = MAX_NUM_OBJECTS;
 	if (listIndex < bufferLimit) {
 		glPushMatrix2();
 		glTranslatef2(-xOff, -yOff, -zOff);
@@ -71,6 +75,7 @@ void RenderList::renderChunks() {
 
 	for (int i = 0; i < bufferLimit; ++i) {
 		RenderChunk& rc = rlists[i];
+		if (rc.vboId == 0 || rc.vboId == (GLuint)-1 || rc.vertexCount <= 0 || rc.vertexCount > 98304) continue;
 
 		glPushMatrix2();
 		glTranslatef2(rc.pos.x, rc.pos.y, rc.pos.z);
@@ -93,4 +98,6 @@ void RenderList::renderChunks() {
 void RenderList::clear() {
 	inited = false;
 	rendered = false;
+	listIndex = 0;
+	bufferLimit = 0;
 }

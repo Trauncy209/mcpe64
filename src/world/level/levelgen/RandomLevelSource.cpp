@@ -2,6 +2,8 @@
 
 #include "feature/FeatureInclude.h"
 #include "../Level.h"
+#include "../LevelSettings.h"
+#include "../storage/LevelData.h"
 #include "../ChunkPos.h"
 #include "../MobSpawner.h"
 #include "../biome/Biome.h"
@@ -42,6 +44,10 @@ RandomLevelSource::RandomLevelSource(Level* level, long seed, int version, bool 
 	printf("random.get : %d\n", randomCopy.nextInt());
 }
 
+bool RandomLevelSource::useBetaWorldGeneration() const {
+    return level && level->getLevelData() && level->getLevelData()->getBetaWorldGeneration();
+}
+
 RandomLevelSource::~RandomLevelSource() {
 
 	// chunks are deleted in the chunk cache instead
@@ -64,9 +70,16 @@ RandomLevelSource::~RandomLevelSource() {
 
 /*public*/
 void RandomLevelSource::prepareHeights(int xOffs, int zOffs, unsigned char* blocks, /*Biome*/void* biomes, float* temperatures) {
-	
+	if (useBetaWorldGeneration() && xOffs == 0 && zOffs == 0) {
+		LOGI("TruancyBetaWorld: flag-only safe generator path at spawn chunk\n");
+	}
+
 	int xChunks = 16 / CHUNK_WIDTH;
-    int waterHeight = Level::DEPTH - 64;
+    const bool betaWorldGeneration = useBetaWorldGeneration();
+    // Java Beta 1.7.3 uses sea level 64.  The legacy path here used DEPTH-64,
+    // which is lower in this fork, so the Beta button now makes oceans/lakes
+    // visibly broader without changing Alpha worlds.
+    int waterHeight = betaWorldGeneration ? 64 : (Level::DEPTH - 64);
 
     int xSize = xChunks + 1;
     int ySize = 128 / CHUNK_HEIGHT + 1;
@@ -137,7 +150,8 @@ void RandomLevelSource::prepareHeights(int xOffs, int zOffs, unsigned char* bloc
 }
 
 void RandomLevelSource::buildSurfaces(int xOffs, int zOffs, unsigned char* blocks, Biome** biomes) {
-    int waterHeight = Level::DEPTH - 64;
+    const bool betaWorldGeneration = useBetaWorldGeneration();
+    int waterHeight = betaWorldGeneration ? 64 : (Level::DEPTH - 64);
 
     float s = 1 / 32.0f;
     perlinNoise2.getRegion(sandBuffer, (float)(xOffs * 16), (float)(zOffs * 16), 0, 16, 16, 1, s, s, 1);
@@ -175,7 +189,7 @@ void RandomLevelSource::buildSurfaces(int xOffs, int zOffs, unsigned char* block
                             } else if (y >= waterHeight - 4 && y <= waterHeight + 1) {
                                 top = b->topMaterial;
 								material = b->material;
-								
+
 								//@attn: ?
                                 if (gravel) {
 									top = 0;
@@ -234,29 +248,34 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
     random.setSeed(((xt * xScale) + (zt * zScale)) ^ level->getSeed());
 
 	const LevelData* levelData = level->getLevelData();
+	const bool betaWorldGeneration = useBetaWorldGeneration();
+	if (betaWorldGeneration && xt == 0 && zt == 0) {
+		LOGI("TruancyBetaWorld: beta population rules active at spawn chunk\n");
+	}
 	const bool allowWaterLakes = !levelData || levelData->getWaterLakes();
 	const bool allowLavaLakes = levelData && levelData->getLavaLakes();
 	const bool allowWaterSprings = !levelData || levelData->getWaterSprings();
 	const bool allowLavaSprings = !levelData || levelData->getLavaSprings();
 
-	// //@todo: hide those chunks if they are aren't visible
-    if (allowWaterLakes && random.nextInt(4) == 0) {
-        int x = xo + random.nextInt(16) + 8;
-        int y = random.nextInt(128);
-        int z = zo + random.nextInt(16) + 8;
-        LakeFeature feature(Tile::calmWater->id);
-			feature.place(level, &random, x, y, z);
-    }
+	// Java Beta 1.7.3 population does lakes before ores/features. Keep this
+	// explicit and world-option-gated; Alpha worlds use their existing toggles.
+	if (allowWaterLakes && random.nextInt(4) == 0) {
+		int x = xo + random.nextInt(16) + 8;
+		int y = random.nextInt(128);
+		int z = zo + random.nextInt(16) + 8;
+		LakeFeature feature(Tile::calmWater->id);
+		feature.place(level, &random, x, y, z);
+	}
 
-    if (allowLavaLakes && random.nextInt(8) == 0) {
-        int x = xo + random.nextInt(16) + 8;
-        int y = random.nextInt(random.nextInt(120) + 8);
-        int z = zo + random.nextInt(16) + 8;
-        if (y < 64 || random.nextInt(10) == 0) {
+	if (allowLavaLakes && random.nextInt(8) == 0) {
+		int x = xo + random.nextInt(16) + 8;
+		int y = random.nextInt(random.nextInt(120) + 8);
+		int z = zo + random.nextInt(16) + 8;
+		if (y < 64 || random.nextInt(10) == 0) {
 			LakeFeature feature(Tile::calmLava->id);
 			feature.place(level, &random, x, y, z);
 		}
-    }
+	}
 
 	static float totalTime = 0;
 	const float st = getTimeS();
@@ -346,11 +365,11 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
     int forests = 0;//1; (java: 0)
     if (random.nextInt(10) == 0) forests += 1;
 
-    if (biome == Biome::forest) forests += oFor + 2; // + 5
-    if (biome == Biome::rainForest) forests += oFor + 2; //+ 5
-    if (biome == Biome::seasonalForest) forests += oFor + 1; // 2
+    if (biome == Biome::forest) forests += oFor + (betaWorldGeneration ? 5 : 2);
+    if (biome == Biome::rainForest) forests += oFor + (betaWorldGeneration ? 5 : 2);
+    if (biome == Biome::seasonalForest) forests += oFor + (betaWorldGeneration ? 2 : 1);
     if (biome == Biome::taiga) {
-		forests += oFor + 1; // + 5
+		forests += oFor + (betaWorldGeneration ? 5 : 1);
 		//LOGI("Biome is taiga!\n");
 	}
 
@@ -371,13 +390,21 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
 		//printf("placing tree at %d, %d, %d\n", x, y, z);
     }
 
-    for (int i = 0; i < 2; i++) {
-        int x = xo + random.nextInt(16) + 8;
-        int y = random.nextInt(128);
-        int z = zo + random.nextInt(16) + 8;
-        FlowerFeature feature(Tile::flower->id);
+	int yellowFlowerCount = 2;
+	if (betaWorldGeneration) {
+		yellowFlowerCount = 0;
+		if (biome == Biome::forest) yellowFlowerCount = 2;
+		else if (biome == Biome::seasonalForest) yellowFlowerCount = 4;
+		else if (biome == Biome::taiga) yellowFlowerCount = 2;
+		else if (biome == Biome::plains) yellowFlowerCount = 3;
+	}
+	for (int i = 0; i < yellowFlowerCount; i++) {
+		int x = xo + random.nextInt(16) + 8;
+		int y = random.nextInt(128);
+		int z = zo + random.nextInt(16) + 8;
+		FlowerFeature feature(Tile::flower->id);
 		feature.place(level, &random, x, y, z);
-    }
+	}
 
     if (random.nextInt(2) == 0) {
         int x = xo + random.nextInt(16) + 8;
@@ -404,12 +431,20 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
     }
 
 	int grassCount = 0;
-	if (biome == Biome::forest) grassCount = 3;
-	else if (biome == Biome::rainForest) grassCount = 12;
-	else if (biome == Biome::seasonalForest) grassCount = 4;
-	else if (biome == Biome::taiga) grassCount = 2;
-	else if (biome == Biome::plains) grassCount = 12;
-	else if (biome == Biome::shrubland) grassCount = 5;
+	if (betaWorldGeneration) {
+		if (biome == Biome::forest) grassCount = 2;
+		else if (biome == Biome::rainForest) grassCount = 10;
+		else if (biome == Biome::seasonalForest) grassCount = 2;
+		else if (biome == Biome::taiga) grassCount = 1;
+		else if (biome == Biome::plains) grassCount = 10;
+	} else {
+		if (biome == Biome::forest) grassCount = 3;
+		else if (biome == Biome::rainForest) grassCount = 12;
+		else if (biome == Biome::seasonalForest) grassCount = 4;
+		else if (biome == Biome::taiga) grassCount = 2;
+		else if (biome == Biome::plains) grassCount = 12;
+	}
+	if (biome == Biome::shrubland) grassCount = 5;
 	else if (biome == Biome::savanna) grassCount = 4;
 
 	if (level->getLevelData() == NULL || level->getLevelData()->getTallGrassEnabled()) {
@@ -435,17 +470,18 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
         ReedsFeature feature;
 		feature.place(level, &random, x, y, z);
     }
-	
 
-    //if (random.nextInt(32) == 0) {
-    //    int x = xo + random.nextInt(16) + 8;
-    //    int y = random.nextInt(128);
-    //    int z = zo + random.nextInt(16) + 8;
-    //    PumpkinFeature().place(level, random, x, y, z);
-    //}
 
+
+	if (betaWorldGeneration && random.nextInt(32) == 0) {
+		int x = xo + random.nextInt(16) + 8;
+		int y = random.nextInt(128);
+		int z = zo + random.nextInt(16) + 8;
+		PumpkinFeature feature;
+		feature.place(level, &random, x, y, z);
+	}
     int cacti = 0;
-    if (biome == Biome::desert) cacti += 5;
+    if (biome == Biome::desert) cacti += betaWorldGeneration ? 10 : 5;
 
     for (int i = 0; i < cacti; i++) {
         int x = xo + random.nextInt(16) + 8;
@@ -484,7 +520,7 @@ void RandomLevelSource::postProcess(ChunkSource* parent, int xt, int zt) {
     for (int x = xo + 8; x < xo + 8 + 16; x++)
         for (int z = zo + 8; z < zo + 8 + 16; z++) {
             int xp = x - (xo + 8);
-            int zp = z - (zo + 8); 
+            int zp = z - (zo + 8);
             int y = level->getTopSolidBlock(x, z);
             float temp = temperatures[xp * 16 + zp] - (y - 64) / 64.0f * SNOW_SCALE;
             if (temp < SNOW_CUTOFF) {
@@ -529,9 +565,10 @@ LevelChunk* RandomLevelSource::getChunk(int xOffs, int zOffs) {
     buildSurfaces(xOffs, zOffs, blocks, biomes);
 
 	const LevelData* levelData = level->getLevelData();
-	if (!levelData || levelData->getCaves())
+	const bool betaWorldGeneration = useBetaWorldGeneration();
+	if (!levelData || levelData->getCaves() || betaWorldGeneration)
 		caveFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
-	if (levelData && levelData->getRavines())
+	if ((levelData && levelData->getRavines()) || betaWorldGeneration)
 		canyonFeature.apply(this, level, xOffs, zOffs, blocks, LevelChunk::ChunkBlockCount);
     levelChunk->recalcHeightmap();
 

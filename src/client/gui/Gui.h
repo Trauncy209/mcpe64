@@ -31,6 +31,7 @@ public:
 	~Gui();
 
 	int getSlotIdAt(int x, int y);
+	int getItemBarSelectionSize() const;
 	void flashSlot(int slotId);
 	bool isInside(int x, int y);
 	RectangleArea getRectangleArea(int extendSide);

@@ -539,18 +539,24 @@ int LevelRenderer::renderChunks( int from, int to, int layer, float alpha )
 	_renderChunks.clear();
 	int count = 0;
 	for (int i = from; i < to; i++) {
+		Chunk* sortedChunk = sortedChunks[i];
+		if (sortedChunk == NULL || layer < 0 || layer >= 3) continue;
 		if (layer == 0) {
 			totalChunks++;
-			if (sortedChunks[i]->empty[layer]) emptyChunks++;
-			else if (!sortedChunks[i]->visible) offscreenChunks++;
-			else if (occlusionCheck && !sortedChunks[i]->occlusion_visible) occludedChunks++;
+			if (sortedChunk->empty[layer]) emptyChunks++;
+			else if (!sortedChunk->visible) offscreenChunks++;
+			else if (occlusionCheck && !sortedChunk->occlusion_visible) occludedChunks++;
 			else renderedChunks++;
 		}
 
-		if (!sortedChunks[i]->empty[layer] && sortedChunks[i]->visible && sortedChunks[i]->occlusion_visible) {
-			int list = sortedChunks[i]->getList(layer);
+		if (!sortedChunk->empty[layer] && sortedChunk->visible && sortedChunk->occlusion_visible) {
+			int list = sortedChunk->getList(layer);
 			if (list >= 0) {
-				_renderChunks.push_back(sortedChunks[i]);
+				#ifdef USE_VBO
+				RenderChunk& rc = sortedChunk->getRenderChunk(layer);
+				if (rc.vboId == 0 || rc.vboId == (GLuint)-1 || rc.vertexCount <= 0) continue;
+				#endif
+				_renderChunks.push_back(sortedChunk);
 				count++;
 			}
 		}
@@ -567,10 +573,15 @@ int LevelRenderer::renderChunks( int from, int to, int layer, float alpha )
 
 	for (unsigned int i = 0; i < _renderChunks.size(); ++i) {
 		Chunk* chunk = _renderChunks[i];
+		if (chunk == NULL) continue;
 		#ifdef USE_VBO
-			renderList.addR(chunk->getRenderChunk(layer));
+			RenderChunk& rc = chunk->getRenderChunk(layer);
+			if (rc.vboId == 0 || rc.vboId == (GLuint)-1 || rc.vertexCount <= 0) continue;
+			renderList.addR(rc);
 		#else
-			renderList.add(chunk->getList(layer));
+			int list = chunk->getList(layer);
+			if (list < 0) continue;
+			renderList.add(list);
 		#endif
 		renderList.next();
 	}

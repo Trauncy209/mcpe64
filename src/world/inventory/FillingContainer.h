@@ -49,6 +49,7 @@ public:
 	std::string		getName() const;
 	int				getContainerSize() const;
 	int				getMaxStackSize() const;
+	void			setCreativeContainer(bool creative);
 
 	void			setContainerChanged();
 

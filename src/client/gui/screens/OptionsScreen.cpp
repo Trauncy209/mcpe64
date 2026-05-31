@@ -54,6 +54,7 @@ void OptionsScreen::init() {
 	buttons.push_back(bHeader);
 	buttons.push_back(btnClose);
 
+
 	if (showProfileButtons) {
 		btnChangeUsername = new Button(10, "Username");
 		btnCredits = new Button(11, "Credits");
@@ -162,8 +163,11 @@ void OptionsScreen::generateOptionScreens() {
 	optionPanes.push_back(new OptionsPane());
 	optionPanes.push_back(new OptionsPane());
 
-	optionPanes[0]->createOptionsGroup("options.group.game")
-		.addOptionItem(&Options::Option::DIFFICULTY, minecraft)
+	OptionsGroup& gameOptions = optionPanes[0]->createOptionsGroup("options.group.game")
+		.addOptionItem(&Options::Option::DIFFICULTY, minecraft);
+	if (returnToPause)
+		gameOptions.addGameModeToggle(minecraft);
+	gameOptions
 		.addOptionItem(&Options::Option::SERVER_VISIBLE, minecraft)
 		.addOptionItem(&Options::Option::THIRD_PERSON, minecraft)
 		.addOptionItem(&Options::Option::HIDE_GUI, minecraft)
