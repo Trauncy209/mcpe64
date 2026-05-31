@@ -9,6 +9,7 @@ This project is about keeping the soul of old MCPE while pushing it forward on m
 We want to preserve what made early Pocket Edition special, fix what was broken, and steadily build a better version of it in public.
 
 [![Download Latest Release](https://img.shields.io/badge/Download-Latest%20Release-2ea44f?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/releases/latest)
+[![Join the Discord](https://img.shields.io/badge/Join%20the%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/pnN65AvKu)
 [![Release](https://img.shields.io/github/v/release/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/Trauncy209/TruancyCraftPE/total?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/releases)
 [![Stars](https://img.shields.io/github/stars/Trauncy209/TruancyCraftPE?style=for-the-badge)](https://github.com/Trauncy209/TruancyCraftPE/stargazers)
@@ -17,7 +18,9 @@ We want to preserve what made early Pocket Edition special, fix what was broken,
 
 **Download here:** https://github.com/Trauncy209/TruancyCraftPE/releases/latest
 
-If you want updates as they drop, **star the repo and turn on notifications/watch it** — releases are frequent and you do not want to miss out.
+**Join the community:** https://discord.gg/pnN65AvKu
+
+If you want updates as they drop, **star the repo, join the Discord, and turn on notifications/watch it** — releases are frequent and you do not want to miss out.
 
 
 ## Screenshots
