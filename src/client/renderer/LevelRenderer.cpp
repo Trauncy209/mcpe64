@@ -72,6 +72,8 @@ LevelRenderer::LevelRenderer( Minecraft* mc)
 	LOGI("numBuffers: %d\n", numListsOrBuffers);
 	//for (int i = 0; i < numListsOrBuffers; ++i) printf("bufId %d: %d\t", i, chunkBuffers[i]);
 
+	skyBuffer = 0;
+	skyVertexCount = 0;
 	glGenBuffers2(1, &skyBuffer);
 	generateSky();
 #else
@@ -1032,7 +1034,9 @@ void LevelRenderer::renderSky(float alpha) {
     glColor4f2(sr, sg, sb, 1.0f);
 
 #ifdef OPENGL_ES
-	drawArrayVT(skyBuffer, skyVertexCount);
+	// Adreno on newer Android builds is crashing inside GLESv1 glDrawArrays
+	// from the retained sky VBO path. The sky plane is cosmetic, so skip this
+	// VBO draw entirely instead of risking a native driver crash.
 #endif
     glEnable2(GL_TEXTURE_2D);
 }
@@ -1249,12 +1253,18 @@ void LevelRenderer::renderHitSelect( Player* player, const HitResult& h, int mod
 
 void LevelRenderer::onGraphicsReset()
 {
-	generateSky();
-
 	// Get new buffers
 #ifdef OPENGL_ES
+	if (skyBuffer != 0 && skyBuffer != (GLuint)-1) {
+		glDeleteBuffers(1, &skyBuffer);
+	}
+	skyBuffer = 0;
+	skyVertexCount = 0;
+	glGenBuffers2(1, &skyBuffer);
+	generateSky();
 	glGenBuffers2(numListsOrBuffers, chunkBuffers);
 #else
+	generateSky();
 	chunkLists = glGenLists(numListsOrBuffers);
 #endif
 
