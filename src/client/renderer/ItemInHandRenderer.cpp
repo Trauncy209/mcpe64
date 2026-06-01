@@ -68,6 +68,10 @@ void ItemInHandRenderer::tick()
 
 void ItemInHandRenderer::renderItem(Mob* mob,  ItemInstance* item )
 {
+	if (item == NULL || item->count <= 0 || item->id <= 0 || item->id >= Item::MAX_ITEMS || item->getItem() == NULL) {
+		return;
+	}
+
 	//Stopwatch& w = handler.get("item:" + Tile::tiles[item->id]->getDescriptionId());
 	//w.start();
 
@@ -101,7 +105,7 @@ void ItemInHandRenderer::renderItem(Mob* mob,  ItemInstance* item )
 	//const int aux = item->getAuxValue();
 
 	if (renderObject.itemId == -1 || reTesselate) {
-		if (item->id < 256 && TileRenderer::canRender(Tile::tiles[item->id]->getRenderShape())) {
+		if (item->id < 256 && Tile::tiles[item->id] != NULL && TileRenderer::canRender(Tile::tiles[item->id]->getRenderShape())) {
 			Tesselator& t = Tesselator::instance;
 			t.beginOverride();
 
@@ -110,6 +114,11 @@ void ItemInHandRenderer::renderItem(Mob* mob,  ItemInstance* item )
 				renderedItemId = ((Tile*)Tile::leaves_carried)->id;
 			if (renderedItemId == Tile::grass->id)
 				renderedItemId = Tile::grass_carried->id;
+			if (renderedItemId <= 0 || renderedItemId >= 256 || Tile::tiles[renderedItemId] == NULL) {
+				t.endOverride(renderObject.chunk.vboId);
+				renderObject.itemId = -1;
+				return;
+			}
 			tileRenderer.renderTile(Tile::tiles[renderedItemId], item->getAuxValue());
 			renderObject.chunk = t.endOverride(renderObject.chunk.vboId);
 
@@ -131,6 +140,11 @@ void ItemInHandRenderer::renderItem(Mob* mob,  ItemInstance* item )
 			Tesselator& t = Tesselator::instance;
 			t.beginOverride();
 			t.color(0xff, 0xff, 0xff);
+			if (itemIcon < 0) {
+				t.endOverride(renderObject.chunk.vboId);
+				renderObject.itemId = -1;
+				return;
+			}
 			const int up = itemIcon & 15;
 			const int vp = itemIcon >> 4;
 			float u1 = (up * 16 + 0.00f) / 256.0f;
@@ -325,7 +339,12 @@ void ItemInHandRenderer::render( float a )
 				glRotatef(45 + 290, 0, 0, 1);
 			}
 		}
-		if (item->getItem()->isMirroredArt()) {
+		Item* renderItemType = item->getItem();
+		if (renderItemType == NULL) {
+			glPopMatrix2();
+			return;
+		}
+		if (renderItemType->isMirroredArt()) {
 			glRotatef2(180, 0, 1, 0);
 		}
 		glEnableClientState2(GL_VERTEX_ARRAY);
