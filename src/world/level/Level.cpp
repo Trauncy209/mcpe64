@@ -879,10 +879,15 @@ void Level::setBrightness(const LightLayer& layer, int x, int y, int z, int brig
     if (y >= DEPTH) return;
     if (!hasChunk(x >> 4, z >> 4)) return;
     LevelChunk* c = getChunk(x >> 4, z >> 4);
+    if (!c || c->isEmpty()) return;
     c->setBrightness(layer, x & 15, y, z & 15, brightness);
-    for (unsigned int i = 0; i < _listeners.size(); i++) {
-        _listeners[i]->tileBrightnessChanged(x, y, z);
-    }
+
+    // On modern Android/Adreno, the game-mode toggle can enqueue hundreds of
+    // lighting writes while the renderer is rebuilding chunks on the GL thread.
+    // Calling tileBrightnessChanged for every nibble write dirties render chunks
+    // re-entrantly and has produced use-after-free/corrupted-header crashes.
+    // Tile changes still dirty geometry through tileChanged/setTilesDirty; pure
+    // light updates are safe to leave for the normal rebuild cadence.
 }
 
 float Level::getBrightness(int x, int y, int z) {
@@ -1168,7 +1173,9 @@ void Level::addListener(LevelListener* listener) {
 
 void Level::removeListener(LevelListener* listener) {
 	ListenerList::iterator it = std::find(_listeners.begin(), _listeners.end(), listener);
-	_listeners.erase(it);
+	if (it != _listeners.end()) {
+		_listeners.erase(it);
+	}
 }
 
 std::vector<AABB>& Level::getCubes(const Entity* source, const AABB& box_) { //@attn: check the AABB* new/delete stuff

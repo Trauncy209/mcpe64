@@ -1530,12 +1530,18 @@ bool Minecraft::isCreativeMode() {
 void Minecraft::toggleGameMode(bool persistToLevel)
 {
 	const bool makeCreative = !isCreativeMode();
+
+	// Keep this hot-path intentionally tiny. The old implementation did a
+	// level.dat save from the UI click while the local RakNet host/client and GL
+	// renderer were live; the crash log shows Scudo heap corruption surfacing in
+	// RakPeer::RunUpdateCycle immediately after switching modes. Do not touch the
+	// network save/packet path here. Persisted mode is saved by the normal level
+	// save path when leaving/pausing.
 	setIsCreativeMode(makeCreative);
 
 	if (level && level->getLevelData()) {
 		level->getLevelData()->setGameType(makeCreative ? GameType::Creative : GameType::Survival);
 		level->getLevelData()->setSpawnMobs(!makeCreative);
-		if (persistToLevel) level->saveLevelData();
 	}
 
 	if (player && player->inventory) {

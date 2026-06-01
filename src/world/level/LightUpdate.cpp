@@ -100,10 +100,13 @@ void LightUpdate::update(Level* level)
 
             if (ok) {
 
-                if (y0 < 0) y0 = 0;
-                if (y1 >= Level::DEPTH) y1 = Level::DEPTH - 1;
+                int yy0 = y0;
+                int yy1 = y1;
+                if (yy0 < 0) yy0 = 0;
+                if (yy1 >= Level::DEPTH) yy1 = Level::DEPTH - 1;
+                if (yy0 > yy1) continue;
 
-                for (int y = y0; y <= y1; y++) {
+                for (int y = yy0; y <= yy1; y++) {
                     int old = level->getBrightness(*layer, x, y, z);
 
                     int target = 0;
